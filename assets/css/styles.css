@@ -807,6 +807,7 @@ button{
     font-size: var(--normal-font-size);
     color: var(--contact-success-color);
     position: absolute;
+    transform: .3s;
     animation: buttons .3s linear;
     display: none;
 }
