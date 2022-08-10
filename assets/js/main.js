@@ -171,7 +171,14 @@ form.addEventListener('submit', e => {
                 failure.style.display = 'none'
             }, 2000)
         })
-        .catch(error => console.error('Error!', error.message))
+        .catch(error => {
+            console.error('Error!', error.message)
+            failure.style.display = 'block'
+            setTimeout(() => {
+                success.style.display = 'none'
+                failure.style.display = 'none'
+            }, 3000)
+        })
 })
 
 
