@@ -169,7 +169,7 @@ form.addEventListener('submit', e => {
             setTimeout(() => {
                 success.style.display = 'none'
                 failure.style.display = 'none'
-            }, 2000)
+            }, 3000)
         })
         .catch(error => {
             console.error('Error!', error.message)
