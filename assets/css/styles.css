@@ -375,12 +375,12 @@ button{
     background-color: var(--first-color-alt);
 }
 
-.download__button:hover .button__icon{
-    transform: translateY(.25rem);
-}
-
 .contact__button:hover .button__icon{
     transform: translateX(.25rem);
+}
+
+.download__button:hover .button__icon{
+    transform: translateY(.25rem);
 }
 
 .button__icon{

@@ -180,5 +180,3 @@ form.addEventListener('submit', e => {
             }, 3000)
         })
 })
-
-
