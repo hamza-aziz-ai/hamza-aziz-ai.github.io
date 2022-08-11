@@ -231,6 +231,12 @@ img {
   }
 }
 
+@media screen and (max-height: 640px){
+  .home {
+    padding-top: 5.2rem;
+  }
+}
+
 /* For medium devices */
 @media screen and (min-width: 767px) {
   .nav {
