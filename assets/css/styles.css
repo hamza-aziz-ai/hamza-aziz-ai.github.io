@@ -866,7 +866,9 @@ button{
     row-gap: 1.5rem;
 }
 
-.footer__link:hover{
+.footer__link:hover,
+.footer__social:hover,
+.footer__coffee:hover{
     color: var(--first-color-lighter);
 }
 
@@ -875,21 +877,27 @@ button{
     margin-right: var(--mb-1-5);
 }
 
-.footer__social:hover{
-    color: var(--first-color);
-}
-
-.footer__copy{
+.footer__donation{
     font-size: var(--small-font-size);
     text-align: center;
-    color: rgb(220, 220, 220);
     margin-top: var(--mb-3);
+}
+
+.coffee__icon{
+    font-size: 1rem;
+    margin-right: var(--mb-0-5);
+}
+
+.footer__coffee{
+    display: inline-flex;
+    align-items: end;
 }
 
 .footer__title,
 .footer__subtitle,
 .footer__link,
-.footer__social{
+.footer__social,
+.footer__donation a{
     color: #FFF;
 }
 
