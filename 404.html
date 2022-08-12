@@ -1,87 +1,100 @@
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en">
 
-        <!--==================== FAVICON ====================-->
-        <link rel="icon" type="image/x-icon" href="./404-assets/img/file-slash.svg" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!--=============== BOXICONS ===============-->
-        <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <!--==================== Google tag (gtag.js) ====================-->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XGQ5FPX2YF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-        <!--=============== CSS ===============-->
-        <link rel="stylesheet" href="404-assets/css/styles.css">
+        gtag('config', 'G-XGQ5FPX2YF');
+    </script>
 
-        <title>Error 404</title>
-    </head>
-    <body>
-        <!--==================== HEADER ====================-->
-        <header class="header">
-            <nav class="nav container">
-                <a href="index.html" class="nav__logo">
-                    HAMZA AZIZ
-                </a>
+    <!--==================== FAVICON ====================-->
+    <link rel="icon" type="image/x-icon" href="./404-assets/img/file-slash.svg" />
 
-                <div class="nav__menu" id="nav-menu">
-                    <ul class="nav__list">
-                        <li class="nav__item">
-                            <a href="index.html#home" class="nav__link">Home</a>
-                        </li>
-                        <li class="nav__item">
-                            <a href="index.html#about" class="nav__link">About</a>
-                        </li>
-                        <li class="nav__item">
-                            <a href="index.html#contact" class="nav__link">Contact</a>
-                        </li>
-                    </ul>
+    <!--=============== BOXICONS ===============-->
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 
-                    <div class="nav__close" id="nav-close">
-                        <i class='bx bx-x'></i>
-                    </div>
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="404-assets/css/styles.css">
+
+    <title>Error 404</title>
+</head>
+
+<body>
+    <!--==================== HEADER ====================-->
+    <header class="header">
+        <nav class="nav container">
+            <a href="index.html" class="nav__logo">
+                HAMZA AZIZ
+            </a>
+
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html#home" class="nav__link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#about" class="nav__link">About</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="index.html#contact" class="nav__link">Contact</a>
+                    </li>
+                </ul>
+
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
+            </div>
+
+            <!-- Toggle button -->
+            <div class="nav__toggle" id="nav-toggle">
+                <i class='bx bx-grid-alt'></i>
+            </div>
+        </nav>
+    </header>
+
+    <!--==================== MAIN ====================-->
+    <main class="main">
+        <!--==================== HOME ====================-->
+        <section class="home">
+            <div class="home__container container">
+                <div class="home__data">
+                    <span class="home__subtitle">Error 404</span>
+                    <h1 class="home__title">Hey Buddy</h1>
+                    <p class="home__description">
+                        We can't seem to find the page <br> you are looking for.
+                    </p>
+                    <a href="index.html#home" class="home__button">
+                        Go Home
+                    </a>
                 </div>
 
-                <!-- Toggle button -->
-                <div class="nav__toggle" id="nav-toggle">
-                    <i class='bx bx-grid-alt'></i>
+                <div class="home__img">
+                    <img src="404-assets/img/ghost-img.png" alt="">
+                    <div class="home__shadow"></div>
                 </div>
-            </nav>
-        </header>
+            </div>
 
-        <!--==================== MAIN ====================-->
-        <main class="main">
-            <!--==================== HOME ====================-->
-            <section class="home">
-                <div class="home__container container">
-                    <div class="home__data">
-                        <span class="home__subtitle">Error 404</span>
-                        <h1 class="home__title">Hey Buddy</h1>
-                        <p class="home__description">
-                            We can't seem to find the page <br> you are looking for.
-                        </p>
-                        <a href="index.html#home" class="home__button">
-                            Go Home
-                        </a>
-                    </div>
+            <footer class="home__footer">
+                <span><a href="tel:+918447644188" class="footer__contact">+91-8447644188</a></span>
+                <span>|</span>
+                <span><a href="mailto:hamzaaziz822@gmail.com" class="footer__email">hamzaaziz822@gmail.com</a></span>
+            </footer>
+        </section>
+    </main>
 
-                    <div class="home__img">
-                        <img src="404-assets/img/ghost-img.png" alt="">
-                        <div class="home__shadow"></div>
-                    </div>
-                </div>
+    <!--=============== SCROLLREVEAL ===============-->
+    <script src="404-assets/js/scrollreveal.min.js"></script>
 
-                <footer class="home__footer">
-                    <span><a href="tel:+918447644188" class="footer__contact">+91-8447644188</a></span>
-                    <span>|</span>
-                    <span><a href="mailto:hamzaaziz822@gmail.com" class="footer__email">hamzaaziz822@gmail.com</a></span>
-                </footer>
-            </section>
-        </main>
+    <!--=============== MAIN JS ===============-->
+    <script src="404-assets/js/main.js"></script>
+</body>
 
-        <!--=============== SCROLLREVEAL ===============-->
-        <script src="404-assets/js/scrollreveal.min.js"></script>
-
-        <!--=============== MAIN JS ===============-->
-        <script src="404-assets/js/main.js"></script>
-    </body>
 </html>
