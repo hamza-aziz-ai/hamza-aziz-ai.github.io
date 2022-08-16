@@ -380,7 +380,7 @@ button{
 }
 
 .download__button:hover .button__icon{
-    transform: translateY(.25rem);
+    transform: translate(.25rem, -0.25rem);
 }
 
 .button__icon{
