@@ -315,11 +315,26 @@ img{
     font-size: var(--big-font-size);
 }
 
-.home__subtitle{
-    font-size: var(--h3-font-size);
+.home__subtitle,
+.home__subtitle-company{
     color: var(--text-color);
     font-weight: var(--font-medium);
+}
+
+.home__subtitle{
+    font-size: var(--h2-font-size);
+}
+
+.home__subtitle-company{
+    font-size: var(--h3-font-size);
     margin-bottom: var(--mb-0-75);
+    display: inline-flex;
+    align-items: center;
+}
+
+.home__subtitle-company-logo{
+    margin-right: 7px;
+    width: 30px;
 }
 
 .home__description{
@@ -380,7 +395,7 @@ button{
 }
 
 .download__button:hover .button__icon{
-    transform: translate(.25rem, -0.25rem);
+    transform: translateY(.25rem);
 }
 
 .button__icon{
@@ -427,7 +442,8 @@ button{
 }
 
 .about__description{
-    text-align: center;
+    text-align: justify;
+    text-justify: inter-word;
     margin-bottom: var(--mb-2-5);
 }
 
@@ -1084,7 +1100,8 @@ button{
     }
 
     .about__description{
-        text-align: initial;
+        text-align: justify;
+        text-justify: inter-word;
     }
 
     .about__info{
