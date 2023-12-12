@@ -1520,7 +1520,8 @@ body.dark-theme {
     }
 
     .qualification__container {
-        column-gap: 14rem;
+        grid-template-columns: repeat(2, 450px);
+        column-gap: 5rem;
     }
 
     .qualification__title {
