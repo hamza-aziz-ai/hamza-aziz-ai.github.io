@@ -1165,6 +1165,10 @@ body.dark-theme {
         right: -2.5rem;
     }
 
+    .button__ghost {
+        padding: 0.4rem;
+    }
+
     .contact__data {
         width: 100%;
     }
