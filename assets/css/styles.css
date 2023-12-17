@@ -161,6 +161,11 @@ body.dark-theme {
     background-color: var(--container-color);
 }
 
+.dark-theme .contact__button:hover {
+    background-color: var(--black-color-light);
+    transition: background-color 0.4s;
+}
+
 .dark-theme .footer {
     background-color: hsl(0, 0%, 4%);
 }
@@ -539,10 +544,11 @@ body.dark-theme {
     font-size: 1.25rem;
     cursor: pointer;
     overflow: hidden;
-    transition: background-color 0.2s;
+    transition: transform 0.4s, background-color 0.2s;
 }
 
 .home__scroll-box:hover {
+    transform: translateY(0.5rem);
     background-color: var(--first-color);
 }
 
@@ -1533,7 +1539,8 @@ body.dark-theme {
 
     .home__scroll:hover .home__scroll-box + .home__scroll-text {
         color: var(--title-color);
-        transition: color 0.4s;
+        transform: translateY(0.5rem);
+        transition: transform 0.4s, color 0.4s;
     }
 
     .home__profile .geometric-box {
