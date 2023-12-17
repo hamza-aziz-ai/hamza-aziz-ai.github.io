@@ -1261,7 +1261,7 @@ body.dark-theme {
 
 /*=============== BREAKPOINTS ===============*/
 /* For small devices */
-@media screen and (max-width: 340px) {
+@media screen and (max-width: 380px) {
     .conatiner {
         margin-inline: 1rem;
     }
