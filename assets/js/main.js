@@ -41,10 +41,11 @@ window.addEventListener('scroll', shadowHeader)
 const contactForm = document.getElementById('contact-form'),
     contactMessage = document.getElementById('contact-message')
 
+// Send email to yourself
 const sendEmail = (event) => {
     event.preventDefault()
 
-    // serviceID - templateID - #form - publicKey
+    // Send email to yourself
     emailjs.sendForm('service_obsgdao', 'template_vk9tpdr', '#contact-form', 'nR5d5T3c8oH0B55An')
         .then(() => {
             // Show sent message
@@ -55,6 +56,9 @@ const sendEmail = (event) => {
                 contactMessage.textContent = ""
             }, 5000)
 
+            // Send a confirmation email to the user
+            sendConfirmationEmail()
+
             // Clear input fields
             contactForm.reset()
 
@@ -64,7 +68,33 @@ const sendEmail = (event) => {
         })
 }
 
+// Send confirmation email to the user
+const sendConfirmationEmail = () => {
+    // Get user email from the form
+    const userEmail = document.getElementById('email').value
+    const userName = document.getElementById('name').value
+    const userSubject = document.getElementById('subject').value
+    const userMessage = document.getElementById('message').value
+
+    // Prepare params for the email template
+    const templateParams = {
+        from_name: userName,
+        subject: userSubject,
+        message: userMessage,
+        reply_to: userEmail
+    }
+
+    // Send the confirmation email
+    emailjs.send('service_obsgdao', 'template_9uhgscf', templateParams, 'nR5d5T3c8oH0B55An')
+        .then(() => {
+            console.log("Confirmation email sent to the user successfully")
+        }, () => {
+            console.error("Failed to send confirmation email")
+        })
+}
+
 contactForm.addEventListener('submit', sendEmail)
+
 
 /*=============== SHOW SCROLL UP ===============*/
 const scrollUp = () => {
