@@ -51,13 +51,13 @@ const sendEmail = (event) => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
 
+	    // Send a confirmation email to the user
+            sendConfirmationEmail()
+
             // Remove message after five seconds
             setTimeout(() => {
                 contactMessage.textContent = ""
             }, 5000)
-
-            // Send a confirmation email to the user
-            sendConfirmationEmail()
 
             // Clear input fields
             contactForm.reset()
