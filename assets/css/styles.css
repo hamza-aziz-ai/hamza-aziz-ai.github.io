@@ -1799,3 +1799,26 @@ body.dark-theme {
         font-size: 1.5rem;
     }
 }
+
+.matrimony-card {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: var(--container-color);
+  color: var(--title-color);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: none;
+}
+.matrimony-card p {
+  margin-bottom: 0.5rem;
+}
+.matrimony-card .button {
+  background-color: var(--first-color);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+}
