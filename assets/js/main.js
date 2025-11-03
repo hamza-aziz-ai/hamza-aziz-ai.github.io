@@ -170,3 +170,18 @@ sr.reveal(`.home__name, .home__info, .about__container .section-title-1, .about_
 sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, {origin: "left"})
 sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, {origin: "right"})
 sr.reveal(`.projects__card, .qualification__content`, {interval: 100})
+
+/*=============== MATRIMONY CARD SHOW ===============*/
+const matrimonyCard = document.querySelector('.matrimony-card');
+const toggleMatrimonyCard = () => {
+  if (!matrimonyCard) return;
+  // When the user is near the bottom of the page, show the card
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const threshold = document.body.offsetHeight - 50;
+  if (scrollPosition >= threshold) {
+    matrimonyCard.style.display = 'block';
+  } else {
+    matrimonyCard.style.display = 'none';
+  }
+};
+window.addEventListener('scroll', toggleMatrimonyCard);
