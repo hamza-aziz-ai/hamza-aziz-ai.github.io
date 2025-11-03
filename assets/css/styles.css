@@ -68,8 +68,7 @@ body {
     font-size: var(--normal-font-size);
     background-color: var(--body-color);
     color: var(--text-color);
-    transition: background-color 0.4s;
-    /* For dark mode */
+    transition: background-color 0.4s; /* For dark mode */
     user-select: none;
 }
 
@@ -789,19 +788,16 @@ body.dark-theme {
     20% {
         transform: translateY(-6px);
     }
-
     40% {
         transform: translateY(0);
     }
-
     60% {
         transform: translateY(-3px);
     }
-
     80% {
         transform: translateY(0);
     }
-
+    
 }
 
 /*=============== QUALIFICATION ===============*/
@@ -1099,8 +1095,8 @@ body.dark-theme {
 }
 
 /* Move label up & sticky label */
-.contact__input:focus+.contact__label,
-.contact__input:not(:placeholder-shown).contact__input:not(:focus)+.contact__label {
+.contact__input:focus + .contact__label,
+.contact__input:not(:placeholder-shown).contact__input:not(:focus) + .contact__label {
     opacity: 1;
     top: -16px;
 }
@@ -1312,7 +1308,6 @@ body.dark-theme {
 
 /* For medium devices */
 @media screen and (min-width: 576px) {
-
     .home__container,
     .about__container,
     .projects__container,
@@ -1403,7 +1398,7 @@ body.dark-theme {
     .geometric-box {
         transform: scale(1.2);
     }
-
+    
     .nav {
         height: calc(var(--header-height) + 2rem);
         column-gap: 4rem;
@@ -1547,7 +1542,7 @@ body.dark-theme {
         font-size: 1.5rem;
     }
 
-    .home__scroll:hover .home__scroll-box+.home__scroll-text {
+    .home__scroll:hover .home__scroll-box + .home__scroll-text {
         color: var(--title-color);
         transform: translateY(0.5rem);
         transition: transform 0.4s, color 0.4s;
