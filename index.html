@@ -23,16 +23,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.4.0/remixicon.css" crossorigin="">
 
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" href="assets/css/styles.css">
 
-    <title>Hamza Aziz - AI/ML Engineer</title>
-</head>
-
-<body>
-    <!--==================== HEADER ====================-->
-    <header class="header" id="header">
-        <nav class="nav container">
+            
             <a href="#" class="nav__logo">
                 <span class="nav__logo-circle">H</span>
                 <span class="nav__logo-name">Hamza Aziz.</span>
@@ -861,4 +853,22 @@
     <script src="assets/js/main.js"></script>
 </body>
 
+        <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const matrimonyCard = document.getElementById('matrimony-card');
+        function toggleMatrimonyCard() {
+          if (!matrimonyCard) return;
+          const scrollPosition = window.innerHeight + window.scrollY;
+          const threshold = document.body.offsetHeight - 50;
+          if (scrollPosition >= threshold) {
+            matrimonyCard.classList.add('show');
+          } else {
+            matrimonyCard.classList.remove('show');
+          }
+        }
+        window.addEventListener('scroll', toggleMatrimonyCard);
+        window.addEventListener('load', toggleMatrimonyCard);
+      });
+    </script
+    
 </html>
