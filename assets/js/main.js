@@ -156,6 +156,29 @@ themeButton.addEventListener('click', () => {
     localStorage.setItem('selected-icon', getCurrentIcon())
 })
 
+/*=============== PAGE TRANSITION TO MATRIMONY ===============*/
+const transitionOverlay = document.getElementById('page-transition')
+const transitionLinks = document.querySelectorAll('a.transition-link[data-transition="matrimony"]')
+
+const startTransition = (url) => {
+    if (!transitionOverlay) {
+        window.location.href = url
+        return
+    }
+    document.body.classList.add('is-transitioning')
+    setTimeout(() => {
+        window.location.href = url
+    }, 350)
+}
+
+transitionLinks.forEach(link => {
+    link.addEventListener('click', (event) => {
+        event.preventDefault()
+        const url = link.getAttribute('href')
+        startTransition(url)
+    })
+})
+
 /*=============== SCROLL REVEAL ANIMATION ===============*/
 const sr = ScrollReveal({
     origin: 'top',

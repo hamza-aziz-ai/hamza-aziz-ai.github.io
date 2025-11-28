@@ -7,8 +7,15 @@
 
   /*========== Colors ==========*/
   /*Color mode HSL(hue, saturation, lightness)*/
-  --first-color: hsl(38, 69%, 59%);
-  --text-color: hsl(38, 8%, 8%);
+  --first-color: hsl(14, 98%, 50%);
+  --black-color: hsl(0, 0%, 0%);
+  --black-color-light: hsl(0, 0%, 40%);
+  --white-color: hsl(0, 0%, 95%);
+  --title-color: hsl(0, 0%, 0%);
+  --text-color: hsl(0, 0%, 35%);
+  --text-color-light: hsl(0, 0%, 64%);
+  --body-color: hsl(0, 0%, 87%);
+  --container-color: hsl(0, 0%, 83%);
 
   /*========== Font and typography ==========*/
   /*.5rem = 8px | 1rem = 16px ...*/
@@ -39,6 +46,8 @@ body {
   font-size: var(--normal-font-size);
   font-weight: 500;
   color: var(--text-color);
+  background-color: var(--body-color);
+  transition: background-color .4s, color .4s;
 }
 
 ul {
@@ -69,7 +78,7 @@ img {
 .header {
   position: fixed;
   width: 100%;
-  background-color: transparent;
+  background-color: var(--body-color);
   top: 0;
   left: 0;
   z-index: 100;
@@ -80,6 +89,12 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.nav__buttons {
+  display: flex;
+  align-items: center;
+  column-gap: 1rem;
 }
 
 .nav__logo, 
@@ -97,17 +112,29 @@ img {
   cursor: pointer;
 }
 
+.change-theme {
+  font-size: 1.25rem;
+  color: var(--title-color);
+  cursor: pointer;
+  transition: color .3s;
+}
+
 @media screen and (max-width: 767px) {
   .nav__menu {
     position: fixed;
-    background-color: var(--first-color);
+    background-color: var(--black-color);
     left: 0;
     top: -100%;
     width: 100%;
     padding: 5rem 0 4rem;
     border-radius: 0 0 1.5rem 1.5rem;
-    box-shadow: 0 2px 4px hsla(38, 4%, 15%, .15);
+    box-shadow: 0 2px 4px hsla(0, 0%, 0%, .25);
     transition: .4s;
+  }
+
+  .nav__menu .nav__link,
+  .nav__close {
+    color: var(--white-color);
   }
 }
 
@@ -119,7 +146,7 @@ img {
 }
 
 .nav__link {
-  color: var(--text-color);
+  color: var(--title-color);
 }
 
 .nav__close {
@@ -138,7 +165,7 @@ img {
 
 /*=============== HOME ===============*/
 .home {
-  background-color: var(--first-color);
+  background-color: var(--body-color);
   padding: 9rem 0 2rem;
   height: 100vh;
   display: grid;
@@ -154,28 +181,35 @@ img {
   text-align: center;
 }
 
+.home__subtitle {
+  color: var(--first-color);
+}
+
 .home__title {
   font-size: var(--biggest-font-size);
   margin: .75rem 0;
+  color: var(--title-color);
 }
 
 .home__button {
   margin-top: 2rem;
   display: inline-block;
-  background-color: var(--text-color);
-  color: #fff;
+  background-color: var(--black-color);
+  color: var(--white-color);
   padding: .80rem 1.5rem;
   border-radius: 3rem;
-  transition: .4s;
+  transition: background-color .4s, box-shadow .4s;
 }
 
 .home__button:hover {
-  box-shadow: 0 4px 12px hsla(38, 69%, 8%, .2);
+  background-color: var(--first-color);
+  box-shadow: 0 4px 12px hsla(14, 98%, 35%, .25);
 }
 
 .home__img img {
   width: 230px;
   animation: floaty 1.8s infinite alternate;
+  filter: grayscale(1) brightness(1.08) contrast(0.95);
 }
 
 .home__img {
@@ -185,7 +219,7 @@ img {
 .home__shadow {
   width: 130px;
   height: 24px;
-  background-color: hsla(38, 21%, 19%, .16);
+  background-color: hsla(0, 0%, 0%, .18);
   margin: 0 auto;
   border-radius: 50%;
   filter: blur(7px);
@@ -201,7 +235,7 @@ img {
 }
 
 .footer__contact, .footer__email {
-  color: #fff;
+  color: var(--text-color);
 }
 
 /* Animate ghost */
@@ -221,6 +255,21 @@ img {
   100% {
     transform: scale(.85, .85);
   }
+}
+
+/*=============== DARK THEME ===============*/
+body.dark-theme {
+  --first-color: hsl(14, 80%, 50%);
+  --black-color: hsl(0, 0%, 18%);
+  --black-color-light: hsl(0, 0%, 30%);
+  --title-color: hsl(0, 0%, 95%);
+  --text-color: hsl(0, 0%, 70%);
+  --body-color: hsl(0, 0%, 8%);
+  --container-color: hsl(0, 0%, 12%);
+}
+
+.dark-theme .home__shadow {
+  background-color: hsla(0, 0%, 100%, .12);
 }
 
 /*=============== BREAKPOINTS ===============*/
