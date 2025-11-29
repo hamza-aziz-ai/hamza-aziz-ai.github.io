@@ -51,7 +51,7 @@ const sendEmail = (event) => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
 
-	    // Send a confirmation email to the user
+            // Send a confirmation email to the user
             sendConfirmationEmail()
 
             // Remove message after five seconds
@@ -98,31 +98,31 @@ contactForm.addEventListener('submit', sendEmail)
 
 /*=============== SHOW SCROLL UP ===============*/
 const scrollUp = () => {
-	const scrollUp = document.getElementById('scroll-up')
+    const scrollUp = document.getElementById('scroll-up')
     // When the scroll is higher than 350 viewport height, add the show-scroll class to the a tag with the scrollup class
-	this.scrollY >= 350 ? scrollUp.classList.add('show-scroll')
-						: scrollUp.classList.remove('show-scroll')
+    this.scrollY >= 350 ? scrollUp.classList.add('show-scroll')
+        : scrollUp.classList.remove('show-scroll')
 }
 window.addEventListener('scroll', scrollUp)
 
 /*=============== SCROLL SECTIONS ACTIVE LINK ===============*/
 const sections = document.querySelectorAll('section[id]')
 
-const scrollActive = () =>{
+const scrollActive = () => {
     const scrollDown = window.scrollY
 
-  sections.forEach(current =>{
-      const sectionHeight = current.offsetHeight,
+    sections.forEach(current => {
+        const sectionHeight = current.offsetHeight,
             sectionTop = current.offsetTop - 58,
             sectionId = current.getAttribute('id'),
             sectionsClass = document.querySelector('.nav__menu a[href*=' + sectionId + ']')
 
-      if(scrollDown > sectionTop && scrollDown <= sectionTop + sectionHeight){
-          sectionsClass.classList.add('active-link')
-      }else{
-          sectionsClass.classList.remove('active-link')
-      }                                                    
-  })
+        if (scrollDown > sectionTop && scrollDown <= sectionTop + sectionHeight) {
+            sectionsClass.classList.add('active-link')
+        } else {
+            sectionsClass.classList.remove('active-link')
+        }
+    })
 }
 window.addEventListener('scroll', scrollActive)
 
@@ -141,9 +141,9 @@ const getCurrentIcon = () => themeButton.classList.contains(iconTheme) ? 'ri-moo
 
 // We validate if the user previously chose a topic
 if (selectedTheme) {
-  // If the validation is fulfilled, we ask what the issue was to know if we activated or deactivated the dark
-  document.body.classList[selectedTheme === 'dark' ? 'add' : 'remove'](darkTheme)
-  themeButton.classList[selectedIcon === 'ri-moon-line' ? 'add' : 'remove'](iconTheme)
+    // If the validation is fulfilled, we ask what the issue was to know if we activated or deactivated the dark
+    document.body.classList[selectedTheme === 'dark' ? 'add' : 'remove'](darkTheme)
+    themeButton.classList[selectedIcon === 'ri-moon-line' ? 'add' : 'remove'](iconTheme)
 }
 
 // Activate / deactivate the theme manually with the button
@@ -188,8 +188,8 @@ const sr = ScrollReveal({
     // reset: true // Animations repeat
 })
 
-sr.reveal(`.home__profile, .about__image, .contact__mail`, {origin: "right"})
-sr.reveal(`.home__name, .home__info, .about__container .section-title-1, .about__info, .contact__social, .contact__data`, {origin: "left"})
-sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, {origin: "left"})
-sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, {origin: "right"})
-sr.reveal(`.projects__card, .qualification__content`, {interval: 100})
+sr.reveal(`.home__profile, .about__image, .contact__mail`, { origin: "right" })
+sr.reveal(`.home__name, .home__info, .about__container .section-title-1, .about__info, .contact__social, .contact__data`, { origin: "left" })
+sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, { origin: "left" })
+sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, { origin: "right" })
+sr.reveal(`.projects__card, .qualification__content`, { interval: 100 })

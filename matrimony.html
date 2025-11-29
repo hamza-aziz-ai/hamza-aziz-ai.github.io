@@ -1,13 +1,24 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--=============== Google tag (gtag.js) ===============-->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KJ0EQRJDCN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-KJ0EQRJDCN');
+    </script>
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.4.0/remixicon.css" crossorigin="">
     <link rel="stylesheet" href="assets/css/matrimony.css">
     <title>Hamza Aziz - Matrimony Profile</title>
 </head>
+
 <body>
     <div class="page-transition" id="page-transition"></div>
     <header class="header" id="header">
@@ -16,10 +27,37 @@
                 <span class="nav__logo-circle">H</span>
                 <span class="nav__logo-name">Hamza Aziz.</span>
             </a>
+
+            <div class="nav__menu" id="nav-menu">
+                <span class="nav__title">Menu</span>
+
+                <h3 class="nav__name">Hamza</h3>
+
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="index.html" class="nav__link transition-link" data-transition="professional">Switch to
+                            Professional</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#contact" class="nav__link">Contact</a>
+                    </li>
+                </ul>
+
+                <div class="nav__close" id="nav-close">
+                    <i class="ri-close-line"></i>
+                </div>
+            </div>
+
             <div class="nav__actions">
-                <a href="index.html" class="button button--ghost transition-link" data-transition="professional">Switch to Professional</a>
-                <a href="#contact" class="button button--ghost">Connect</a>
+                <div class="nav__quick-links">
+                    <a href="index.html" class="button button--ghost transition-link"
+                        data-transition="professional">Switch to Professional</a>
+                    <a href="#contact" class="button button--ghost">Contact</a>
+                </div>
                 <i class="ri-moon-line change-theme" id="theme-button"></i>
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class="ri-menu-4-line"></i>
+                </div>
             </div>
         </nav>
     </header>
@@ -29,17 +67,25 @@
             <div class="container grid hero__grid">
                 <div class="hero__intro">
                     <span class="pill">Matrimony Profile</span>
-                    <h1 class="hero__title">Hamza Aziz</h1>
-                    <p class="hero__tagline">Grounded, curious, and family-centered professional with a passion for technology and meaningful connections.</p>
+                    <div class="hero__header">
+                        <div class="hero__portrait">
+                            <img src="assets/img/matrimony-profile/profile-5.jpg" alt="Hamza Aziz portrait">
+                        </div>
+                        <div class="hero__text">
+                            <h1 class="hero__title">Hamza Aziz</h1>
+                            <p class="hero__tagline">Grounded, curious, and family-centered professional with a passion
+                                for technology and meaningful connections.</p>
+                        </div>
+                    </div>
                     <div class="hero__highlights">
                         <div class="highlight">
                             <span class="highlight__label">Age</span>
-                            <span class="highlight__value" id="age-highlight">27</span>
+                            <span class="highlight__value" id="age-highlight"></span>
                             <span class="highlight__note">DOB: 23 Aug 2001</span>
                         </div>
                         <div class="highlight">
                             <span class="highlight__label">Location</span>
-                            <span class="highlight__value">Ghaziabad, Uttar Pradesh (Delhi NCR)</span>
+                            <span class="highlight__value"><a class="detail__link" href="https://maps.app.goo.gl/LpvjQn289iCd9Tz18" target="_blank" rel="noopener">Ghaziabad, Uttar Pradesh (Delhi NCR)</a></span>
                         </div>
                         <div class="highlight">
                             <span class="highlight__label">Profession</span>
@@ -56,13 +102,40 @@
                         </div>
                     </div>
                     <div class="card__body">
-                        <p>AI Developer with a balance of ambition and humility. I value integrity, kindness, and building a warm household where families feel welcome.</p>
+                        <p>AI Developer with a balance of ambition and humility. I value integrity, kindness, and
+                            building a warm household where families feel welcome.</p>
                         <ul class="card__list">
-                            <li><i class="ri-heart-2-line"></i> Interests: Fitness, reading, photography, community work</li>
-                            <li><i class="ri-community-line"></i> Family: Close-knit and supportive; value shared traditions</li>
+                            <li><i class="ri-heart-2-line"></i> Hobbies: Investments, technical blogging, reading,
+                                cherishing family moments</li>
+                            <li><i class="ri-community-line"></i> Family: Close-knit and supportive; value shared
+                                traditions</li>
                             <li><i class="ri-flag-line"></i> Values: Honesty, respect, growth, and partnership</li>
                         </ul>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="more-about section">
+            <div class="container">
+                <h2 class="section__title">More About Myself and My Family</h2>
+                <div class="more__text">
+                    <p class="more__paragraph">Assalam alaykum! I'm Hamza Aziz, an <span class="text-strong">AI
+                            Developer</span> at <a class="detail__link text-highlight text-normal" href="https://voiceplug.ai/" target="_blank" rel="noopener">VoicePlug Inc.</a> and a Computer
+                        Science graduate (2023) from <a class="detail__link text-highlight text-normal" href="https://www.abesit.in/course/b-tech-cse/" target="_blank" rel="noopener">ABES Institute of Technology</a>. I'm also pursuing my Executive M.Tech
+                        in AI & ML from <a class="detail__link text-highlight text-normal" href="https://bits-pilani-wilp.ac.in/m-tech/artificial-intelligence-and-machine-learning.php" target="_blank" rel="noopener">BITS Pilani</a>. I try my best to maintain a healthy balance between <span
+                            class="text-brush">Deen and Dunya</span>, value emotional intelligence, and believe in
+                        keeping a peaceful, respectful home environment.</p>
+                    <p class="more__paragraph">I live with my mother in Ghaziabad; she is a humble and soft-hearted
+                        woman who has shaped my values through her kindness and faith. My father passed away in 2021,
+                        and his teachings of <span class="text-underline">integrity and hard work</span> continue to
+                        guide me.</p>
+                    <p class="more__paragraph">I'm looking for a kind, respectful, and emotionally mature partner who
+                        prioritizes Deen, values family bonding, and brings warmth and positivity into the home. Someone
+                        soft-natured, caring, and able to embrace my mother with love would be deeply cherished. I
+                        believe a successful marriage is built on <span class="text-italic">mutual respect</span>,
+                        understanding, and companionship.</p>
+                    <p class="more__paragraph">For transparency, I'm sharing my profiles: <a class="detail__link" href="https://www.linkedin.com/in/hamzaziizzz/" target="_blank" rel="noopener">LinkedIn</a> shows my professional track and financial stability, and <a class="detail__link" href="https://www.instagram.com/hamzaziizzz/" target="_blank" rel="noopener">Instagram</a> offers a window into my everyday life and values.</p>
                 </div>
             </div>
         </section>
@@ -74,12 +147,48 @@
                     <p class="gallery__note">A few moments that reflect my everyday life and interests.</p>
                 </div>
                 <div class="gallery__grid">
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-1.jpg" alt="Hamza Aziz photo 1"></div>
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-2.jpg" alt="Hamza Aziz photo 2"></div>
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-3.jpg" alt="Hamza Aziz photo 3"></div>
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-4.jpg" alt="Hamza Aziz photo 4"></div>
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-5.jpg" alt="Hamza Aziz photo 5"></div>
-                    <div class="gallery__item"><img src="assets/img/matrimony-profile/profile-6.jpg" alt="Hamza Aziz photo 6"></div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-1.jpg" alt="Hamza Aziz photo 1">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-1.jpg" download
+                            title="Download photo 1">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-2.jpg" alt="Hamza Aziz photo 2">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-2.jpg" download
+                            title="Download photo 2">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-3.jpg" alt="Hamza Aziz photo 3">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-3.jpg" download
+                            title="Download photo 3">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-4.jpg" alt="Hamza Aziz photo 4">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-4.jpg" download
+                            title="Download photo 4">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-5.jpg" alt="Hamza Aziz photo 5">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-5.jpg" download
+                            title="Download photo 5">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
+                    <div class="gallery__item">
+                        <img src="assets/img/matrimony-profile/profile-6.jpg" alt="Hamza Aziz photo 6">
+                        <a class="gallery__download" href="assets/img/matrimony-profile/profile-6.jpg" download
+                            title="Download photo 6">
+                            <i class="ri-download-2-line"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -103,25 +212,46 @@
 
         <section class="details section" id="contact">
             <div class="container grid details__grid">
-                <div>
+                <div class="details__block">
                     <h2 class="section__title">Personal Snapshot</h2>
                     <div class="detail__card">
                         <div class="detail__row"><span>Height</span><span>5'5"</span></div>
-                        <div class="detail__row"><span>Education</span><span>M.Tech (AI & ML), BITS Pilani (WILP), through 2027</span></div>
-                        <div class="detail__row"><span>Work</span><span>AI Product Engineer @ <a class="inline-link" href="https://voiceplug.ai/" target="_blank" rel="noopener">VoicePlug Inc.</a></span></div>
+                        <div class="detail__row"><span>Education</span><span>M.Tech (AI & ML), <a class="detail__link" href="https://bits-pilani-wilp.ac.in/m-tech/artificial-intelligence-and-machine-learning.php" target="_blank" rel="noopener">BITS Pilani (WILP)</a>,
+                                through 2027</span></div>
+                        <div class="detail__row"><span>Work</span><span>AI Product Engineer @ <a class="inline-link"
+                                    href="https://voiceplug.ai/" target="_blank" rel="noopener">VoicePlug
+                                    Inc.</a></span></div>
                         <div class="detail__row"><span>Lifestyle</span><span>Non-smoker, health-conscious</span></div>
-                        <div class="detail__row"><span>Outlook</span><span>Moderate, family values with a modern mindset</span></div>
-                        <div class="detail__row"><span>Graduation</span><span>B.Tech, CSE, ABES Institute of Technology (2023)</span></div>
+                        <div class="detail__row"><span>Outlook</span><span>Moderate, family values with a modern
+                                mindset</span></div>
+                        <div class="detail__row"><span>Graduation</span><span>B.Tech, CSE, <a class="detail__link" href="https://www.abesit.in/course/b-tech-cse/" target="_blank" rel="noopener">ABES Institute of Technology</a>
+                                (2023)</span></div>
                     </div>
                 </div>
-                <div>
+                <div class="details__block">
                     <h2 class="section__title">Partner Preferences</h2>
                     <div class="detail__card">
                         <div class="detail__row"><span>Values</span><span>Kind, empathetic, family-oriented</span></div>
-                        <div class="detail__row"><span>Education</span><span>Graduate or above</span></div>
-                        <div class="detail__row"><span>Faith</span><span>Muslim; open-minded toward shared growth</span></div>
-                        <div class="detail__row"><span>Interests</span><span>Appreciates learning, travel, and community</span></div>
-                        <div class="detail__row"><span>Location</span><span>Ghaziabad, Uttar Pradesh (Delhi NCR)</span></div>
+                        <div class="detail__row"><span>Education</span><span>B.Tech, B.Arch, or BCA/MCA (technical background preferred)</span></div>
+                        <div class="detail__row"><span>Faith</span><span>Muslim; open-minded toward shared growth</span>
+                        </div>
+                        <div class="detail__row"><span>Interests</span><span>Appreciates learning, travel, and
+                                family-moments</span></div>
+                        <div class="detail__row"><span>Location</span><span><a class="detail__link" href="https://maps.app.goo.gl/LpvjQn289iCd9Tz18" target="_blank" rel="noopener">Aligarh, Lucknow or Delhi NCR</a></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="details__block details__block--full">
+                    <h2 class="section__title">Family Details</h2>
+                    <div class="detail__card">
+                        <div class="detail__row"><span>Father's Name</span><span>Late Dr. Abdul Aziz Ansari</span></div>
+                        <div class="detail__row"><span>Occupation</span><span>Passed Away (Was Assistant Director @
+                                <a class="detail__link text-normal" href="https://nitratextile.org/" target="_blank" rel="noopener">NITRA</a>)</span></div>
+                        <div class="detail__row"><span>Mother's Name</span><span>Amna Ansari</span></div>
+                        <div class="detail__row"><span>Occupation</span><span>Home Maker</span></div>
+                        <div class="detail__row"><span>No. of Brother</span><span>0</span></div>
+                        <div class="detail__row"><span>No. of Sister</span><span>0</span></div>
+                        <div class="detail__row"><span>Family Financial Status</span><span>Middle Class</span></div>
                     </div>
                 </div>
             </div>
@@ -129,7 +259,10 @@
                 <p class="contact__text">If our values align, I'd be happy to connect with you and your family.</p>
                 <div class="contact__links">
                     <a class="button" href="mailto:hamzaaziz822@gmail.com"><i class="ri-mail-send-line"></i>Email</a>
-                    <a class="button button--ghost" href="tel:+918447644188"><i class="ri-phone-line"></i>Call</a>
+                    <a class="button button--ghost" href="https://wa.me/918447644188" target="_blank" rel="noopener"><i class="ri-whatsapp-line"></i>WhatsApp</a>
+                    <a class="button button--ghost" href="assets/pdf/Hamza-BioData.pdf" download>
+                        <i class="ri-download-2-line"></i> Download Bio-Data
+                    </a>
                 </div>
             </div>
         </section>
@@ -137,4 +270,5 @@
 
     <script src="assets/js/matrimony.js"></script>
 </body>
+
 </html>

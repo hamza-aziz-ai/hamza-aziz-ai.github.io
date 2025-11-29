@@ -71,7 +71,8 @@ img {
 }
 
 .main {
-  overflow: hidden; /* For the animations ScrollReveal */
+  overflow: hidden;
+  /* For the animations ScrollReveal */
 }
 
 /*=============== HEADER & NAV ===============*/
@@ -97,7 +98,7 @@ img {
   column-gap: 1rem;
 }
 
-.nav__logo, 
+.nav__logo,
 .nav__toggle {
   color: var(--text-color);
   display: inline-flex;
@@ -234,7 +235,8 @@ img {
   align-self: flex-end;
 }
 
-.footer__contact, .footer__email {
+.footer__contact,
+.footer__email {
   color: var(--text-color);
 }
 
@@ -243,6 +245,7 @@ img {
   0% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(15px);
   }
@@ -252,6 +255,7 @@ img {
   0% {
     transform: scale(1, 1);
   }
+
   100% {
     transform: scale(.85, .85);
   }
@@ -280,7 +284,7 @@ body.dark-theme {
   }
 }
 
-@media screen and (min-height: 320px){
+@media screen and (min-height: 320px) {
   .home {
     padding-top: 5rem;
   }
@@ -291,17 +295,19 @@ body.dark-theme {
   .nav {
     height: calc(var(--header-height) + 1.5rem);
   }
-  .nav__toggle, 
+
+  .nav__toggle,
   .nav__close {
     display: none;
   }
+
   .nav__list {
     flex-direction: row;
     column-gap: 3.5rem;
   }
 }
 
-@media screen and (min-width: 620px){
+@media screen and (min-width: 620px) {
   .home {
     padding-top: 9rem;
   }
@@ -314,12 +320,15 @@ body.dark-theme {
     align-items: center;
     column-gap: 2rem;
   }
+
   .home__data {
     text-align: initial;
   }
+
   .home__img img {
     width: 400px;
   }
+
   .home__shadow {
     width: 250px;
     height: 40px;

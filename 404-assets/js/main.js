@@ -1,20 +1,20 @@
 /*=============== SHOW MENU ===============*/
 const navMenu = document.getElementById('nav-menu'),
-      navToggle = document.getElementById('nav-toggle'),
-      navClose = document.getElementById('nav-close')
+    navToggle = document.getElementById('nav-toggle'),
+    navClose = document.getElementById('nav-close')
 
 /*===== MENU SHOW =====*/
 /* Validate if constant exists */
-if(navToggle){
-    navToggle.addEventListener('click', () =>{
+if (navToggle) {
+    navToggle.addEventListener('click', () => {
         navMenu.classList.add('show-menu')
     })
 }
 
 /*===== MENU HIDDEN =====*/
 /* Validate if constant exists */
-if(navClose){
-    navClose.addEventListener('click', () =>{
+if (navClose) {
+    navClose.addEventListener('click', () => {
         navMenu.classList.remove('show-menu')
     })
 }
@@ -22,7 +22,7 @@ if(navClose){
 /*=============== REMOVE MENU MOBILE ===============*/
 const navLink = document.querySelectorAll('.nav__link')
 
-function linkAction(){
+function linkAction() {
     const navMenu = document.getElementById('nav-menu')
     // When we click on each nav__link, we remove the show-menu class
     navMenu.classList.remove('show-menu')
@@ -41,8 +41,8 @@ const getCurrentTheme = () => document.body.classList.contains(darkTheme) ? 'dar
 const getCurrentIcon = () => themeButton.classList.contains(iconTheme) ? 'bx-moon' : 'bx-sun'
 
 if (selectedTheme) {
-  document.body.classList[selectedTheme === 'dark' ? 'add' : 'remove'](darkTheme)
-  themeButton.classList[selectedIcon === 'bx-moon' ? 'add' : 'remove'](iconTheme)
+    document.body.classList[selectedTheme === 'dark' ? 'add' : 'remove'](darkTheme)
+    themeButton.classList[selectedIcon === 'bx-moon' ? 'add' : 'remove'](iconTheme)
 }
 
 themeButton.addEventListener('click', () => {
@@ -58,6 +58,6 @@ const sr = ScrollReveal({
     duration: 3000,
 })
 
-sr.reveal(`.home__data`, {origin: 'top', delay: 400})
-sr.reveal(`.home__img`, {origin: 'bottom', delay: 600})
-sr.reveal(`.home__footer`, {origin: 'bottom', delay: 800})
+sr.reveal(`.home__data`, { origin: 'top', delay: 400 })
+sr.reveal(`.home__img`, { origin: 'bottom', delay: 600 })
+sr.reveal(`.home__footer`, { origin: 'bottom', delay: 800 })

@@ -1502,13 +1502,13 @@ body.dark-theme {
         color: var(--white-color);
         padding: 0.85rem 1.2rem;
         /* border-radius: 0.9rem; */
-    display: inline-flex;
-    align-items: center;
-    column-gap: 0.35rem;
-    line-height: 1;
-    white-space: nowrap;
-    transition: background-color 0.4s;
-}
+        display: inline-flex;
+        align-items: center;
+        column-gap: 0.35rem;
+        line-height: 1;
+        white-space: nowrap;
+        transition: background-color 0.4s;
+    }
 
     .nav__link-button:hover {
         background-color: var(--first-color);
