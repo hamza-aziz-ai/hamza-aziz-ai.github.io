@@ -604,7 +604,7 @@ img {
 }
 
 .contact__cta {
-    margin-top: 5rem;
+    margin-top: 0;
     background: var(--container-color);
     padding: 1.5rem;
     border-radius: 1rem;
