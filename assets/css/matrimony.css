@@ -482,6 +482,36 @@ img {
     color: var(--text-color);
 }
 
+.more__arabic {
+    font-size: 1.5rem;
+    font-weight: var(--font-semi-bold);
+    color: var(--title-color);
+    letter-spacing: 0.5px;
+    position: relative;
+    /* margin: 0 auto 1rem; */
+    width: 100%;
+}
+
+/* .more__arabic::before,
+.more__arabic::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 20px;
+    background: radial-gradient(circle at 30% 30%, hsla(14, 98%, 50%, 0.45), transparent 55%);
+    opacity: 0.8;
+}
+
+.more__arabic::before {
+    left: 200px;
+}
+
+.more__arabic::after {
+    right: 200px;
+} */
+
 .text-strong {
     font-weight: var(--font-semi-bold);
     color: var(--title-color);
