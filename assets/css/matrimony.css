@@ -42,6 +42,9 @@ body {
     background-color: var(--body-color);
     color: var(--text-color);
     transition: background-color .4s, color .4s;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 a {
