@@ -473,7 +473,7 @@ img {
 
 .more-about .more__text {
     display: grid;
-    gap: .75rem;
+    gap: 1.25rem;
 }
 
 .more-about .section__title {
@@ -481,8 +481,30 @@ img {
 }
 
 .more__paragraph {
-    line-height: 1.6;
+    line-height: 1.75;
     color: var(--text-color);
+}
+
+.more__section {
+    position: relative;
+    padding: 1rem 1.15rem 1.05rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.9), hsla(0, 0%, 100%, 0.7));
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.more__section:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+}
+
+.section__subtitle {
+    font-size: 1.1rem;
+    font-weight: var(--font-semi-bold);
+    color: var(--title-color);
+    margin-bottom: .5rem;
 }
 
 .more__arabic {
