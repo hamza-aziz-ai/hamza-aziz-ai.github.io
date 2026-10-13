@@ -634,13 +634,16 @@
                         <h2 class="projects__title">DriveThru Voice Ordering Modernization</h2>
 
                         <p class="projects__description">
-                            Shipping production features for a real-time, multi-tenant <b>DriveThru voice ordering
-                                agent</b> serving multiple QSR brands. Built on <b>FastAPI + Socket.IO</b> with a
-                            <b>LangGraph (ReAct)</b> agent over <b>Google Gemini 2.5-flash</b> (with 2.0-flash
-                            fallback), <b>Redis</b>-backed session state, and <b>MongoDB</b>-backed order-event audit
-                            trail. Hardened entity extraction against ASR disfluencies, added combo/multi-size guard
-                            logic, and integrated <b>4 POS providers</b> (QUBeyond, Clover, Speedline, Deliverect)
-                            with <b>Jinja2</b>-templated per-restaurant prompts.
+                            A real-time voice agent that takes DriveThru orders and files them straight into the
+                            restaurant's POS, across multiple QSR brands. On <b>FastAPI + Socket.IO</b>: a speech
+                            layer streams the customer's words in as text, <b>Gemini 2.5 Flash-Lite</b> extracts menu
+                            items, an order agent replies from a cached menu-aware prompt, and a second model turns
+                            each spoken confirmation into cart operations written under lock to <b>Redis</b>. The hard
+                            part is making a non-deterministic model safe to bill: required-choice and per-item limit
+                            enforcement, a final cart check before submission, and staff handoff after repeated
+                            failures &mdash; all deterministic code, validated against replays of real production
+                            calls before shipping. <b>MongoDB</b> menu and order records, <b>Jinja2</b> per-brand
+                            prompt templating, <b>four POS integrations</b>.
                         </p>
                     </div>
 
