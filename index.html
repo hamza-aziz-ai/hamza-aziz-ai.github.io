@@ -726,9 +726,6 @@
                     <div class="projects__image">
                         <img src="assets/img/projects/AI-Chatbot-for-ERP.png" alt="erp chatbot" class="projects__img">
 
-                        <a href="https://github.com/hamza-aziz-ai/G6-Voice-Assistant" class="projects__button button">
-                            <i class="ri-arrow-right-up-line"></i>
-                        </a>
                     </div>
 
                     <div class="projects__content">
@@ -736,21 +733,20 @@
                         <h2 class="projects__title">Conversational AI for College ERP</h2>
 
                         <p class="projects__description">
-                            Currently leading the development of a production-grade <b>voice- and text-based
-                                assistant</b> for querying real-time college ERP data. The system converts user queries
-                            into structured SQL using <b>Rasa</b>, <b>Gemini 2.0</b>, and <b>Milvus</b>, integrates
-                            <b>SpeechRecognition</b> for speech-to-text, and provides spoken responses via <b>TTS</b>.
+                            A voice- and text-driven assistant that answers questions against live college ERP data
+                            across multiple client institutes. Audio is transcribed server-side through a
+                            <b>FastAPI</b> gateway, then a two-stage <b>Rasa</b> router picks the ERP module &mdash;
+                            asking a clarifying question and re-classifying when confidence is low, so an ambiguous
+                            query never reaches the LLM. Schema grounding is the hard part: each institute's hundreds
+                            of field mappings (aliases, sample values) are embedded into <b>Milvus</b> and retrieved
+                            alongside similar few-shot examples, so <b>Gemini 2.5 Flash</b> emits constrained SQL
+                            fragments into a fixed payload contract instead of free-form SQL. The ERP executes it; a
+                            second model summarises the rows and <b>gTTS</b> speaks them back.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <!-- <a href="https://github.com/anubhavpatrick/G6-Voice-Assistant" target="_blank" class="projects__link">
-                            <i class="ri-github-fill"></i> View
-                        </a> -->
-
-                        <!-- <a href="" target="_blank" class="projects__link">
-                            
-                        </a> -->
+                        <!-- private client project; no public link -->
                     </div>
                 </article>
 
@@ -759,34 +755,27 @@
                         <img src="assets/img/projects/face-recognition.png" alt="face recognition"
                             class="projects__img">
 
-                        <a href="https://github.com/anubhavpatrick/Multi-Person-Face-Recognition"
-                            class="projects__button button">
-                            <i class="ri-arrow-right-up-line"></i>
-                        </a>
                     </div>
 
                     <div class="projects__content">
                         <h3 class="projects__subtitle">Industrial Project | Global InfoVentures Pvt. Ltd.</h3>
-                        <h2 class="projects__title">CCTV-Based Face Recognition Attendance System</h2>
+                        <h2 class="projects__title">PTZ Classroom Attendance &mdash; One Camera per Room</h2>
 
                         <p class="projects__description">
-                            Engineered and deployed a <b>real-time multi-stream face recognition system</b> integrated
-                            with the G5 Portal. The system processes feeds from <b>20+ CCTV cameras</b> using an
-                            optimized <b>TensorRT-based SCRFD model</b> for face detection and <b>w600k_r50</b> for
-                            recognition, powered by <b>NVIDIA DGX A100</b>. Designed for educational institutions, the
-                            system ensures <b>&gt;99.99%</b> accuracy, auto-identifies individuals, and updates
-                            centralized attendance logs reducing administrative load significantly.
+                            Classroom attendance from a <b>single PTZ camera per room</b> instead of a wall of fixed
+                            cameras. The system drives one <b>ONVIF</b> camera through a timed preset sweep &mdash;
+                            dedicated faculty captures at lecture start and end, then a <b>23-preset trace</b> across
+                            the seats &mdash; with zoom and focus settling budgeted into every hop. Frames go to a
+                            <b>TensorRT</b>-backed <b>InsightFace-REST</b> service for detection and embedding, and
+                            identities come from a top-1 <b>Milvus</b> search over 512-d vectors. A separate
+                            <b>YOLOv9</b> service counts heads independently; the two are reconciled per lecture and
+                            synced to the institute ERP. Four Dockerised services on a MIG-partitioned GPU, with
+                            <b>PostgreSQL</b> attendance logs.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <!-- <a href="https://github.com/anubhavpatrick/Multi-Person-Face-Recognition" target="_blank" class="projects__link">
-                            <i class="ri-github-fill"></i> View
-                        </a> -->
-
-                        <!-- <a href="" target="_blank" class="projects__link">
-                            
-                        </a> -->
+                        <!-- private client project; no public link -->
                     </div>
                 </article>
 
