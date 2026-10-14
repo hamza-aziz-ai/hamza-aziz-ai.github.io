@@ -630,20 +630,17 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Industrial Project | VoicePlug Inc.</h3>
+                        <h3 class="projects__subtitle">VoicePlug Inc.</h3>
                         <h2 class="projects__title">DriveThru Voice Ordering Modernization</h2>
 
                         <p class="projects__description">
-                            A real-time voice agent that takes DriveThru orders and files them straight into the
-                            restaurant's POS, across multiple QSR brands. On <b>FastAPI + Socket.IO</b>: a speech
-                            layer streams the customer's words in as text, <b>Gemini 2.5 Flash-Lite</b> extracts menu
-                            items, an order agent replies from a cached menu-aware prompt, and a second model turns
-                            each spoken confirmation into cart operations written under lock to <b>Redis</b>. The hard
-                            part is making a non-deterministic model safe to bill: required-choice and per-item limit
-                            enforcement, a final cart check before submission, and staff handoff after repeated
-                            failures &mdash; all deterministic code, validated against replays of real production
-                            calls before shipping. <b>MongoDB</b> menu and order records, <b>Jinja2</b> per-brand
-                            prompt templating, <b>four POS integrations</b>.
+                            A real-time voice agent that takes DriveThru orders and files them into the POS, across multiple QSR brands.
+                            On <b>FastAPI + Socket.IO</b>, a speech layer streams the customer's words in, <b>Gemini 2.5 Flash-Lite</b>
+                            extracts menu items, an order agent replies from a cached menu-aware prompt, and a second model turns each
+                            spoken confirmation into <b>Redis</b> cart operations. The hard part is making a non-deterministic model
+                            safe to bill on: required-choice and per-item limit enforcement, a final cart check before submission, and
+                            staff handoff after repeated failures &mdash; deterministic code, validated against replays of real calls.
+                            <b>MongoDB</b> records, <b>Jinja2</b> per-brand prompts, four POS integrations.
                         </p>
                     </div>
 
@@ -656,30 +653,25 @@
                     <div class="projects__image">
                         <img src="assets/img/projects/halal-lens.png" alt="HalalLens" class="projects__img">
 
-                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank" class="projects__button button">
-                            <i class="ri-arrow-right-up-line"></i>
-                        </a>
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Personal Project | Open-Source</h3>
+                        <h3 class="projects__subtitle">Personal Project</h3>
                         <h2 class="projects__title">HalalLens &mdash; Halal Investment Research Copilot</h2>
 
                         <p class="projects__description">
-                            A full-stack <b>Shariah-compliance research platform</b> for Indian equities. Built with
-                            <b>FastAPI</b> (33 REST endpoints), <b>Next.js 14 + TypeScript</b>, and <b>PostgreSQL</b>,
-                            featuring an AAOIFI-style ratio engine and a dual-mode <b>&ldquo;Explain Why&rdquo;</b>
-                            narrator that switches between deterministic rules and a <b>vLLM / OpenAI-compatible
-                                LLM</b> with citation grounding. In-process workers crawl <b>BSE &amp; NSE</b>
-                            announcements, extract financials from PDF/XBRL, and refresh compliance verdicts on a
-                            schedule.
+                            A full-stack <b>Shariah-compliance research platform</b> for Indian equities. A <b>FastAPI</b> backend (34
+                            REST endpoints) and a <b>Next.js 14 + TypeScript</b> front end sit over <b>PostgreSQL</b>, with an
+                            AAOIFI-style ratio engine deciding whether a stock screens clean. The piece worth building twice is the
+                            dual-mode <b>&ldquo;Explain Why&rdquo;</b> narrator: it answers from deterministic rules where they suffice
+                            and falls through to a <b>vLLM / OpenAI-compatible</b> model with citation grounding where they don't, so
+                            every verdict stays traceable to a source. In-process workers crawl <b>BSE &amp; NSE</b> announcements, pull
+                            financials out of PDF and XBRL filings, and refresh verdicts on a schedule.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank" class="projects__link">
-                            <i class="ri-github-fill"></i> View
-                        </a>
+                        <!-- private repo; no public link -->
                     </div>
                 </article>
 
@@ -695,18 +687,17 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Personal Project | Open-Source</h3>
+                        <h3 class="projects__subtitle">Open Source</h3>
                         <h2 class="projects__title">Codex&ndash;Claude Council &mdash; Two AIs, One Answer</h2>
 
                         <p class="projects__description">
-                            An open-source <b>plugin and MCP server</b> that puts one question to both <b>ChatGPT</b>
-                            (via the Codex CLI) and <b>Claude</b> (via Claude Code). They answer independently, then
-                            reply to each other round after round until they agree &mdash; one model writes the final
-                            answer while the other checks it. Built on <b>Node.js 20+</b> with <b>zero runtime
-                                dependencies</b>, speaking <b>MCP over JSON-RPC/stdio</b>, it runs locally on existing
-                            subscriptions with <b>no API keys</b> across Claude Code, Codex, Claude Desktop and the
-                            ChatGPT app. On a 24-question benchmark of tricky programs it scored <b>24/24</b>,
-                            matching the best single model while catching the other's one miss.
+                            An open-source <b>plugin and MCP server</b> that puts one question to both <b>ChatGPT</b> (via the Codex
+                            CLI) and <b>Claude</b> (via Claude Code). They answer independently, then reply to each other round after
+                            round until they agree &mdash; one model writes the final answer while the other checks it. Built on
+                            <b>Node.js 20+</b> with zero runtime dependencies, speaking <b>MCP</b> over JSON-RPC/stdio, it runs locally
+                            on existing subscriptions with no API keys, across Claude Code, Codex, Claude Desktop and the ChatGPT app.
+                            On a 24-question benchmark of deliberately tricky programs, run from fresh sessions with no web search, it
+                            scored <b>24/24</b>, matching the best single model while catching the other's one miss.
                         </p>
                     </div>
 
@@ -729,19 +720,17 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Industrial Project | Global InfoVentures Pvt. Ltd.</h3>
+                        <h3 class="projects__subtitle">Global InfoVentures Pvt. Ltd.</h3>
                         <h2 class="projects__title">Conversational AI for College ERP</h2>
 
                         <p class="projects__description">
-                            A voice- and text-driven assistant that answers questions against live college ERP data
-                            across multiple client institutes. Audio is transcribed server-side through a
-                            <b>FastAPI</b> gateway, then a two-stage <b>Rasa</b> router picks the ERP module &mdash;
-                            asking a clarifying question and re-classifying when confidence is low, so an ambiguous
-                            query never reaches the LLM. Schema grounding is the hard part: each institute's hundreds
-                            of field mappings (aliases, sample values) are embedded into <b>Milvus</b> and retrieved
-                            alongside similar few-shot examples, so <b>Gemini 2.5 Flash</b> emits constrained SQL
-                            fragments into a fixed payload contract instead of free-form SQL. The ERP executes it; a
-                            second model summarises the rows and <b>gTTS</b> speaks them back.
+                            A voice- and text-driven assistant that answers questions against live college ERP data across multiple
+                            client institutes. Audio is transcribed server-side through a <b>FastAPI</b> gateway, then a two-stage
+                            <b>Rasa</b> router picks the ERP module &mdash; asking a clarifying question and re-classifying when
+                            confidence is low, so an ambiguous query never reaches the LLM. Schema grounding is the hard part: each
+                            institute's hundreds of field mappings are embedded into <b>Milvus</b> and retrieved alongside similar
+                            few-shot examples, so <b>Gemini 2.5 Flash</b> emits constrained SQL fragments into a fixed payload contract
+                            instead of free-form SQL. The ERP executes it and a second model summarises the rows.
                         </p>
                     </div>
 
@@ -758,19 +747,44 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Industrial Project | Global InfoVentures Pvt. Ltd.</h3>
+                        <h3 class="projects__subtitle">Global InfoVentures Pvt. Ltd.</h3>
                         <h2 class="projects__title">PTZ Classroom Attendance &mdash; One Camera per Room</h2>
 
                         <p class="projects__description">
-                            Classroom attendance from a <b>single PTZ camera per room</b> instead of a wall of fixed
-                            cameras. The system drives one <b>ONVIF</b> camera through a timed preset sweep &mdash;
-                            dedicated faculty captures at lecture start and end, then a <b>23-preset trace</b> across
-                            the seats &mdash; with zoom and focus settling budgeted into every hop. Frames go to a
-                            <b>TensorRT</b>-backed <b>InsightFace-REST</b> service for detection and embedding, and
-                            identities come from a top-1 <b>Milvus</b> search over 512-d vectors. A separate
-                            <b>YOLOv9</b> service counts heads independently; the two are reconciled per lecture and
-                            synced to the institute ERP. Four Dockerised services on a MIG-partitioned GPU, with
-                            <b>PostgreSQL</b> attendance logs.
+                            Classroom attendance from a <b>single PTZ camera per room</b> instead of a wall of fixed cameras. The system
+                            drives one <b>ONVIF</b> camera through a timed preset sweep &mdash; dedicated faculty captures at lecture
+                            start and end, then a <b>23-preset trace</b> across the seats &mdash; with zoom and focus settling budgeted
+                            into every hop. Frames go to a <b>TensorRT</b>-backed <b>InsightFace-REST</b> service for detection and
+                            embedding, and identities come from a top-1 <b>Milvus</b> search over 512-d vectors. A separate
+                            <b>YOLOv9</b> service counts heads independently; the two are reconciled per lecture and synced to the
+                            institute ERP. Four Dockerised services on a MIG-partitioned GPU, with <b>PostgreSQL</b> attendance logs.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <!-- private client project; no public link -->
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/face-recognition.png" alt="CCTV face recognition"
+                            class="projects__img">
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Global InfoVentures Pvt. Ltd.</h3>
+                        <h2 class="projects__title">CCTV Face Recognition Attendance &mdash; Multi-Stream</h2>
+
+                        <p class="projects__description">
+                            The multi-stream sibling to the PTZ system. A producer process decodes <b>20+</b> live <b>RTSP</b> camera
+                            feeds &mdash; ROI crop and lighting check per frame &mdash; into a shared in-memory queue; a consumer
+                            batches 32 frames per request to <b>InsightFace-REST</b>, running as two <b>TensorRT</b> replicas on
+                            separate MIG slices behind <b>nginx</b>, where <b>SCRFD</b> (<code>scrfd_10g_gnkps</code>) detects and
+                            <b>w600k_r50</b> embeds. Identities resolve by cosine search over a GPU-indexed <b>Milvus</b> collection.
+                            The gallery improves itself: high-confidence crops land in a staging collection that a nightly job folds
+                            into the index. Results persist to <b>PostgreSQL</b>, sync to the institute ERP, and stream back to on-site
+                            displays over <b>Kafka</b>.
                         </p>
                     </div>
 
@@ -789,24 +803,22 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Internship Project | Global InfoVentures Pvt. Ltd.</h3>
+                        <h3 class="projects__subtitle">Internship | Global InfoVentures Pvt. Ltd.</h3>
                         <h2 class="projects__title">PPE Violation Detection</h2>
 
                         <p class="projects__description">
-                            A PPE Violation Detection System capable of detecting PPE Violation in real time and
-                            alerting the concerned person, using YOLOv7 and Gmail API.
+                            A browser-based PPE monitor: point it at an uploaded clip or a live camera URL and it streams the raw and
+                            annotated feeds back side by side over <b>MJPEG</b>. A custom-trained <b>YOLOv7</b> model classifies every
+                            person in frame as compliant or violating at a 0.75 confidence gate, and a temporal rule waits for a run of
+                            unsafe frames before firing &mdash; so one stray detection doesn't page anyone. When it does fire, the
+                            <b>Gmail API</b> emails the offending frame to a configured recipient as evidence, then holds a cooldown
+                            before the next alert. <b>Flask</b>, <b>OpenCV</b> and <b>PyTorch</b> on CPU, with per-run detection reports
+                            exportable from the UI as a timestamped log.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <a href="https://github.com/hamza-aziz-ai/PPE-Violation-Detection-Deployment" target="_blank"
-                            class="projects__link">
-                            <i class="ri-github-fill"></i> View
-                        </a>
-
-                        <!-- <a href="" target="_blank" class="projects__link">
-                            
-                        </a> -->
+                        <!-- repo link removed: hamza-aziz-ai/PPE-Violation-Detection-Deployment returns 404 -->
                     </div>
                 </article>
 
@@ -820,12 +832,17 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">College Major Project | ABESIT</h3>
+                        <h3 class="projects__subtitle">Final-Year Project | ABESIT</h3>
                         <h2 class="projects__title">Mr. Healthcare - Medical Chatbot</h2>
 
                         <p class="projects__description">
-                            A Medical Chatbot capable of answering medical queries of the user, using knowledge graph
-                            and NLP.
+                            A knowledge-graph question-answering bot over a curated medical dataset. An <b>Aho-Corasick</b> automaton
+                            matches free text against roughly <b>2,800</b> disease, symptom and department terms, rule-based intent
+                            detection works out which of ten questions is being asked &mdash; causes, prevention, treatment,
+                            complications, which specialist to see &mdash; and the pair compiles into templated <b>Cypher</b> over a
+                            <b>Neo4j</b> graph, with returned rows formatted back into sentences. An offline ETL builds the graph from
+                            the source dataset, diseases as nodes and symptoms as edges. Deterministic and inspectable throughout, with
+                            no LLM in the loop. <b>Vue</b> front end on a <b>Flask</b> API.
                         </p>
                     </div>
 
@@ -852,14 +869,17 @@
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Self Learning Project</h3>
+                        <h3 class="projects__subtitle">Personal Project</h3>
                         <h2 class="projects__title">Cold Email Generator</h2>
 
                         <p class="projects__description">
-                            An AI-powered tool designed to craft personalized and professional cold emails for job
-                            opportunities and business outreach. By leveraging the power of Generative AI, this project
-                            simplifies the process of creating emails to make a strong first impression, ensuring you
-                            can focus on delivering value rather than worrying about writing the perfect email.
+                            A <b>Streamlit</b> tool that turns a job posting into a tailored outreach email. Paste a careers-page URL
+                            and <b>BeautifulSoup</b> scrapes it, a Groq-hosted <b>Llama</b> model pulls out the role, the required
+                            skills and the description, and a <b>FAISS</b> vector store matches those skills against a portfolio of past
+                            work so the most relevant links get cited in the draft rather than chosen by hand. <b>LangChain</b> wires
+                            the extraction and generation prompts together. It deliberately stops at the draft and never sends anything
+                            &mdash; the goal is a strong opening paragraph worth editing, not an automated spam cannon. Deployed as a
+                            public <b>Streamlit</b> app, so it can be tried without installing anything.
                         </p>
                     </div>
 
