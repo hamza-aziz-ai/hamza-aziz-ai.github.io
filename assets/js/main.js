@@ -268,7 +268,7 @@ if (projectsTrack) {
         dot.className = 'projects__dot'
         dot.type = 'button'
         dot.setAttribute('aria-label', 'Go to project ' + (i + 1))
-        dot.addEventListener('click', () => goTo(i))
+        dot.addEventListener('click', () => goManual(i))
         dotsBox.appendChild(dot)
         return dot
     })
@@ -283,17 +283,59 @@ if (projectsTrack) {
 
     const sync = () => setActive(activeIndex())
 
-    prevBtn.addEventListener('click', () => goTo(activeIndex() - 1))
-    nextBtn.addEventListener('click', () => goTo(activeIndex() + 1))
+    /* Auto-advance every 10s, wrapping at the end. Manual control is
+       unchanged and always wins: any interaction restarts the countdown. */
+    const AUTO_INTERVAL = 10000
+    let autoTimer = 0
+    let held = false
+
+    const stopAuto = () => {
+        clearInterval(autoTimer)
+        autoTimer = 0
+    }
+
+    const startAuto = () => {
+        stopAuto()
+        // Respect a reduced-motion preference by not rotating at all.
+        if (reduceMotion.matches) return
+        autoTimer = setInterval(() => {
+            // Skip while pointed at, focused, or in a background tab: a
+            // hidden tab has no frame loop, so the tween could not run.
+            if (held || document.hidden) return
+            goTo((activeIndex() + 1) % cards.length)
+        }, AUTO_INTERVAL)
+    }
+
+    // Pause mechanism (WCAG 2.2.2): hovering or focusing holds the rotation
+    // so a slide cannot change out from under someone reading it.
+    const hold = () => { held = true }
+    const release = () => { held = false }
+    const slider = projectsTrack.parentElement
+    slider.addEventListener('mouseenter', hold)
+    slider.addEventListener('mouseleave', release)
+    slider.addEventListener('focusin', hold)
+    slider.addEventListener('focusout', release)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) stopAuto()
+        else startAuto()
+    })
+
+    const goManual = i => {
+        goTo(i)
+        startAuto()
+    }
+
+    prevBtn.addEventListener('click', () => goManual(activeIndex() - 1))
+    nextBtn.addEventListener('click', () => goManual(activeIndex() + 1))
 
     projectsTrack.addEventListener('keydown', event => {
         if (event.key === 'ArrowRight') {
             event.preventDefault()
-            goTo(activeIndex() + 1)
+            goManual(activeIndex() + 1)
         }
         if (event.key === 'ArrowLeft') {
             event.preventDefault()
-            goTo(activeIndex() - 1)
+            goManual(activeIndex() - 1)
         }
     })
 
@@ -309,4 +351,5 @@ if (projectsTrack) {
 
     window.addEventListener('resize', () => goTo(activeIndex()))
     sync()
+    startAuto()
 }
