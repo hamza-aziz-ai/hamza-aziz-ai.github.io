@@ -239,19 +239,24 @@ if (projectsTrack) {
         cancelAnimationFrame(animation)
         if (reduceMotion.matches || Math.abs(distance) < 2) {
             animating = false
+            projectsTrack.style.scrollSnapType = ''
             projectsTrack.scrollLeft = to
             return
         }
         const duration = durationFor(Math.abs(distance))
         const started = performance.now()
         animating = true
+        // The snap engine re-corrects scrollLeft on every frame we write,
+        // which is what makes the glide stutter. Suspend it for the tween.
+        projectsTrack.style.scrollSnapType = 'none'
         const step = now => {
             const progress = Math.min((now - started) / duration, 1)
-            projectsTrack.scrollLeft = from + distance * ease(progress)
+            projectsTrack.scrollLeft = Math.round(from + distance * ease(progress))
             if (progress < 1) {
                 animation = requestAnimationFrame(step)
             } else {
                 projectsTrack.scrollLeft = to
+                projectsTrack.style.scrollSnapType = ''
                 animating = false
             }
         }

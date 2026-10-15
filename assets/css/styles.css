@@ -1897,6 +1897,9 @@ body.dark-theme {
     /* Slides are full width, so `start` is both the natural resting point
        and what the arrow/dot targets are computed from. */
     scroll-snap-align: start;
+    /* Keep each slide's layout and painting to itself, so sliding does not
+       repaint the other seven full-size banners. */
+    contain: layout paint;
 }
 
 .projects__controls {
