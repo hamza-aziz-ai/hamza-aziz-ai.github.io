@@ -218,26 +218,42 @@ if (projectsTrack) {
     // so the duration is ours and reduced-motion is handled explicitly.
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     let animation = 0
+    let animating = false
+
+    // Sine in-out. Of the usual curves this has the lowest peak velocity for
+    // a given duration (~47px per frame across one card, against ~115 for
+    // cubic and ~185 for a quintic ease-out), and peak velocity is what
+    // shows up as judder on a wide slide.
+    const ease = progress => -(Math.cos(Math.PI * progress) - 1) / 2
+
+    // Scale duration to distance so a one-card step and a jump to the far
+    // end both feel deliberate rather than sluggish or abrupt.
+    const durationFor = distance => Math.min(900, Math.max(520, distance * 0.55))
 
     const goTo = i => {
         const index = Math.max(0, Math.min(i, cards.length - 1))
-        const card = cards[index]
         setActive(index)
         const from = projectsTrack.scrollLeft
-        const to = offsetOf(card)
+        const to = offsetOf(cards[index])
+        const distance = to - from
         cancelAnimationFrame(animation)
-        if (reduceMotion.matches || Math.abs(to - from) < 2) {
+        if (reduceMotion.matches || Math.abs(distance) < 2) {
+            animating = false
             projectsTrack.scrollLeft = to
             return
         }
+        const duration = durationFor(Math.abs(distance))
         const started = performance.now()
+        animating = true
         const step = now => {
-            const progress = Math.min((now - started) / 400, 1)
-            const eased = progress < 0.5
-                ? 4 * progress * progress * progress
-                : 1 - Math.pow(-2 * progress + 2, 3) / 2
-            projectsTrack.scrollLeft = from + (to - from) * eased
-            if (progress < 1) animation = requestAnimationFrame(step)
+            const progress = Math.min((now - started) / duration, 1)
+            projectsTrack.scrollLeft = from + distance * ease(progress)
+            if (progress < 1) {
+                animation = requestAnimationFrame(step)
+            } else {
+                projectsTrack.scrollLeft = to
+                animating = false
+            }
         }
         animation = requestAnimationFrame(step)
     }
@@ -278,7 +294,7 @@ if (projectsTrack) {
 
     let ticking = false
     projectsTrack.addEventListener('scroll', () => {
-        if (ticking) return
+        if (ticking || animating) return
         ticking = true
         requestAnimationFrame(() => {
             sync()
