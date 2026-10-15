@@ -618,7 +618,9 @@
                 <span>Projects.</span>
             </h2>
 
-            <div class="projects__container container grid">
+            <div class="projects__container container">
+                <div class="projects__track" id="projects-track" tabindex="0"
+                    role="region" aria-roledescription="carousel" aria-label="Projects">
                 <article class="projects__card">
                     <div class="projects__image">
                         <img src="assets/img/projects/drivethru-voice-ordering.png" alt="DriveThru Voice Ordering"
@@ -886,11 +888,19 @@
                             <i class="ri-github-fill"></i> View
                         </a>
 
-                        <!-- <a href="" target="_blank" class="projects__link">
-                            
-                        </a> -->
                     </div>
                 </article> -->
+                </div>
+
+                <div class="projects__controls">
+                    <button class="projects__nav" id="projects-prev" type="button" aria-label="Previous project">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </button>
+                    <div class="projects__dots" id="projects-dots"></div>
+                    <button class="projects__nav" id="projects-next" type="button" aria-label="Next project">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>
+                </div>
             </div>
         </section>
 

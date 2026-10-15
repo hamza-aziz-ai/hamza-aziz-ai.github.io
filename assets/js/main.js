@@ -192,4 +192,100 @@ sr.reveal(`.home__profile, .about__image, .contact__mail`, { origin: "right" })
 sr.reveal(`.home__name, .home__info, .about__container .section-title-1, .about__info, .contact__social, .contact__data`, { origin: "left" })
 sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, { origin: "left" })
 sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, { origin: "right" })
-sr.reveal(`.projects__card, .qualification__content`, { interval: 100 })
+sr.reveal(`.qualification__content`, { interval: 100 })
+
+/*=============== PROJECTS SLIDER ===============*/
+const projectsTrack = document.getElementById('projects-track')
+
+if (projectsTrack) {
+    const cards = Array.from(projectsTrack.children)
+    const dotsBox = document.getElementById('projects-dots')
+    const prevBtn = document.getElementById('projects-prev')
+    const nextBtn = document.getElementById('projects-next')
+
+    const offsetOf = card => card.offsetLeft - projectsTrack.offsetLeft
+
+    const activeIndex = () => {
+        const x = projectsTrack.scrollLeft
+        let best = 0
+        cards.forEach((card, i) => {
+            if (Math.abs(offsetOf(card) - x) < Math.abs(offsetOf(cards[best]) - x)) best = i
+        })
+        return best
+    }
+
+    // Animate scrollLeft directly rather than relying on scroll-behavior,
+    // so the duration is ours and reduced-motion is handled explicitly.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let animation = 0
+
+    const goTo = i => {
+        const index = Math.max(0, Math.min(i, cards.length - 1))
+        const card = cards[index]
+        setActive(index)
+        const from = projectsTrack.scrollLeft
+        const to = offsetOf(card)
+        cancelAnimationFrame(animation)
+        if (reduceMotion.matches || Math.abs(to - from) < 2) {
+            projectsTrack.scrollLeft = to
+            return
+        }
+        const started = performance.now()
+        const step = now => {
+            const progress = Math.min((now - started) / 400, 1)
+            const eased = progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2
+            projectsTrack.scrollLeft = from + (to - from) * eased
+            if (progress < 1) animation = requestAnimationFrame(step)
+        }
+        animation = requestAnimationFrame(step)
+    }
+
+    const dots = cards.map((card, i) => {
+        const dot = document.createElement('button')
+        dot.className = 'projects__dot'
+        dot.type = 'button'
+        dot.setAttribute('aria-label', 'Go to project ' + (i + 1))
+        dot.addEventListener('click', () => goTo(i))
+        dotsBox.appendChild(dot)
+        return dot
+    })
+
+    // Driven from the target index, not from scrollLeft: during a tween the
+    // scroll position has not arrived yet, and a disabled button never fires.
+    const setActive = i => {
+        dots.forEach((dot, j) => dot.setAttribute('aria-current', j === i ? 'true' : 'false'))
+        prevBtn.disabled = i === 0
+        nextBtn.disabled = i === cards.length - 1
+    }
+
+    const sync = () => setActive(activeIndex())
+
+    prevBtn.addEventListener('click', () => goTo(activeIndex() - 1))
+    nextBtn.addEventListener('click', () => goTo(activeIndex() + 1))
+
+    projectsTrack.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') {
+            event.preventDefault()
+            goTo(activeIndex() + 1)
+        }
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault()
+            goTo(activeIndex() - 1)
+        }
+    })
+
+    let ticking = false
+    projectsTrack.addEventListener('scroll', () => {
+        if (ticking) return
+        ticking = true
+        requestAnimationFrame(() => {
+            sync()
+            ticking = false
+        })
+    })
+
+    window.addEventListener('resize', () => goTo(activeIndex()))
+    sync()
+}
