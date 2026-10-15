@@ -288,6 +288,7 @@ if (projectsTrack) {
     const AUTO_INTERVAL = 10000
     let autoTimer = 0
     let held = false
+    let inView = false
 
     const stopAuto = () => {
         clearInterval(autoTimer)
@@ -296,8 +297,9 @@ if (projectsTrack) {
 
     const startAuto = () => {
         stopAuto()
-        // Respect a reduced-motion preference by not rotating at all.
-        if (reduceMotion.matches) return
+        // Respect a reduced-motion preference by not rotating at all, and
+        // do not run the clock while the section is off screen.
+        if (reduceMotion.matches || !inView) return
         autoTimer = setInterval(() => {
             // Skip while pointed at, focused, or in a background tab: a
             // hidden tab has no frame loop, so the tween could not run.
@@ -351,5 +353,17 @@ if (projectsTrack) {
 
     window.addEventListener('resize', () => goTo(activeIndex()))
     sync()
-    startAuto()
+
+    // Start the countdown when the section is actually reached, so the
+    // first slide is not already two projects along by the time it is seen.
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(entries => {
+            inView = entries[0].isIntersecting
+            if (inView) startAuto()
+            else stopAuto()
+        }, { threshold: 0.3 }).observe(projectsTrack)
+    } else {
+        inView = true
+        startAuto()
+    }
 }
