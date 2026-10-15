@@ -662,9 +662,9 @@
                             A full-stack <b>Shariah-compliance research platform</b> for Indian equities. A <b>FastAPI</b> backend (34
                             REST endpoints) and a <b>Next.js 14 + TypeScript</b> front end sit over <b>PostgreSQL</b>, with an
                             AAOIFI-style ratio engine deciding whether a stock screens clean. The piece worth building twice is the
-                            dual-mode <b>&ldquo;Explain Why&rdquo;</b> narrator: it answers from deterministic rules where they suffice
-                            and falls through to a <b>vLLM / OpenAI-compatible</b> model with citation grounding where they don't, so
-                            every verdict stays traceable to a source. In-process workers crawl <b>BSE &amp; NSE</b> announcements, pull
+                            <b>&ldquo;Explain Why&rdquo;</b> narrator: it runs on deterministic rules by default, each verdict citing
+                            the filing date and the figures it was computed from, with an optional <b>vLLM / OpenAI-compatible</b> mode
+                            behind a config flag. Separate ingestion and evaluation containers crawl <b>BSE</b> announcements, pull
                             financials out of PDF and XBRL filings, and refresh verdicts on a schedule.
                         </p>
                     </div>
