@@ -1889,8 +1889,10 @@ body.dark-theme {
    decorative dash beside every one of 30+ paragraphs. This scope replaces
    both. It is self-contained: no rule here is used by index.html. */
 .case {
-    max-width: 42rem;          /* ~70 characters; .container's 1120px is a
-                                  layout width, not a reading width */
+    max-width: 52rem;          /* measured at ~71 characters per line with the
+                                  17px body below. 42rem gave 57, which is
+                                  under the comfortable range. .container's
+                                  1120px is a layout width, not a reading one. */
     margin-inline: auto;
     padding-inline: 1.5rem;
     padding-block: 3rem 4rem;
