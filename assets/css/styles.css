@@ -536,6 +536,20 @@ body.dark-theme {
     color: var(--first-color);
 }
 
+.home__opportunities {
+    margin-bottom: 1.5rem;
+    padding: .75rem 1rem;
+    border-left: 3px solid var(--first-color);
+    background: linear-gradient(90deg, hsla(14, 98%, 50%, .09), transparent);
+    color: var(--title-color);
+    font-size: var(--small-font-size);
+    line-height: 1.6;
+}
+
+.home__opportunities strong {
+    font-weight: var(--font-semi-bold);
+}
+
 .home__buttons {
     display: flex;
     justify-content: center;
@@ -1627,7 +1641,7 @@ body.dark-theme {
     }
 
     .home__line {
-        left: -10rem;
+        left: -6rem;
         bottom: 4rem;
         width: 80px;
         rotate: 30deg;
