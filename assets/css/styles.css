@@ -2044,6 +2044,183 @@ body.dark-theme {
     }
 }
 
+/*=============== CHAT ASSISTANT ===============*/
+/* Built by assets/js/chat.js. Colours come from the theme variables, so
+   body.dark-theme recolours it with no extra rules. The launcher stacks
+   above .scrollup in the same column: that button is 36px at right 1rem,
+   and 44px at right 3rem from 1150px up, always at bottom 3rem. Its top edge
+   is therefore at most 3rem + 44px = 92px; the launcher starts at 108px. */
+.chat__launcher {
+    position: fixed;
+    right: 1rem;
+    bottom: 6.75rem;
+    z-index: var(--z-fixed);
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--first-color);
+    color: var(--white-color);
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px hsla(0, 0%, 0%, .25);
+}
+
+.chat__launcher:focus-visible,
+.chat__close:focus-visible,
+.chat__send:focus-visible,
+.chat__chip:focus-visible {
+    outline: 2px solid var(--first-color);
+    outline-offset: 2px;
+}
+
+.chat__panel {
+    position: fixed;
+    right: 1rem;
+    bottom: 10.5rem;
+    z-index: var(--z-fixed);
+    display: flex;
+    flex-direction: column;
+    width: min(22rem, calc(100vw - 2rem));
+    height: min(32rem, calc(100vh - 12rem));
+    background-color: var(--body-color);
+    border: 1px solid var(--container-color);
+    border-radius: .75rem;
+    box-shadow: 0 8px 32px hsla(0, 0%, 0%, .3);
+    overflow: hidden;
+    user-select: text;
+}
+
+.chat__panel[hidden] {
+    display: none;
+}
+
+.chat__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem 1rem;
+    background-color: var(--container-color);
+}
+
+.chat__title {
+    color: var(--title-color);
+    font-weight: var(--font-semi-bold);
+}
+
+.chat__close,
+.chat__send {
+    display: grid;
+    place-items: center;
+    border: none;
+    background: none;
+    color: var(--title-color);
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.chat__log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.chat__msg {
+    max-width: 85%;
+    padding: .5rem .75rem;
+    border-radius: .75rem;
+    font-size: var(--normal-font-size);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.chat__msg--model {
+    align-self: flex-start;
+    background-color: var(--container-color);
+    color: var(--title-color);
+}
+
+.chat__msg--user {
+    align-self: flex-end;
+    background-color: var(--first-color);
+    color: var(--white-color);
+}
+
+.chat__msg--pending {
+    opacity: .6;
+}
+
+.chat__msg--error {
+    border: 1px solid var(--first-color);
+}
+
+.chat__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    padding: 0 1rem .75rem;
+}
+
+.chat__chips[hidden] {
+    display: none;
+}
+
+.chat__chip {
+    padding: .35rem .65rem;
+    border: 1px solid var(--first-color);
+    border-radius: 1rem;
+    background: none;
+    color: var(--title-color);
+    font-family: var(--body-font);
+    font-size: var(--small-font-size);
+    cursor: pointer;
+}
+
+.chat__form {
+    display: flex;
+    align-items: flex-end;
+    gap: .5rem;
+    padding: .6rem .75rem;
+    border-top: 1px solid var(--container-color);
+}
+
+.chat__input {
+    flex: 1;
+    max-height: 6rem;
+    padding: .5rem .6rem;
+    border: 1px solid var(--container-color);
+    border-radius: .5rem;
+    background-color: var(--body-color);
+    color: var(--title-color);
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    resize: none;
+}
+
+.chat__send:disabled {
+    opacity: .4;
+    cursor: wait;
+}
+
+.chat__note {
+    padding: 0 .75rem .6rem;
+    color: var(--text-color-light);
+    font-size: var(--smaller-font-size);
+}
+
+@media screen and (min-width: 1150px) {
+    .chat__launcher,
+    .chat__panel {
+        right: 3rem;
+    }
+}
+
 /*=============== PROJECTS SLIDER ===============*/
 /* Overrides the grid rules above; must stay last in the file. */
 .projects__container {
