@@ -1,0 +1,80 @@
+# On every push to main: set sitemap <lastmod> from git history, wait for
+# GitHub Pages to serve it, then resubmit both sitemaps to Search Console so
+# Google re-crawls whatever changed. Scripts live in .github/scripts/.
+name: Sitemap freshness
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commit the updated sitemap.xml
+  pages: write      # request a Pages build after that commit
+
+# Two pushes in quick succession must not race on sitemap.xml.
+concurrency:
+  group: sitemap
+  cancel-in-progress: false
+
+jobs:
+  sitemap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # lastmod comes from `git log`, which needs full history
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set lastmod from git history
+        run: python .github/scripts/sitemap_lastmod.py
+
+      - name: Commit sitemap.xml if it changed
+        id: commit
+        run: |
+          if git diff --quiet -- sitemap.xml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "sitemap.xml already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "Update sitemap lastmod from git history"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # A push made with GITHUB_TOKEN does not reliably trigger a Pages
+      # build, so ask for one explicitly. It also cannot re-trigger this
+      # workflow, which is what prevents a loop.
+      - name: Request a Pages build
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
+
+      # Resubmitting before the new sitemap is live would hand Google the
+      # old one. Compare the served bytes with this commit's file.
+      - name: Wait until the live sitemap matches this commit
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS "https://hamzaaziz.dev/sitemap.xml?cb=$(date +%s)" | cmp -s - sitemap.xml; then
+              echo "live sitemap matches after ~$(( (i-1)*15 ))s"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::live sitemap.xml did not match the committed file within 15 minutes"
+          exit 1
+
+      - name: Install Google auth
+        run: pip install --quiet google-auth requests
+
+      - name: Resubmit sitemaps to Search Console
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python .github/scripts/submit_sitemaps.py
