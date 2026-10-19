@@ -1,75 +1,108 @@
-// Self-check for the Worker's request handling. No network, no real key:
-// Gemini is replaced by a stub. Run:  node worker/test.mjs
+// Self-check for the Worker's request handling. No network, no real keys:
+// Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
-import worker, { toContents } from "./src/index.js";
+import worker, { toTurns } from "./src/index.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
-const env = (over = {}) => ({ ALLOWED_ORIGINS: ORIGIN, MODEL: "test-model", GEMINI_API_KEY: "k", ...over });
+const env = (over = {}) => ({ ALLOWED_ORIGINS: ORIGIN, MODEL: "test-model", FALLBACK_MODEL: "@cf/test", GEMINI_API_KEY: "k", ...over });
 const req = (body, { origin = ORIGIN, method = "POST", path = "/chat" } = {}) =>
   new Request(`https://w.example${path}`, {
     method,
     headers: { "Content-Type": "application/json", ...(origin ? { Origin: origin } : {}) },
     body: method === "POST" ? (typeof body === "string" ? body : JSON.stringify(body)) : undefined,
   });
-const ask = { messages: [{ role: "user", text: "What does Hamza work on?" }] };
+const ask = { messages: [{ role: "user", text: "Hi" }, { role: "model", text: "Hello" }, { role: "user", text: "What does Hamza work on?" }] };
 
-let upstreamCalls = [];
-const stub = (status, payload) => {
+let geminiCalls = [];
+const gemini = (status, payload) => {
   globalThis.fetch = async (url, init) => {
-    upstreamCalls.push({ url, init });
+    geminiCalls.push({ url, init });
     return new Response(JSON.stringify(payload), { status });
   };
 };
+const geminiOK = () => gemini(200, { candidates: [{ content: { parts: [{ text: "From Gemini." }] } }] });
+let aiCalls = [];
+const ai = (impl) => ({ run: async (model, input) => { aiCalls.push({ model, input }); return impl(); } });
+const reset = () => { geminiCalls = []; aiCalls = []; };
 
-// toContents validation
-assert.equal(toContents([]), null, "empty rejected");
-assert.equal(toContents([{ role: "model", text: "hi" }]), null, "must end with user");
-assert.equal(toContents([{ role: "user", text: "x".repeat(801) }]), null, "over 800 chars rejected");
-assert.equal(toContents([{ role: "system", text: "hi" }]), null, "unknown role rejected");
-assert.equal(toContents(Array.from({ length: 12 }, (_, i) => ({ role: i % 2 ? "model" : "user", text: "q" })).concat({ role: "user", text: "last" })).length, 8, "trimmed to last 8");
+// Validation
+assert.equal(toTurns([]), null, "empty rejected");
+assert.equal(toTurns([{ role: "model", text: "hi" }]), null, "must end with user");
+assert.equal(toTurns([{ role: "user", text: "x".repeat(801) }]), null, "over 800 chars rejected");
+assert.equal(toTurns([{ role: "system", text: "hi" }]), null, "unknown role rejected");
+assert.equal(toTurns(Array.from({ length: 13 }, (_, i) => ({ role: i % 2 ? "model" : "user", text: "q" }))).length, 8, "trimmed to last 8");
 
 // Routing and CORS
 assert.equal((await worker.fetch(req(ask, { path: "/x" }), env())).status, 404);
 assert.equal((await worker.fetch(req(null, { method: "OPTIONS" }), env())).status, 204, "preflight from allowed origin");
-assert.equal((await worker.fetch(req(null, { method: "OPTIONS", origin: "https://evil.example" }), env())).status, 403, "preflight from other origin");
+assert.equal((await worker.fetch(req(null, { method: "OPTIONS", origin: "https://evil.example" }), env())).status, 403);
 assert.equal((await worker.fetch(req(ask, { origin: "https://evil.example" }), env())).status, 403, "POST from other origin");
 assert.equal((await worker.fetch(req(ask, { origin: null }), env())).status, 403, "POST with no origin");
 assert.equal((await worker.fetch(req(null, { method: "GET" }), env())).status, 405);
-
-// Input and config errors
 assert.equal((await worker.fetch(req("{not json"), env())).status, 400);
 assert.equal((await worker.fetch(req({ messages: [] }), env())).status, 400);
-assert.equal((await worker.fetch(req(ask), env({ GEMINI_API_KEY: "" }))).status, 503, "missing key");
+assert.equal((await worker.fetch(req(ask), env({ GEMINI_API_KEY: "" }))).status, 503, "no backend at all");
+assert.equal((await worker.fetch(req(ask), env({ CHAT_LIMITER: { limit: async () => ({ success: false }) } }))).status, 429);
 
-// Rate limiter
-const limited = await worker.fetch(req(ask), env({ CHAT_LIMITER: { limit: async () => ({ success: false }) } }));
-assert.equal(limited.status, 429, "rate limited");
-
-// Happy path: reply returned, key sent as header not in URL, CORS echoed
-upstreamCalls = [];
-stub(200, { candidates: [{ content: { parts: [{ text: "He builds voice AI." }] } }] });
-let r = await worker.fetch(req(ask), env({ CHAT_LIMITER: { limit: async () => ({ success: true }) } }));
+// 1. Gemini answers: fallback never touched, key in header not URL
+reset(); geminiOK();
+let r = await worker.fetch(req(ask), env({ AI: ai(() => ({ response: "from AI" })) }));
 assert.equal(r.status, 200);
-assert.deepEqual(await r.json(), { reply: "He builds voice AI." });
+assert.deepEqual(await r.json(), { reply: "From Gemini." });
+assert.equal(r.headers.get("X-Chat-Backend"), "gemini");
 assert.equal(r.headers.get("Access-Control-Allow-Origin"), ORIGIN);
-assert.equal(upstreamCalls.length, 1);
-assert.ok(upstreamCalls[0].url.endsWith("/models/test-model:generateContent"));
-assert.ok(!upstreamCalls[0].url.includes("key="), "key never in URL");
-assert.equal(upstreamCalls[0].init.headers["x-goog-api-key"], "k");
-const sent = JSON.parse(upstreamCalls[0].init.body);
-assert.ok(sent.systemInstruction.parts[0].text.includes("KNOWLEDGE"), "knowledge sent");
-assert.equal(sent.generationConfig.maxOutputTokens, 450);
+assert.equal(aiCalls.length, 0, "fallback unused when Gemini answers");
+assert.ok(geminiCalls[0].url.endsWith("/models/test-model:generateContent"));
+assert.ok(!geminiCalls[0].url.includes("key="), "key never in URL");
+assert.equal(geminiCalls[0].init.headers["x-goog-api-key"], "k");
+const gBody = JSON.parse(geminiCalls[0].init.body);
+assert.deepEqual(gBody.contents.map((c) => c.role), ["user", "model", "user"]);
+const fullPromptLen = gBody.systemInstruction.parts[0].text.length;
 
-// Upstream failures are mapped, never passed through
-stub(429, { error: { message: "quota exceeded for project 123" } });
-r = await worker.fetch(req(ask), env());
+// 2. Gemini out of quota -> Workers AI answers with the CORE prompt
+reset(); gemini(429, { error: { message: "quota exceeded for project 123" } });
+r = await worker.fetch(req(ask), env({ AI: ai(() => ({ response: "From Workers AI." })) }));
+assert.equal(r.status, 200);
+assert.deepEqual(await r.json(), { reply: "From Workers AI." });
+assert.equal(r.headers.get("X-Chat-Backend"), "workers-ai");
+assert.equal(aiCalls[0].model, "@cf/test");
+const msgs = aiCalls[0].input.messages;
+assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "assistant", "user"], "model role mapped to assistant");
+assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller core prompt");
+assert.ok(msgs[0].content.includes("KNOWLEDGE"));
+
+// 3. Gemini 5xx, network error, or empty -> fallback too
+for (const setup of [() => gemini(500, {}), () => gemini(200, { candidates: [] }), () => { globalThis.fetch = async () => { throw new Error("down"); }; }]) {
+  reset(); setup();
+  r = await worker.fetch(req(ask), env({ AI: ai(() => ({ response: "fb" })) }));
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get("X-Chat-Backend"), "workers-ai");
+}
+
+// 4. OpenAI-style Workers AI output shape is accepted
+reset(); gemini(500, {});
+r = await worker.fetch(req(ask), env({ AI: ai(() => ({ choices: [{ message: { content: "choices shape" } }] })) }));
+assert.deepEqual(await r.json(), { reply: "choices shape" });
+
+// 5. No Gemini key: Workers AI only
+reset();
+r = await worker.fetch(req(ask), env({ GEMINI_API_KEY: "", AI: ai(() => ({ response: "AI only" })) }));
+assert.equal(r.status, 200);
+assert.equal(geminiCalls.length, 0);
+
+// 6. Both exhausted -> "today's limit"; both broken -> generic; nothing leaks
+reset(); gemini(429, { error: { message: "project 123" } });
+r = await worker.fetch(req(ask), env({ AI: ai(() => { throw new Error("4006: daily free allocation exceeded"); }) }));
 assert.equal(r.status, 503);
-assert.ok(!(await r.text()).includes("project 123"), "upstream body not leaked");
-stub(500, { error: "boom" });
-assert.equal((await worker.fetch(req(ask), env())).status, 502);
-stub(200, { candidates: [] });
-assert.equal((await worker.fetch(req(ask), env())).status, 502, "empty answer");
-globalThis.fetch = async () => { throw new Error("network down"); };
-assert.equal((await worker.fetch(req(ask), env())).status, 503, "network error");
+const limitBody = await r.text();
+assert.ok(limitBody.includes("today's limit"));
+assert.ok(!limitBody.includes("project 123") && !limitBody.includes("4006"), "upstream details not leaked");
+reset(); gemini(500, {});
+r = await worker.fetch(req(ask), env({ AI: ai(() => { throw new Error("internal"); }) }));
+assert.equal(r.status, 502);
+
+// 7. Gemini only, no AI binding: quota still reported as a limit
+reset(); gemini(429, {});
+assert.equal((await worker.fetch(req(ask), env())).status, 503);
 
 console.log("worker self-check: all assertions passed");
