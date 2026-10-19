@@ -439,4 +439,11 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Projects Internal Files
+graphify-out/
+docs/
+.claude/
+.codex/
 /assets/pdf/*backup-codes*.txt
+AGENTS.md
+CLAUDE.md
