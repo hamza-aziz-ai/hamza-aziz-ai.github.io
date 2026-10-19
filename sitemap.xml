@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Covers hamzaaziz.dev EXCEPT /hamza-aziz-cv/, which is served by the
+     separate hamza-aziz-cv repo and declared by its own sitemap. Both are
+     listed in robots.txt. Do not add /hamza-aziz-cv/ URLs here: declaring a
+     URL in two sitemaps lets their lastmod values drift apart. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-<url>
-  <loc>https://hamzaaziz.dev/</loc>
-  <lastmod>2026-10-19</lastmod>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://hamzaaziz.dev/matrimony.html</loc>
-  <lastmod>2026-09-20T00:00:00+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://hamzaaziz.dev/assets/pdf/Hamza_Aziz_CV_UAE.pdf</loc>
-  <lastmod>2026-10-15T00:00:00+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-
-<url>
-  <loc>https://hamzaaziz.dev/projects/voice-ai.html</loc>
-  <lastmod>2026-10-19</lastmod>
-</url>
-<url>
-  <loc>https://hamzaaziz.dev/projects/conversational-erp.html</loc>
-  <lastmod>2026-10-19</lastmod>
-</url>
-<url>
-  <loc>https://hamzaaziz.dev/projects/computer-vision-attendance.html</loc>
-  <lastmod>2026-10-19</lastmod>
-</url>
-<url>
-  <loc>https://hamzaaziz.dev/hamza-aziz-cv/</loc>
-  <lastmod>2026-10-19</lastmod>
-</url>
+  <url>
+    <loc>https://hamzaaziz.dev/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://hamzaaziz.dev/projects/voice-ai.html</loc>
+    <lastmod>2026-10-19</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://hamzaaziz.dev/projects/conversational-erp.html</loc>
+    <lastmod>2026-10-19</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://hamzaaziz.dev/projects/computer-vision-attendance.html</loc>
+    <lastmod>2026-10-19</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://hamzaaziz.dev/assets/pdf/Hamza_Aziz_CV_UAE.pdf</loc>
+    <lastmod>2026-10-15</lastmod>
+    <priority>0.64</priority>
+  </url>
+  <url>
+    <loc>https://hamzaaziz.dev/matrimony.html</loc>
+    <lastmod>2026-09-20</lastmod>
+    <priority>0.50</priority>
+  </url>
 </urlset>
