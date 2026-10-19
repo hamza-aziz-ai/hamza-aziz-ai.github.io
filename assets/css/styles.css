@@ -349,6 +349,9 @@ body.dark-theme {
     width: max-content;
     margin: 0 auto 3rem;
     font-size: var(--h2-font-size);
+    /* Was an <h3> and inherited this from the h1-h4 rule. It is a <p> now, so
+       the weight has to live here. See DECISIONS D-010. */
+    font-weight: var(--font-bold);
 }
 
 .nav__name::after,
