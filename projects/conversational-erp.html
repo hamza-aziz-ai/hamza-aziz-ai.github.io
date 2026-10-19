@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversational ERP AI Case Study | Hamza Aziz</title>
-    <meta name="description" content="Voice and text questions over college ERP data using FastAPI, Rasa, Milvus schema retrieval and constrained Gemini SQL generation.">
+    <meta name="description" content="A natural-language interface to college ERP data where the model emits fields and conditions, never SQL. Rasa routes before retrieval, Milvus grounds per-institution schemas, and deterministic code builds every query.">
     <link rel="canonical" href="https://hamzaaziz.dev/projects/conversational-erp.html">
     <meta property="og:type" content="article">
     <meta property="og:title" content="Conversational ERP AI Case Study | Hamza Aziz">
-    <meta property="og:description" content="Voice and text questions over college ERP data using FastAPI, Rasa, Milvus schema retrieval and constrained Gemini SQL generation.">
+    <meta property="og:description" content="A natural-language interface to college ERP data where the model emits fields and conditions, never SQL. Rasa routes before retrieval, Milvus grounds per-institution schemas, and deterministic code builds every query.">
     <meta property="og:url" content="https://hamzaaziz.dev/projects/conversational-erp.html">
     <meta property="og:image" content="https://hamzaaziz.dev/assets/img/projects/AI-Chatbot-for-ERP.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Conversational ERP AI Case Study | Hamza Aziz">
-    <meta name="twitter:description" content="Voice and text questions over college ERP data using FastAPI, Rasa, Milvus schema retrieval and constrained Gemini SQL generation.">
+    <meta name="twitter:description" content="A natural-language interface to college ERP data where the model emits fields and conditions, never SQL. Rasa routes before retrieval, Milvus grounds per-institution schemas, and deterministic code builds every query.">
     <meta name="twitter:image" content="https://hamzaaziz.dev/assets/img/projects/AI-Chatbot-for-ERP.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
@@ -21,15 +21,29 @@
     <main class="container section">
         <nav aria-label="Breadcrumb"><a href="../index.html#projects">Hamza Aziz / Projects</a></nav>
         <h1>Conversational AI for college ERP data</h1>
-        <p class="about__description">Global InfoVentures Pvt. Ltd. · Assistant Engineer — AI</p>
+        <p class="about__description">Global InfoVentures Pvt. Ltd. &middot; AI Engineer &middot; natural-language interface over institutional ERP systems</p>
         <h2>The problem</h2>
-        <p class="about__description">Questions about institutional data must resolve to the right ERP module and field mappings. Different institutes use different schemas, so generic free-form SQL generation is a poor fit.</p>
-        <h2>The system</h2>
-        <p class="about__description">A FastAPI gateway handles audio transcription. A two-stage Rasa router chooses the ERP module and requests clarification when confidence is low. Milvus retrieves institute-specific field mappings and similar examples. Gemini generates constrained SQL fragments within a fixed payload contract; the ERP executes the request, and a second model summarizes returned rows.</p>
-        <h2>Engineering focus</h2>
-        <p class="about__description">Schema grounding and routing separate language interpretation from the ERP execution interface. This portfolio example highlights retrieval, intent handling and backend integration rather than claiming a general-purpose autonomous database agent.</p>
+        <p class="about__description">Administrative staff need answers that already exist in an ERP database &mdash; fee status, library issues, employee records, admissions &mdash; but getting them means knowing which module to open and which report to run. The obvious fix is to let people ask in plain language and generate SQL from it.</p>
+        <p class="about__description">The obvious fix is also the dangerous one. A language model emitting raw SQL against a live institutional database puts an unpredictable component directly on the write path of records about real students. The design question is how much of the query the model is allowed to author.</p>
+        <h2>The decision that shapes everything else</h2>
+        <p class="about__description">The model does not write SQL. It emits <strong>fields and conditions</strong> as structured JSON, and a deterministic payload builder turns those into the actual query &mdash; applying alias mappings, default filters and joins before handing the result to the ERP's own web service, which owns the data and executes against it.</p>
+        <p class="about__description">This narrows the blast radius considerably: the model cannot invent a table, a join or a destructive statement, because it never gets to express one. The honest limit is that conditions still travel as SQL fragments, joined and passed through. Prompt instructions are the control there, not a grammar or an allow-list. Closing that gap with an explicit condition grammar is the single change I would make first.</p>
+        <h2>Routing before retrieval, retrieval before generation</h2>
+        <p class="about__description">A Rasa intent classifier picks the module &mdash; student, employee, library, fee &mdash; <em>before</em> any retrieval or model call happens. A second Rasa bot disambiguates the genuinely ambiguous case, student versus employee, where the same question shape applies to both.</p>
+        <p class="about__description">This ordering is deliberate and it is a cost decision as much as an accuracy one. Classification is fast and cheap; it runs first and narrows what follows. By the time the language model is invoked it sees one module's schema rather than the whole institution's, which makes the generation task smaller and the prompt shorter.</p>
+        <p class="about__description">Only then does retrieval run: the question is embedded with a 384-dimension sentence model, schema fields are retrieved from a Milvus collection, and matching few-shot examples are pulled dynamically. Because schema aliases are stored per institution rather than written into prompts, the same pipeline serves several institutions with different column names and no per-institution prompt forks.</p>
+        <h2>Trade-offs I would defend, and one I would not</h2>
+        <p class="about__description"><strong>Structured output over raw SQL</strong> &mdash; defensible, and described above. The ERP builds the FROM clause and the joins; the model contributes intent, not syntax.</p>
+        <p class="about__description"><strong>Per-institution alias collections over per-institution prompts</strong> &mdash; defensible. Adding an institution becomes a data task rather than a prompt-engineering task. The cost is that a schema change needs a collection rebuild, and a stale alias fails quietly rather than loudly.</p>
+        <p class="about__description"><strong>Exact-match payload caching</strong> &mdash; not defensible as built. A cache hit requires zero embedding distance, which makes it an exact-match cache wearing a vector database's clothes, and a hit still re-runs against the ERP because result rows are not cached. It is also not keyed by institution. Either key it properly and cache results, or delete it; as it stands it adds a lookup and buys nothing.</p>
+        <p class="about__description"><strong>Swallowed audit-insert failures</strong> &mdash; not defensible. Every interaction attempts an audit row, but a failed insert is logged and dropped, so the trail is best-effort. For a system answering questions about student records, the audit trail should be as durable as the answer.</p>
+        <h2>Voice as an output mode, not an architecture</h2>
+        <p class="about__description">Speech is a client concern. The service exposes transcription, query processing, clarification, module selection and feedback as ordinary HTTP endpoints; synthesized audio is produced where it makes sense and omitted where it does not. Keeping the voice layer at the edge means the whole query pipeline is testable with text and a terminal, which is how it was actually developed.</p>
+        <h2>What is not measured</h2>
+        <p class="about__description">No latency, accuracy or throughput benchmarks exist for this system, and I will not invent them. The useful next step is a labelled routing set measuring module-classification accuracy, end-to-end latency split by stage, and how often the deterministic payload builder rejects what the model produced &mdash; that last number is the real measure of whether the structured-output decision is doing its job.</p>
         <h2>What this demonstrates</h2>
-        <p class="about__description">Retrieval, intent routing and constrained generation can connect natural-language questions to existing business systems while keeping execution behind the ERP interface.</p>
+        <p class="about__description">Deciding where a language model's authority ends. The interesting work is the boundary: classification narrows the problem, retrieval grounds it, the model contributes structured intent, and deterministic code &mdash; not the model &mdash; constructs anything that touches the database.</p>
+        <p class="about__description">Client institutions are not named here, and no institutional data appears in this write-up.</p>
         <h2>Other case studies</h2>
         <p class="about__description"><a href="voice-ai.html">Production voice AI for drive-thru ordering</a> · <a href="computer-vision-attendance.html">Computer vision attendance with a PTZ camera</a></p>
         <p><a href="https://hamzaaziz.dev/hamza-aziz-cv/">Full CV</a> · <a href="../assets/pdf/Hamza_Aziz_CV_UAE.pdf">Download UAE CV (PDF)</a> · <a href="mailto:hamza.aziz.dev@gmail.com">Discuss an AI engineering opportunity</a></p>

@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Vision Attendance Case Study | Hamza Aziz</title>
-    <meta name="description" content="PTZ classroom attendance using ONVIF camera sweeps, TensorRT face inference, Milvus identity matching, YOLO head counts and ERP integration.">
+    <meta name="description" content="Classroom attendance from one PTZ camera: ONVIF preset sweeps, 512-d embeddings in Milvus, and an independent YOLOv9 headcount as a cross-check against the people face recognition cannot report missing.">
     <link rel="canonical" href="https://hamzaaziz.dev/projects/computer-vision-attendance.html">
     <meta property="og:type" content="article">
     <meta property="og:title" content="Computer Vision Attendance Case Study | Hamza Aziz">
-    <meta property="og:description" content="PTZ classroom attendance using ONVIF camera sweeps, TensorRT face inference, Milvus identity matching, YOLO head counts and ERP integration.">
+    <meta property="og:description" content="Classroom attendance from one PTZ camera: ONVIF preset sweeps, 512-d embeddings in Milvus, and an independent YOLOv9 headcount as a cross-check against the people face recognition cannot report missing.">
     <meta property="og:url" content="https://hamzaaziz.dev/projects/computer-vision-attendance.html">
     <meta property="og:image" content="https://hamzaaziz.dev/assets/img/projects/classroom-attendance.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Computer Vision Attendance Case Study | Hamza Aziz">
-    <meta name="twitter:description" content="PTZ classroom attendance using ONVIF camera sweeps, TensorRT face inference, Milvus identity matching, YOLO head counts and ERP integration.">
+    <meta name="twitter:description" content="Classroom attendance from one PTZ camera: ONVIF preset sweeps, 512-d embeddings in Milvus, and an independent YOLOv9 headcount as a cross-check against the people face recognition cannot report missing.">
     <meta name="twitter:image" content="https://hamzaaziz.dev/assets/img/projects/classroom-attendance.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
@@ -21,15 +21,30 @@
     <main class="container section">
         <nav aria-label="Breadcrumb"><a href="../index.html#projects">Hamza Aziz / Projects</a></nav>
         <h1>Computer vision attendance with a PTZ camera</h1>
-        <p class="about__description">Global InfoVentures Pvt. Ltd. · Assistant Engineer — AI</p>
+        <p class="about__description">Global InfoVentures Pvt. Ltd. &middot; AI Engineer &middot; classroom attendance from a single pan-tilt-zoom camera</p>
         <h2>The problem</h2>
-        <p class="about__description">A single movable camera must capture different classroom seats while allowing time for zoom and focus to settle. Recognition, independent head counts and attendance synchronization must fit the lecture workflow.</p>
+        <p class="about__description">Marking attendance in a lecture hall by hand costs minutes of every class. Doing it with cameras usually means one fixed camera per section of the room, which multiplies hardware, cabling and cost across a campus.</p>
+        <p class="about__description">The constraint that shaped this system: one pan-tilt-zoom camera per room. A PTZ camera can cover a whole hall, but only one part of it at a time &mdash; so the design problem becomes scheduling attention, and accepting that attendance is assembled from a sweep rather than captured in an instant.</p>
         <h2>The system</h2>
-        <p class="about__description">An ONVIF PTZ camera follows timed presets, with faculty captures at lecture start and end and a 23-preset seat sweep. TensorRT-backed InsightFace-REST detects faces and computes embeddings. A top-1 Milvus search matches 512-dimensional vectors, while a separate YOLOv9 service counts heads. PostgreSQL stores attendance logs, and results are reconciled per lecture and synchronized to the ERP.</p>
-        <h2>Engineering focus</h2>
-        <p class="about__description">This portfolio example connects camera orchestration, GPU inference, identity retrieval and backend integration. Four Dockerized services run on a MIG-partitioned GPU. The emphasis is on the operational pipeline rather than an isolated recognition model.</p>
+        <p class="about__description">Each camera runs an ONVIF preset sweep: move to the faculty position first, wait out the zoom and focus settling time, capture, then traverse the configured class presets, then the wider positions used for counting. The sweep is gated to class hours, and frames are published over RTSP into a shared buffer.</p>
+        <p class="about__description">Recognition workers consume that buffer, call an InsightFace service for 512-dimension embeddings, and do a top-1 nearest-neighbour search against a Milvus collection with an L2 distance threshold. Matches become attendance records in a PostgreSQL table partitioned by year. A scheduled job pushes the current lecture's attendance to the institution's ERP at a fixed interval during class hours, with a manual resend endpoint for staff.</p>
+        <p class="about__description">Running alongside it, on a second buffer, is a YOLOv9 person-detection service producing a headcount from the wide positions.</p>
+        <h2>Why a second model that recognises nobody</h2>
+        <p class="about__description">The headcount service is the part I would point at first. Face recognition can only tell you about people it matched; it is structurally incapable of telling you it missed someone. A student facing away, badly lit or occluded simply does not appear, and the system has no internal signal that anything is wrong.</p>
+        <p class="about__description">An independent headcount does have that signal. If recognition names eleven people and detection counts nineteen bodies, the gap is visible without anyone reviewing footage. It is a cheap, deliberately redundant cross-check against a failure mode the primary model cannot self-report &mdash; and it is the difference between a system that is confidently wrong and one that knows it should be doubted.</p>
+        <p class="about__description">It has its own weakness: counts are summed across camera positions, and overlapping fields of view can double-count the same person. That makes it a <em>discrepancy signal</em>, not a ground truth, and it should be read as one.</p>
+        <h2>Decisions and their costs</h2>
+        <p class="about__description"><strong>Timed sweeps over event-driven capture.</strong> The cycle is built from fixed waits for zoom and focus settling &mdash; several minutes of deliberate sleeping per full cycle. It is simple, predictable, and gentle on the camera's motors. It also means a short faculty window can be missed entirely, because the camera is simply pointed elsewhere when it opens.</p>
+        <p class="about__description"><strong>Top-1 matching with a distance threshold and no margin check.</strong> Cheap and fast. But with no comparison against the second-best match, two similar-looking faces produce a confident wrong answer rather than an abstention. A margin test is the first accuracy change I would make.</p>
+        <p class="about__description"><strong>Acknowledge before persist.</strong> The ingestion endpoint returns success before the database write completes, which keeps the capture loop from blocking. A failed write is logged and never retried, so a record can be acknowledged and still not exist. For attendance this is the wrong default &mdash; an outbox with retries is the fix, and it is the first reliability change I would make.</p>
+        <p class="about__description"><strong>Unbounded queues.</strong> No backpressure logic to write, and no limit on memory growth if consumers fall behind producers. Fine while throughput holds; a slow failure when it does not.</p>
+        <p class="about__description"><strong>Liveness detection built but gated off.</strong> A separate face-liveness service exists and is deployed, and the system currently runs with it disabled. Without it, a photograph held to a camera is a live question rather than a solved one.</p>
+        <h2>What is not measured</h2>
+        <p class="about__description">No recognition accuracy, latency or throughput figures were produced for this system. The sweep cycle time is calculable from the configured waits, but that is arithmetic over configuration, not a measurement of a running deployment.</p>
+        <p class="about__description">The instrumentation worth adding, in order: the recognition-versus-headcount discrepancy per lecture, which is already the system's own health signal; end-to-end lag from capture to ERP push; and queue depth, which is the leading indicator for the unbounded-queue problem above.</p>
         <h2>What this demonstrates</h2>
-        <p class="about__description">Physical camera timing, GPU inference, identity retrieval and persistence must work together to produce lecture-level attendance records.</p>
+        <p class="about__description">Designing around a hardware constraint rather than against it, and building a cheap independent check against the failure a model cannot report about itself. The judgement on display is mostly about what the system does <em>not</em> know &mdash; and making that visible instead of letting a confident number stand unchallenged.</p>
+        <p class="about__description">Client institutions are not named here, and no student data, imagery or configuration appears in this write-up.</p>
         <h2>Other case studies</h2>
         <p class="about__description"><a href="voice-ai.html">Production voice AI for drive-thru ordering</a> · <a href="conversational-erp.html">Conversational AI for college ERP data</a></p>
         <p><a href="https://hamzaaziz.dev/hamza-aziz-cv/">Full CV</a> · <a href="../assets/pdf/Hamza_Aziz_CV_UAE.pdf">Download UAE CV (PDF)</a> · <a href="mailto:hamza.aziz.dev@gmail.com">Discuss an AI engineering opportunity</a></p>
