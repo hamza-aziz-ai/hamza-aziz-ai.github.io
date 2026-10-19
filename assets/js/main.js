@@ -180,19 +180,30 @@ transitionLinks.forEach(link => {
 })
 
 /*=============== SCROLL REVEAL ANIMATION ===============*/
-const sr = ScrollReveal({
-    origin: 'top',
-    distance: '60px',
-    duration: 2500,
-    delay: 400,
-    // reset: true // Animations repeat
-})
+// Nothing above the fold is revealed. ScrollReveal sets opacity:0 on its
+// targets, and Chrome has ignored opacity-0 paints as Largest Contentful
+// Paint candidates since Chrome 86, so revealing .home__* made the hero
+// portrait ineligible to count until it repainted -- while index.html asks
+// for that same image at fetchpriority="high". Do not add .home__* back.
+//
+// The whole block is skipped for prefers-reduced-motion. ScrollReveal has no
+// reduced-motion handling of its own, so without this guard every section
+// fades for 2500ms for a visitor who asked for no motion. See DECISIONS D-008.
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const sr = ScrollReveal({
+        origin: 'top',
+        distance: '60px',
+        duration: 2500,
+        delay: 400,
+        // reset: true // Animations repeat
+    })
 
-sr.reveal(`.home__profile, .about__image, .contact__mail`, { origin: "right" })
-sr.reveal(`.home__name, .home__info, .about__container .section-title-1, .about__info, .contact__social, .contact__data`, { origin: "left" })
-sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, { origin: "left" })
-sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, { origin: "right" })
-sr.reveal(`.projects__container, .qualification__content`, { interval: 100 })
+    sr.reveal(`.about__image, .contact__mail`, { origin: "right" })
+    sr.reveal(`.about__container .section-title-1, .about__info, .contact__social, .contact__data`, { origin: "left" })
+    sr.reveal(`.skills__content:nth-child(1), .skills__content:nth-child(3)`, { origin: "left" })
+    sr.reveal(`.skills__content:nth-child(2), .skills__content:nth-child(4)`, { origin: "right" })
+    sr.reveal(`.projects__container, .qualification__content`, { interval: 100 })
+}
 
 /*=============== PROJECTS SLIDER ===============*/
 const projectsTrack = document.getElementById('projects-track')
