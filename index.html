@@ -17,6 +17,59 @@
     <meta name="twitter:description" content="Hamza Aziz, AI Product Engineer working on production voice AI and computer vision. Open to AI engineering roles in the UAE, India, and with US-headquartered companies." />
     <meta name="twitter:image" content="https://hamzaaziz.dev/assets/img/professional-profile/about-profile-optimized.webp" />
 
+    <!--=============== STRUCTURED DATA ===============-->
+    <!-- The Person node is SHARED with hamza-aziz-cv/index.html, which already
+         ships it live under this same @id. Reuse the id and keep name, jobTitle
+         and url identical: a second Person node for one human on one domain is
+         the opposite of the consolidation this markup exists for. `image` is
+         deliberately omitted because the CV page already asserts a different
+         one and a conflicting value is worse than none. No alumniOf -- the
+         BITS M.Tech runs 2025-2027 and is not complete. See DECISIONS D-009. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://hamzaaziz.dev/#website",
+          "url": "https://hamzaaziz.dev/",
+          "name": "Hamza Aziz",
+          "publisher": { "@id": "https://hamzaaziz.dev/#person" }
+        },
+        {
+          "@type": "ProfilePage",
+          "url": "https://hamzaaziz.dev/",
+          "name": "Hamza Aziz | AI Engineer — Voice AI & Computer Vision",
+          "isPartOf": { "@id": "https://hamzaaziz.dev/#website" },
+          "mainEntity": { "@id": "https://hamzaaziz.dev/#person" }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://hamzaaziz.dev/#person",
+          "name": "Hamza Aziz",
+          "jobTitle": "AI Product Engineer",
+          "url": "https://hamzaaziz.dev/",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "VoicePlug Inc.",
+            "url": "https://voiceplug.ai/"
+          },
+          "knowsAbout": [
+            "Voice AI",
+            "Computer Vision",
+            "Generative AI",
+            "Conversational AI"
+          ],
+          "sameAs": [
+            "https://github.com/hamza-aziz-ai",
+            "https://www.linkedin.com/in/hamza-aziz-ai/",
+            "https://medium.com/@hamzaziizzz"
+          ]
+        }
+      ]
+    }
+    </script>
+
     <!--=============== Google tag (gtag.js) ===============-->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GT-T5PL6LBH"></script>
     <script>
