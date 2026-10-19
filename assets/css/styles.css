@@ -125,6 +125,10 @@ img {
 }
 
 /*========== Variables Dark theme ==========*/
+/* .dark-theme-preload is set on <html> by the inline head script on
+   projects/*.html, before <body> exists, so a dark-theme visitor never sees a
+   light flash. That page's own script then moves it to body.dark-theme. */
+.dark-theme-preload body,
 body.dark-theme {
     --first-color: hsl(14, 80%, 50%);
     --black-color: hsl(0, 0%, 18%);
@@ -1975,25 +1979,63 @@ body.dark-theme {
 
 .case a {
     color: var(--first-color);
+    text-decoration: none;
     text-underline-offset: 3px;
-    text-decoration: underline;
 }
 
 .case a:hover {
-    text-decoration: none;
+    text-decoration: underline;
 }
 
-/* These pages carry no nav, so there is no theme toggle to press. The
-   system preference is the only signal available. index.html keeps its
-   .dark-theme class toggle and is unaffected. */
-@media (prefers-color-scheme: dark) {
-    body:has(.case) {
-        --title-color: hsl(0, 0%, 95%);
-        --text-color: hsl(0, 0%, 75%);
-        --text-color-light: hsl(0, 0%, 55%);
-        --body-color: hsl(0, 0%, 12%);
-        --container-color: hsl(0, 0%, 16%);
-    }
+/* Theme comes from body.dark-theme, exactly as on index.html, applied by the
+   inline script in each page's <head> from the same localStorage key. Do not
+   use prefers-color-scheme here: it would override the visitor's own choice. */
+.case__banner {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-block: 2rem 0.5rem;
+}
+
+.case__theme {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--container-color);
+    color: var(--title-color);
+    cursor: pointer;
+    transition: background-color 0.4s;
+}
+
+.case__theme:hover {
+    color: var(--first-color);
+}
+
+.case__theme svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+/* One icon is shown at a time: moon on light, sun on dark. */
+.case__theme .case__sun {
+    display: none;
+}
+
+.dark-theme .case__theme .case__moon {
+    display: none;
+}
+
+.dark-theme .case__theme .case__sun {
+    display: block;
 }
 
 @media screen and (min-width: 576px) {

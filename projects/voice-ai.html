@@ -16,12 +16,24 @@
     <meta name="twitter:description" content="How a production drive-thru voice system keeps a fluent model from standing in for a validated order: six distinct turn outcomes, deterministic cart validation, four POS providers, and measured 3.02s median reply latency.">
     <meta name="twitter:image" content="https://hamzaaziz.dev/assets/img/projects/drivethru-voice-ordering.png">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <script>
+        try {
+            if (localStorage.getItem('selected-theme') === 'dark') {
+                document.documentElement.classList.add('dark-theme-preload')
+            }
+        } catch (e) { /* private mode: fall through to the light default */ }
+    </script>
 </head>
 <body>
+        <button class="case__theme" id="case-theme" type="button" aria-label="Switch between light and dark theme">
+            <svg class="case__moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>
+            <svg class="case__sun" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-6 1.5 3h-3L12 1Zm0 22-1.5-3h3L12 23ZM1 12l3-1.5v3L1 12Zm22 0-3 1.5v-3l3 1.5ZM4.2 4.2l3.2 1-2.2 2.2-1-3.2Zm15.6 15.6-3.2-1 2.2-2.2 1 3.2ZM19.8 4.2l-1 3.2-2.2-2.2 3.2-1ZM4.2 19.8l1-3.2 2.2 2.2-3.2 1Z"/></svg>
+        </button>
     <main class="case">
         <nav class="case__crumb" aria-label="Breadcrumb"><a href="../index.html#projects">Hamza Aziz / Projects</a></nav>
         <h1>Production voice AI for drive-thru ordering</h1>
         <p class="case__meta">VoicePlug Inc. &middot; AI Product Engineer &middot; speech-to-order NLU service</p>
+        <img class="case__banner" src="../assets/img/projects/drivethru-voice-ordering-optimized.webp" alt="DriveThru voice ordering" width="1200" height="675" fetchpriority="high">
         <h2>The problem</h2>
         <p>A customer speaks at a drive-thru speaker and expects food. Between those two things sits a chain of systems that can each fail independently, and a language model that is fluent but not authoritative. The model can produce a sentence that sounds like a confirmed order while the cart behind it says something else.</p>
         <p>The engineering problem is therefore not &ldquo;make the model understand speech&rdquo;. It is: decide what counts as true, and refuse to let a plausible sentence stand in for a validated one.</p>
@@ -51,5 +63,25 @@
         <p><a href="conversational-erp.html">Conversational AI for college ERP data</a> · <a href="computer-vision-attendance.html">Computer vision attendance with a PTZ camera</a></p>
         <p class="case__links"><a href="https://hamzaaziz.dev/hamza-aziz-cv/">Full CV</a> · <a href="../assets/pdf/Hamza_Aziz_CV_UAE.pdf">Download UAE CV (PDF)</a> · <a href="mailto:hamza.aziz.dev@gmail.com">Discuss an AI engineering opportunity</a></p>
     </main>
+    <script>
+        // Mirrors index.html's toggle (main.js:150-157) so the choice carries
+        // across both pages through the same localStorage key.
+        (function () {
+            var root = document.documentElement
+            var body = document.body
+            if (root.classList.contains('dark-theme-preload')) {
+                root.classList.remove('dark-theme-preload')
+                body.classList.add('dark-theme')
+            }
+            document.getElementById('case-theme').addEventListener('click', function () {
+                body.classList.toggle('dark-theme')
+                var now = body.classList.contains('dark-theme') ? 'dark' : 'light'
+                try {
+                    localStorage.setItem('selected-theme', now)
+                    localStorage.setItem('selected-icon', now === 'dark' ? 'ri-moon-line' : 'ri-sun-line')
+                } catch (e) { /* nothing to persist to */ }
+            })
+        })()
+    </script>
 </body>
 </html>
