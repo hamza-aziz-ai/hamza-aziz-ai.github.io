@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversational ERP AI Case Study | Hamza Aziz</title>
+    <meta name="description" content="Voice and text questions over college ERP data using FastAPI, Rasa, Milvus schema retrieval and constrained Gemini SQL generation.">
+    <link rel="canonical" href="https://hamzaaziz.dev/projects/conversational-erp.html">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+    <main class="container section">
+        <nav aria-label="Breadcrumb"><a href="../index.html#projects">Hamza Aziz / Projects</a></nav>
+        <h1>Conversational AI for college ERP data</h1>
+        <p class="about__description">Global InfoVentures Pvt. Ltd. · Assistant Engineer — AI</p>
+        <h2>The problem</h2>
+        <p class="about__description">Questions about institutional data must resolve to the right ERP module and field mappings. Different institutes use different schemas, so generic free-form SQL generation is a poor fit.</p>
+        <h2>The system</h2>
+        <p class="about__description">A FastAPI gateway handles audio transcription. A two-stage Rasa router chooses the ERP module and requests clarification when confidence is low. Milvus retrieves institute-specific field mappings and similar examples. Gemini generates constrained SQL fragments within a fixed payload contract; the ERP executes the request, and a second model summarizes returned rows.</p>
+        <h2>Engineering focus</h2>
+        <p class="about__description">Schema grounding and routing separate language interpretation from the ERP execution interface. This portfolio example highlights retrieval, intent handling and backend integration rather than claiming a general-purpose autonomous database agent.</p>
+        <h2>What this demonstrates</h2>
+        <p class="about__description">Retrieval, intent routing and constrained generation can connect natural-language questions to existing business systems while keeping execution behind the ERP interface.</p>
+        <p><a href="../assets/pdf/Hamza_Aziz_CV_UAE.pdf">Download UAE CV</a> · <a href="mailto:hamza.aziz.dev@gmail.com">Discuss an AI engineering opportunity</a></p>
+    </main>
+</body>
+</html>

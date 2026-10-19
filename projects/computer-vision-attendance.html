@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Vision Attendance Case Study | Hamza Aziz</title>
+    <meta name="description" content="PTZ classroom attendance using ONVIF camera sweeps, TensorRT face inference, Milvus identity matching, YOLO head counts and ERP integration.">
+    <link rel="canonical" href="https://hamzaaziz.dev/projects/computer-vision-attendance.html">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+    <main class="container section">
+        <nav aria-label="Breadcrumb"><a href="../index.html#projects">Hamza Aziz / Projects</a></nav>
+        <h1>Computer vision attendance with a PTZ camera</h1>
+        <p class="about__description">Global InfoVentures Pvt. Ltd. · Assistant Engineer — AI</p>
+        <h2>The problem</h2>
+        <p class="about__description">A single movable camera must capture different classroom seats while allowing time for zoom and focus to settle. Recognition, independent head counts and attendance synchronization must fit the lecture workflow.</p>
+        <h2>The system</h2>
+        <p class="about__description">An ONVIF PTZ camera follows timed presets, with faculty captures at lecture start and end and a 23-preset seat sweep. TensorRT-backed InsightFace-REST detects faces and computes embeddings. A top-1 Milvus search matches 512-dimensional vectors, while a separate YOLOv9 service counts heads. PostgreSQL stores attendance logs, and results are reconciled per lecture and synchronized to the ERP.</p>
+        <h2>Engineering focus</h2>
+        <p class="about__description">This portfolio example connects camera orchestration, GPU inference, identity retrieval and backend integration. Four Dockerized services run on a MIG-partitioned GPU. The emphasis is on the operational pipeline rather than an isolated recognition model.</p>
+        <h2>What this demonstrates</h2>
+        <p class="about__description">Physical camera timing, GPU inference, identity retrieval and persistence must work together to produce lecture-level attendance records.</p>
+        <p><a href="../assets/pdf/Hamza_Aziz_CV_UAE.pdf">Download UAE CV</a> · <a href="mailto:hamza.aziz.dev@gmail.com">Discuss an AI engineering opportunity</a></p>
+    </main>
+</body>
+</html>
