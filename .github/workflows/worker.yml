@@ -1,0 +1,53 @@
+# Deploy the chat assistant's Cloudflare Worker whenever the code or the pages
+# it answers from change. The knowledge text is rebuilt from the pages first,
+# so a site edit reaches the chat without a manual step. Private notes are not
+# involved: they live in Workers KV (worker/upload_notes.py), never in git.
+name: Chat Worker deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - "index.html"
+      - "projects/**"
+      - ".github/workflows/worker.yml"
+  # The CV page lives in the hamza-aziz-cv repo and is fetched live, so a
+  # weekly rebuild picks up CV edits.
+  schedule:
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: worker-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build knowledge from the site
+        run: python -I worker/build_knowledge.py
+
+      - name: Self-check
+        run: node worker/test.mjs
+
+      - name: Deploy
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4.151.2 deploy
