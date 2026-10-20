@@ -25,8 +25,9 @@
         } catch (e) { /* private mode: fall through to the light default */ }
     </script>
     <!-- Google tag: Google Ads (GT-T5PL6LBH) and GA4 "Hamza Aziz Portfolio Website" (G-KJ0EQRJDCN), same as index.html -->
-    <!-- Loaded first-party through Cloudflare's Google tag gateway (/iitk/); works only while the DNS records are proxied -->
-    <script async src="/iitk/?id=G-KJ0EQRJDCN"></script>
+    <!-- Loaded first-party through Cloudflare's Google tag gateway (/iitk/). /iitk/ exists only while
+         the DNS records are proxied; if it fails to load, fall back to googletagmanager.com. -->
+    <script async src="/iitk/?id=G-KJ0EQRJDCN" onerror="var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-KJ0EQRJDCN';document.head.appendChild(s)"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
