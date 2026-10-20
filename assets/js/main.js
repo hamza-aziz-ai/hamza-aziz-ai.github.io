@@ -54,7 +54,7 @@ const sendEmail = (event) => {
         user_subject: document.getElementById('subject').value,
         user_message: document.getElementById('message').value,
     }
-    emailjs.send('service_zdg06yb', 'template_axt14ah', notifyParams, 'qaTk8r3XCLMu5l1sG')
+    emailjs.send('service_lc9tq7j', 'template_axt14ah', notifyParams, 'qaTk8r3XCLMu5l1sG')
         .then(() => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
