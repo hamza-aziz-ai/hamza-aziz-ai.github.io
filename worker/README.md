@@ -29,7 +29,7 @@ is charged, because the Google project has no billing account.
    project that has **no billing account**, so the free tier can never bill.
    Keep it out of every repo folder.
 2. **Check the fallback model id.** Cloudflare dashboard → AI → Models. Confirm
-   `@cf/meta/llama-3.1-8b-instruct` exists, or set `FALLBACK_MODEL` in
+   `@cf/meta/llama-3.1-8b-instruct-fp8` exists, or set `FALLBACK_MODEL` in
    `wrangler.toml` to another free `@cf/` text model. Third-party models such
    as `anthropic/...` are billed separately; don't use them here.
 3. From the repo root:
