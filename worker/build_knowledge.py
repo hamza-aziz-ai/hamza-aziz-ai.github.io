@@ -86,7 +86,8 @@ def main() -> int:
     for title, url, text in sources():
         raw[title] = text
         body = text if url.endswith(".pdf") else to_text(text)
-        sections[title] = f"## {title}\n{body}"
+        # The URL lets the assistant send visitors to the page itself.
+        sections[title] = f"## {title}\nPage: {url}\n{body}"
 
     # Contact details sit behind icons and links, so to_text() drops them;
     # list them so "what's his LinkedIn / phone?" gets an answer. Only what
