@@ -136,8 +136,14 @@ async function askGemini(env, turns) {
   }
   // The free tier's daily quota surfaces as 429. The Google project has no
   // billing account, so this is a hard cap, never a charge.
-  if (res.status === 429) return { outcome: "quota" };
-  if (!res.ok) return { outcome: "error" };
+  if (!res.ok) {
+    // Private to the account (wrangler tail / dashboard logs), never sent to
+    // the visitor. Google's status name says why: RESOURCE_EXHAUSTED,
+    // PERMISSION_DENIED, INVALID_ARGUMENT, NOT_FOUND...
+    const why = await res.json().then((d) => d?.error?.status).catch(() => "");
+    console.log(`gemini ${res.status} ${why || ""}`.trim());
+    return { outcome: res.status === 429 ? "quota" : "error" };
+  }
   const data = await res.json().catch(() => ({}));
   const reply = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
   return reply ? { reply } : { outcome: "error" };
