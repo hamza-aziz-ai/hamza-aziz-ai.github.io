@@ -5,7 +5,7 @@ static and a model API key cannot live in page JavaScript, so this
 Cloudflare Worker holds it and the widget (`assets/js/chat.js`) calls it.
 
 ```
-hamzaaziz.dev widget ──POST /chat──▶ Worker ──▶ Gemini 2.5 Flash-Lite (full site text)
+hamzaaziz.dev widget ──POST /chat──▶ Worker ──▶ Gemini 3.5 Flash-Lite (full site text)
                                         └─ on quota/error ─▶ Workers AI (homepage + CV text)
 ```
 
