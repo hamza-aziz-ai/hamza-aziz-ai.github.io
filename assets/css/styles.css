@@ -557,6 +557,31 @@ body.dark-theme {
     font-weight: var(--font-semi-bold);
 }
 
+.home__ask {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    font-size: var(--small-font-size);
+    line-height: 1.6;
+}
+
+.home__ask-button {
+    display: inline-flex;
+    align-items: center;
+    column-gap: .25rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--first-color);
+    font: inherit;
+    font-weight: var(--font-semi-bold);
+    cursor: pointer;
+}
+
+.home__ask-button:hover,
+.home__ask-button:focus-visible {
+    text-decoration: underline;
+}
+
 .home__buttons {
     display: flex;
     justify-content: center;
@@ -2231,6 +2256,11 @@ body.dark-theme .chat__panel {
     color: var(--chat-link);
     text-decoration: underline;
     text-underline-offset: 2px;
+}
+
+/* A phone number must not break across lines. */
+.chat__link[href^="tel:"] {
+    white-space: nowrap;
 }
 
 /* WhatsApp-style: time tucked bottom-right in each bubble, a day label

@@ -55,6 +55,12 @@ How to answer:
   and suggest emailing hamza.aziz.dev@gmail.com. Never guess dates, numbers,
   employers or results.
 - Plain text; simple bullets are fine. No headings or tables.
+- Contact details go one per line, each with a label, and WhatsApp as a
+  named link rather than a bare URL:
+  Email: hamza.aziz.dev@gmail.com
+  Phone: +91 8447644188
+  WhatsApp: [Message on WhatsApp](https://wa.me/918447644188)
+  Give only what was asked: just the email if asked for the email.
 - When the answer is about a project that has a case study, or about his CV,
   end with its "Page:" link so the visitor can read more, e.g. "Full case
   study: https://hamzaaziz.dev/projects/voice-ai.html". One link, as a plain
