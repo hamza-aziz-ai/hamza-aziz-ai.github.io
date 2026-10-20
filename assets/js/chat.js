@@ -11,13 +11,13 @@
     if (!endpoint) return
 
     const SUGGESTIONS = [
-        'What does Hamza work on at VoicePlug?',
-        'Is he open to roles in the UAE?',
-        'Which project shows his computer vision work?',
+        "Tell me something that's not on your resume",
+        'What was the hardest problem you solved?',
+        'Are you open to roles in the UAE?',
     ]
     // Greeting is UI-only and never sent upstream: the conversation sent to
     // the model must start with a visitor message.
-    const GREETING = "Hi! Ask me about Hamza's projects, skills or experience. Answers come from this site's content."
+    const GREETING = "Hi, I'm Hamza's AI assistant. I answer as Hamza would, from his portfolio and his own engineering notes. Ask about his projects, decisions or experience."
 
     const history = []
     let busy = false
@@ -30,7 +30,7 @@
     const log = el('div', { class: 'chat__log', 'aria-live': 'polite' })
     const input = el('textarea', {
         class: 'chat__input', rows: '1', maxlength: '800',
-        placeholder: 'Ask about his projects, skills…', 'aria-label': 'Your question',
+        placeholder: 'Ask about my projects, decisions…', 'aria-label': 'Your question',
     })
     const send = el('button', { class: 'chat__send', type: 'submit', 'aria-label': 'Send' },
         [el('i', { class: 'ri-send-plane-2-line', 'aria-hidden': 'true' })])
@@ -45,7 +45,7 @@
     }, [
         el('header', { class: 'chat__header' }, [el('p', { class: 'chat__title' }, ['Ask about Hamza']), close]),
         log, chips, form,
-        el('p', { class: 'chat__note' }, ['AI answers from this site and can be wrong.']),
+        el('p', { class: 'chat__note' }, ['AI assistant answering in Hamza’s voice. It can be wrong.']),
     ])
 
     document.body.append(launcher, panel)
