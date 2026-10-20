@@ -45,8 +45,16 @@ const contactForm = document.getElementById('contact-form'),
 const sendEmail = (event) => {
     event.preventDefault()
 
-    // Send email to yourself
-    emailjs.sendForm('service_zdg06yb', 'template_axt14ah', '#contact-form', 'qaTk8r3XCLMu5l1sG')
+    // Send email to yourself. emailjs.send with the fields' values, not
+    // sendForm: a submitted form turns each line break into \r\n, which the
+    // HTML template showed as double blank lines.
+    const notifyParams = {
+        user_name: document.getElementById('name').value,
+        user_email: document.getElementById('email').value,
+        user_subject: document.getElementById('subject').value,
+        user_message: document.getElementById('message').value,
+    }
+    emailjs.send('service_zdg06yb', 'template_axt14ah', notifyParams, 'qaTk8r3XCLMu5l1sG')
         .then(() => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
