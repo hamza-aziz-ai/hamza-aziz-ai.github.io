@@ -59,6 +59,10 @@ const sendEmail = (event) => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
 
+            // GA4 recommended event for a lead. No form content is sent.
+            // gtag is absent when analytics is blocked; the form still works.
+            if (typeof gtag === 'function') gtag('event', 'generate_lead', { method: 'contact_form' })
+
             // Send a confirmation email to the user
             sendConfirmationEmail()
 
