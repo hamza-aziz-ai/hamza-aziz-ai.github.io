@@ -19,7 +19,7 @@ is charged, because the Google project has no billing account.
 |---|---|
 | `src/index.js` | The Worker: origin check, rate limit, validation, Gemini then Workers AI |
 | `src/knowledge.js` | GENERATED. The public site text the assistant may answer from |
-| `build_knowledge.py` | Regenerates `knowledge.js` from every sitemap page and the CV page, except matrimony and the bio-data PDF (CI runs it) |
+| `build_knowledge.py` | Regenerates `knowledge.js` from every sitemap page, the CV page and the PDFs they link, except matrimony and the bio-data PDF; marksheets keep results only (CI runs it) |
 | `sanitize_notes.py` | Cleans raw design docs into private notes |
 | `upload_notes.py` | Uploads the private notes to Workers KV |
 | `test.mjs` | Self-check with both models and KV stubbed: `node worker/test.mjs` |

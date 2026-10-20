@@ -48,7 +48,9 @@ jobs:
           python -I worker/build_knowledge.py
 
       - name: Self-check
-        run: node worker/test.mjs
+        run: |
+          node worker/test.mjs
+          python -I worker/test_results_only.py
 
       - name: Deploy
         working-directory: worker

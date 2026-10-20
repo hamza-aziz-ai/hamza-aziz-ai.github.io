@@ -25,6 +25,7 @@ import json
 import pathlib
 import re
 import sys
+import urllib.parse
 import urllib.request
 
 from pypdf import PdfReader
@@ -36,7 +37,42 @@ CORE = ("Homepage", "CV")
 OUT = ROOT / "worker/src/knowledge.js"
 # URL prefixes never read, and text that must never appear in the output.
 EXCLUDED_URLS = (SITE + "matrimony", SITE + "assets/pdf/Hamza-BioData.pdf")
-EXCLUDED = ("matrimony", "Hamza-BioData", "class-10.pdf", "class-12.pdf", "college-degree.pdf")
+EXCLUDED = ("matrimony", "Hamza-BioData")
+# Marksheets and the degree certificate, linked from the CV page. Only their
+# results are kept: see results_only().
+EDUCATION_DOCS = re.compile(r"/(?:class-\d+|college-degree)\.pdf$")
+PERSONAL = re.compile(
+    r"roll|registration|enrol|serial|date of birth|\bdob\b|mother|father|guardian"
+    r"|digilocker|verify|qr code|powered by",
+    re.I,
+)
+NAME_LINE = re.compile(r"^[A-Z][A-Z .']{1,30}$")
+NAME_LINE_KEEP = re.compile(r"EDUCATION|EXAMINATION|ENGINEERING|DIVISION|DISTINCTION|UNIVERSITY|SCHOOL")
+
+
+def results_only(text: str) -> str:
+    """A marksheet's board, school, year, subjects and grades, nothing else.
+
+    Personal details sit on their own, often unlabelled, lines (a parent's
+    name alone on the line after its label), so this keeps lines that look
+    like results rather than trying to spot every personal one. Drops: lines
+    naming a personal field, long digit runs (roll, registration and serial
+    numbers), dates (birth date, issue stamps), short all-caps name lines,
+    and lines that are mostly non-Latin (the Hindi text extracts as noise).
+    """
+    keep = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or PERSONAL.search(line):
+            continue
+        if re.search(r"\d{6,}|\b\d{1,2}/\d{1,2}/\d{2,4}\b", line):
+            continue
+        if sum(c.isascii() for c in line) / len(line) < 0.8:
+            continue
+        if NAME_LINE.match(line) and not NAME_LINE_KEEP.search(line):
+            continue
+        keep.append(line)
+    return "\n".join(keep)
 
 
 def fetch(url: str) -> bytes:
@@ -48,18 +84,26 @@ def fetch(url: str) -> bytes:
 def sources() -> list[tuple[str, str, str]]:
     """(title, url, text) for every page in the sitemap, plus the CV page."""
     urls = re.findall(r"<loc>([^<]+)</loc>", (ROOT / "sitemap.xml").read_text(encoding="utf-8"))
-    out = []
-    for url in [*urls, CV_PAGE]:
-        if url.startswith(EXCLUDED_URLS):
+    queue, seen, out = [*urls, CV_PAGE], set(), []
+    while queue:
+        url = queue.pop(0)
+        if url in seen or url.startswith(EXCLUDED_URLS):
             continue
+        seen.add(url)
         local = ROOT / (url[len(SITE):] or "index.html")
         if url.endswith(".pdf"):
             pdf = PdfReader(io.BytesIO(local.read_bytes() if local.is_file() else fetch(url)))
             text = "\n".join((p.extract_text() or "") for p in pdf.pages)
-            title = f"{local.stem.replace('_', ' ')} (PDF)"
+            if EDUCATION_DOCS.search(url):
+                text = results_only(text)
+            title = f"{local.stem.replace('_', ' ').replace('-', ' ')} (PDF)"
         else:
             text = local.read_text(encoding="utf-8") if local.is_file() else fetch(url).decode("utf-8")
             title = {SITE: "Homepage", CV_PAGE: "CV"}.get(url) or page_title(text)
+            # PDFs a page links to (the CV page links the marksheets) are
+            # part of the site even though no sitemap lists them.
+            for href in re.findall(r'href="([^"]+\.pdf)"', text):
+                queue.append(urllib.parse.urljoin(url, href))
         out.append((title, url, text))
     return out
 
