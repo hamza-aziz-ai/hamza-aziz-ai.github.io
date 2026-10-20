@@ -2233,6 +2233,25 @@ body.dark-theme .chat__panel {
     text-underline-offset: 2px;
 }
 
+/* WhatsApp-style: time tucked bottom-right in each bubble, a day label
+   centred above each new day. */
+.chat__time {
+    display: block;
+    margin-top: .15rem;
+    font-size: var(--smaller-font-size);
+    text-align: right;
+    opacity: .7;
+}
+
+.chat__day {
+    align-self: center;
+    padding: .15rem .6rem;
+    border-radius: .5rem;
+    background-color: var(--chat-bubble);
+    color: var(--text-color);
+    font-size: var(--smaller-font-size);
+}
+
 .chat__msg--pending {
     opacity: .6;
 }

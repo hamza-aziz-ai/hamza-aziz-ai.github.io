@@ -26,6 +26,7 @@
 
     const history = []
     let busy = false
+    let lastDay = ''
     // Touch screens: focusing the field pops the on-screen keyboard over the
     // answer, so it opens only when the visitor taps the field themselves.
     const touch = matchMedia('(pointer: coarse)').matches
@@ -110,21 +111,25 @@
         input.value = ''
         if (touch) input.blur()  // drop the keyboard so the answer is readable
 
-        addMessage('user', text)
-        history.push({ role: 'user', text })
+        const sentAt = Date.now()
+        addMessage('user', text, '', sentAt)
+        history.push({ role: 'user', text, at: sentAt })
         const pending = addMessage('model', 'Thinking…', 'chat__msg--pending')
 
         try {
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: history.slice(-8) }),
+                // The visitor's timezone lets the assistant tell their local time.
+                body: JSON.stringify({
+                    messages: history.slice(-8).map(({ role, text }) => ({ role, text })),
+                    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                }),
             })
             const data = await res.json().catch(() => ({}))
             const reply = res.ok ? data.reply : null
             if (!reply) throw new Error(failureText(data))
-            history.push({ role: 'model', text: reply })
-            pending.replaceChildren(renderMarkdown(reply))
+            history.push({ role: 'model', text: reply, at: settle(pending, renderMarkdown(reply)) })
             pending.classList.remove('chat__msg--pending')
         } catch (err) {
             // A failed turn is dropped from history so the next question is
@@ -132,7 +137,7 @@
             history.pop()
             // fetch() itself rejects with a TypeError ("Failed to fetch") when
             // the network or CORS fails; only the Worker's own messages are shown.
-            pending.replaceChildren(renderMarkdown((!(err instanceof TypeError) && err.message) || UNAVAILABLE))
+            settle(pending, renderMarkdown((!(err instanceof TypeError) && err.message) || UNAVAILABLE))
             pending.classList.replace('chat__msg--pending', 'chat__msg--error')
         } finally {
             busy = false
@@ -148,12 +153,30 @@
         // Rounded up to the minute, so "try after" is never a little early.
         const at = new Date(Math.ceil(Date.parse(data.retryAt) / 60000) * 60000)
         if (!data.retryAt || isNaN(at)) return data.error || UNAVAILABLE
-        const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+        const p = dateParts(at)
+        const when = `${clock(at)}, ${p.weekday}, ${p.day} ${p.month} ${p.year}`
+        return `The assistant is unavailable right now. Please try after ${when} or drop your query at hamza.aziz.dev@gmail.com`
+    }
+
+    // Times and dates in the visitor's own timezone, en-GB order.
+    function dateParts(at) {
+        return Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
             hour: '2-digit', minute: '2-digit', hour12: true,
             weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
         }).formatToParts(at).map(x => [x.type, x.value]))
-        const when = `${p.hour}:${p.minute} ${p.dayPeriod.toUpperCase()}, ${p.weekday}, ${p.day} ${p.month} ${p.year}`
-        return `The assistant is unavailable right now. Please try after ${when} or drop your query at hamza.aziz.dev@gmail.com`
+    }
+    // "09:05 PM"
+    function clock(at) {
+        const p = dateParts(at)
+        return `${p.hour}:${p.minute} ${p.dayPeriod.toUpperCase()}`
+    }
+    // WhatsApp-style day label: "Today", "Yesterday" or "20 October 2026".
+    function dayLabel(at) {
+        const day = d => new Date(d).toDateString()
+        if (day(at) === day(Date.now())) return 'Today'
+        if (day(at) === day(Date.now() - 864e5)) return 'Yesterday'
+        const p = dateParts(at)
+        return `${p.day} ${p.month} ${p.year}`
     }
 
     // Replays the conversation handed over by the floating panel.
@@ -166,19 +189,38 @@
         if (!Array.isArray(saved)) return
         for (const m of saved) {
             if (!m || (m.role !== 'user' && m.role !== 'model') || typeof m.text !== 'string') continue
-            history.push({ role: m.role, text: m.text })
-            addMessage(m.role, m.text)
+            const at = Number.isFinite(m.at) ? m.at : Date.now()
+            history.push({ role: m.role, text: m.text, at })
+            addMessage(m.role, m.text, '', at)
         }
         if (history.length) chips.hidden = true
     }
 
-    // Model replies are rendered as Markdown; visitor text stays plain.
-    function addMessage(role, text, extra) {
-        const msg = el('div', { class: `chat__msg chat__msg--${role}${extra ? ' ' + extra : ''}` },
-            role === 'model' && !extra ? [renderMarkdown(text)] : [text])
+    // Model replies are rendered as Markdown; visitor text stays plain. Each
+    // bubble carries its time, and a day label opens each new day.
+    function addMessage(role, text, extra, at = Date.now()) {
+        const label = dayLabel(at)
+        if (label !== lastDay) {
+            lastDay = label
+            log.append(el('p', { class: 'chat__day' }, [label]))
+        }
+        const msg = el('div', { class: `chat__msg chat__msg--${role}${extra ? ' ' + extra : ''}` }, [
+            el('div', { class: 'chat__body' }, role === 'model' && !extra ? [renderMarkdown(text)] : [text]),
+            el('time', { class: 'chat__time', datetime: new Date(at).toISOString() }, [clock(at)]),
+        ])
         log.append(msg)
         log.scrollTop = log.scrollHeight
         return msg
+    }
+
+    // Swaps a pending bubble's text and stamps it with the time it arrived.
+    function settle(msg, content) {
+        const now = Date.now()
+        msg.querySelector('.chat__body').replaceChildren(content)
+        const stamp = msg.querySelector('.chat__time')
+        stamp.textContent = clock(now)
+        stamp.setAttribute('datetime', new Date(now).toISOString())
+        return now
     }
 
     // Minimal Markdown built as DOM nodes: nothing the model writes is ever
