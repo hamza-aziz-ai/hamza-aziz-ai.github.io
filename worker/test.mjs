@@ -31,6 +31,9 @@ const reset = () => { geminiCalls = []; aiCalls = []; };
 assert.equal(toTurns([]), null, "empty rejected");
 assert.equal(toTurns([{ role: "model", text: "hi" }]), null, "must end with user");
 assert.equal(toTurns([{ role: "user", text: "x".repeat(801) }]), null, "over 800 chars rejected");
+const longReply = toTurns([{ role: "user", text: "q" }, { role: "model", text: "y".repeat(3000) }, { role: "user", text: "follow-up" }]);
+assert.equal(longReply.length, 3, "a long earlier reply does not block the follow-up");
+assert.equal(longReply[1].text.length, 2500, "earlier replies are trimmed to bound cost");
 assert.equal(toTurns([{ role: "system", text: "hi" }]), null, "unknown role rejected");
 assert.equal(toTurns(Array.from({ length: 13 }, (_, i) => ({ role: i % 2 ? "model" : "user", text: "q" }))).length, 8, "trimmed to last 8");
 
@@ -74,12 +77,12 @@ assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller
 assert.ok(msgs[0].content.includes("KNOWLEDGE"));
 // Private notes reach Gemini when present, and never the fallback.
 assert.ok(gBody.systemInstruction.parts[0].text.endsWith(NOTE), "Gemini gets the KV notes");
-assert.ok(!msgs[0].content.includes("PRIVATE NOTES") && !msgs[0].content.includes(NOTE), "fallback never sees private notes");
+assert.ok(!msgs[0].content.includes("BACKGROUND (private)") && !msgs[0].content.includes(NOTE), "fallback never sees private notes");
 // No KV binding, or a KV error: Gemini still answers, from the public text.
 for (const NOTES_KV of [undefined, { get: async () => { throw new Error("kv down"); } }]) {
   reset(); geminiOK();
   assert.equal((await worker.fetch(req(ask), env({ NOTES_KV }))).status, 200);
-  assert.ok(!JSON.parse(geminiCalls[0].init.body).systemInstruction.parts[0].text.includes("PRIVATE NOTES"));
+  assert.ok(!JSON.parse(geminiCalls[0].init.body).systemInstruction.parts[0].text.includes("BACKGROUND (private)"));
 }
 
 // 3. Gemini 5xx, network error, or empty -> fallback too
