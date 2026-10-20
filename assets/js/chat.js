@@ -13,13 +13,13 @@
     const pageMode = script.dataset.mode === 'page'
 
     const SUGGESTIONS = [
-        "Tell me something that's not on your resume",
-        'What was the hardest problem you solved?',
-        'Are you open to roles in the UAE?',
+        "What's something not on Hamza's resume?",
+        'What was the hardest problem he solved?',
+        'Is he open to roles in the UAE?',
     ]
     // Greeting is UI-only and never sent upstream: the conversation sent to
     // the model must start with a visitor message.
-    const GREETING = "Hi, I'm Hamza's AI assistant. I answer as Hamza would, from his portfolio and his own engineering notes. Ask about his projects, decisions or experience."
+    const GREETING = "Hi, I'm Hamza's AI assistant. I answer on his behalf, from his portfolio and his own engineering notes. Ask about his projects, decisions or experience."
     // Carries the conversation into the full-page view; read once, then removed.
     const HANDOFF = 'chat-handoff'
 
@@ -38,7 +38,7 @@
     const log = el('div', { class: 'chat__log', 'aria-live': 'polite' })
     const input = el('textarea', {
         class: 'chat__input', rows: '1', maxlength: '800',
-        placeholder: 'Ask about my projects, decisions…', 'aria-label': 'Your question',
+        placeholder: 'Ask about his projects, decisions…', 'aria-label': 'Your question',
     })
     const send = el('button', { class: 'chat__send', type: 'submit', 'aria-label': 'Send' }, [icon('ri-send-plane-2-line')])
     const form = el('form', { class: 'chat__form' }, [input, send])
@@ -60,7 +60,7 @@
             el('div', { class: 'chat__actions' }, pageMode ? [home] : [expand, close]),
         ]),
         log, chips, form,
-        el('p', { class: 'chat__note' }, ['AI assistant answering in Hamza’s voice. It can be wrong.']),
+        el('p', { class: 'chat__note' }, ['AI assistant answering on Hamza’s behalf. It can be wrong.']),
     ])
 
     addMessage('model', GREETING)
