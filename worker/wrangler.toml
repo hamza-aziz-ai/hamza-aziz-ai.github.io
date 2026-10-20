@@ -1,6 +1,10 @@
 name = "hamzaaziz-chat"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
+# Served only at hamzaaziz-chat.hamza-aziz-ai.workers.dev; no per-version
+# preview hosts, which would be extra public copies of the endpoint.
+workers_dev = true
+preview_urls = false
 
 [vars]
 # Comma-separated. Only these origins get CORS headers and are served.
