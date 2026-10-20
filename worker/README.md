@@ -19,7 +19,7 @@ is charged, because the Google project has no billing account.
 |---|---|
 | `src/index.js` | The Worker: origin check, rate limit, validation, Gemini then Workers AI |
 | `src/knowledge.js` | GENERATED. The public site text the assistant may answer from |
-| `build_knowledge.py` | Regenerates `knowledge.js` from the site's pages (CI runs it) |
+| `build_knowledge.py` | Regenerates `knowledge.js` from every sitemap page and the CV page, except matrimony and the bio-data PDF (CI runs it) |
 | `sanitize_notes.py` | Cleans raw design docs into private notes |
 | `upload_notes.py` | Uploads the private notes to Workers KV |
 | `test.mjs` | Self-check with both models and KV stubbed: `node worker/test.mjs` |
@@ -29,14 +29,14 @@ is charged, because the Google project has no billing account.
 ## How it deploys
 
 **Automatically.** `.github/workflows/worker.yml` runs on every push to
-`main` that touches `worker/`, `index.html` or `projects/`, weekly (to pick up
+`main` that touches `worker/`, `index.html`, `projects/`, `assets/pdf/` or `sitemap.xml`, weekly (to pick up
 CV edits, since the CV page lives in another repo), and on demand from the
 Actions tab. It rebuilds `knowledge.js`, runs the self-check and deploys.
 It needs one repository secret, `CLOUDFLARE_API_TOKEN`: Cloudflare dashboard
 → My Profile → API Tokens → Create Token → template **Edit Cloudflare
 Workers**, scoped to this account only.
 
-**By hand**, if ever needed: `python -I worker/build_knowledge.py`, then
+**By hand**, if ever needed: `pip install pypdf`, `python worker/build_knowledge.py`, then
 `cd worker && npx wrangler deploy`.
 
 One-time setup, already done: the `GEMINI_API_KEY` Worker secret (an AI

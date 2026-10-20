@@ -11,6 +11,8 @@ on:
       - "worker/**"
       - "index.html"
       - "projects/**"
+      - "assets/pdf/**"
+      - "sitemap.xml"
       - ".github/workflows/worker.yml"
   # The CV page lives in the hamza-aziz-cv repo and is fetched live, so a
   # weekly rebuild picks up CV edits.
@@ -41,7 +43,9 @@ jobs:
           node-version: "22"
 
       - name: Build knowledge from the site
-        run: python -I worker/build_knowledge.py
+        run: |
+          pip install --quiet pypdf==6.21.1   # reads the CV PDF
+          python -I worker/build_knowledge.py
 
       - name: Self-check
         run: node worker/test.mjs
