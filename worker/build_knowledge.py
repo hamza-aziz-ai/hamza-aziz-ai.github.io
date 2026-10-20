@@ -60,6 +60,11 @@ def main() -> int:
         with urllib.request.urlopen(req, timeout=30) as r:
             sections[title] = f"## {title}\n{to_text(r.read().decode('utf-8'))}"
 
+    # Profile links sit behind icons, so to_text() drops their URLs; list
+    # them so "what's his LinkedIn?" gets the address. Professional ones only.
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    links = sorted(set(re.findall(r'href="(https://(?:www\.)?(?:linkedin\.com|github\.com|medium\.com)/[^"]+)"', home)))
+    sections["Homepage"] += "\n\nProfiles and links:\n" + "\n".join(links) + "\nEmail: hamza.aziz.dev@gmail.com"
     knowledge = "\n\n".join(sections.values())
     core = "\n\n".join(sections[t] for t in CORE)
 
