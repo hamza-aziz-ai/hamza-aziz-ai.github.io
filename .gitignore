@@ -447,3 +447,6 @@ docs/
 /assets/pdf/*backup-codes*.txt
 AGENTS.md
 CLAUDE.md
+
+# Wrangler local cache
+.wrangler/
