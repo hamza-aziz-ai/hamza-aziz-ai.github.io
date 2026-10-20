@@ -46,7 +46,7 @@ const sendEmail = (event) => {
     event.preventDefault()
 
     // Send email to yourself
-    emailjs.sendForm('service_obsgdao', 'template_vk9tpdr', '#contact-form', 'nR5d5T3c8oH0B55An')
+    emailjs.sendForm('service_zdg06yb', 'template_axt14ah', '#contact-form', 'qaTk8r3XCLMu5l1sG')
         .then(() => {
             // Show sent message
             contactMessage.textContent = "Message sent successfully ✅"
@@ -85,7 +85,7 @@ const sendConfirmationEmail = () => {
     }
 
     // Send the confirmation email
-    emailjs.send('service_obsgdao', 'template_9uhgscf', templateParams, 'nR5d5T3c8oH0B55An')
+    emailjs.send('service_zdg06yb', 'template_jdxrf2e', templateParams, 'qaTk8r3XCLMu5l1sG')
         .then(() => {
             console.log("Confirmation email sent to the user successfully")
         }, () => {
