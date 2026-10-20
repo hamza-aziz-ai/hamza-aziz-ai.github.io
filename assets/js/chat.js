@@ -87,6 +87,10 @@
 
     launcher.addEventListener('click', () => (panel.hidden ? open() : hide()))
     close.addEventListener('click', hide)
+    // In-page prompts (the homepage hero line) stay hidden until the chat
+    // exists, then open it.
+    for (const cta of document.querySelectorAll('[data-chat-cta]')) cta.hidden = false
+    for (const btn of document.querySelectorAll('[data-chat-open]')) btn.addEventListener('click', open)
     expand.addEventListener('click', () => {
         try { localStorage.setItem(HANDOFF, JSON.stringify(history)) } catch { /* opens empty */ }
         window.open('/chat.html', '_blank', 'noopener')
