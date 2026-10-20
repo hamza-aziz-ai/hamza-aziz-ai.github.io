@@ -25,6 +25,10 @@
 
     const history = []
     let busy = false
+    // Touch screens: focusing the field pops the on-screen keyboard over the
+    // answer, so it opens only when the visitor taps the field themselves.
+    const touch = matchMedia('(pointer: coarse)').matches
+    const focusInput = () => { if (!touch) input.focus() }
 
     const launcher = el('button', {
         class: 'chat__launcher', type: 'button',
@@ -63,7 +67,7 @@
     if (pageMode) {
         document.body.append(panel)
         restore()
-        input.focus()
+        focusInput()
     } else {
         document.body.append(launcher, panel)
     }
@@ -71,7 +75,7 @@
     const open = () => {
         panel.hidden = false
         launcher.setAttribute('aria-expanded', 'true')
-        input.focus()
+        focusInput()
     }
     const hide = () => {
         panel.hidden = true
@@ -103,6 +107,7 @@
         send.disabled = true
         chips.hidden = true
         input.value = ''
+        if (touch) input.blur()  // drop the keyboard so the answer is readable
 
         addMessage('user', text)
         history.push({ role: 'user', text })
@@ -131,7 +136,7 @@
         } finally {
             busy = false
             send.disabled = false
-            input.focus()
+            focusInput()
             log.scrollTop = log.scrollHeight
         }
     }
