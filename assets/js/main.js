@@ -41,9 +41,102 @@ window.addEventListener('scroll', shadowHeader)
 const contactForm = document.getElementById('contact-form'),
     contactMessage = document.getElementById('contact-message')
 
+/* Email address checks before sending. The browser already checks the
+   syntax (type="email"); whether the mailbox exists cannot be checked from
+   a browser. These catch the next best things: a mistyped popular domain,
+   and a domain that cannot receive mail at all. */
+
+// ponytail: short list of popular providers; add any domain visitors keep
+// mistyping.
+// Real providers are listed even when only one letter apart (ymail/gmail),
+// so they are never "corrected" into each other.
+const COMMON_DOMAINS = ['gmail.com', 'googlemail.com', 'yahoo.com', 'yahoo.co.in', 'ymail.com',
+    'rocketmail.com', 'outlook.com', 'outlook.in', 'hotmail.com', 'hotmail.co.uk', 'live.com', 'live.in',
+    'msn.com', 'icloud.com', 'me.com', 'mac.com', 'aol.com', 'proton.me', 'protonmail.com', 'zoho.com',
+    'zohomail.in', 'rediffmail.com', 'gmx.com', 'mail.com', 'yandex.com']
+let typoWarnedFor = ''
+
+const editDistance = (a, b) => {
+    const row = Array.from({ length: b.length + 1 }, (_, j) => j)
+    for (let i = 1; i <= a.length; i++) {
+        let diagonal = row[0]
+        row[0] = i
+        for (let j = 1; j <= b.length; j++) {
+            const above = row[j]
+            row[j] = Math.min(row[j] + 1, row[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1))
+            diagonal = above
+        }
+    }
+    return row[b.length]
+}
+
+// "gmial.com" -> "gmail.com"; null when the domain is fine or nothing is close.
+const suggestDomain = domain => {
+    if (COMMON_DOMAINS.includes(domain)) return null
+    let best = null, bestDistance = 3
+    for (const candidate of COMMON_DOMAINS) {
+        const distance = editDistance(domain, candidate)
+        if (distance < bestDistance) { best = candidate; bestDistance = distance }
+    }
+    return best
+}
+
+// Can the domain receive mail? Asked over DNS-over-HTTPS; only the domain
+// leaves the browser. Fails open: a DNS outage or a blocker must never stop
+// a real message, and a bad address still bounces back to Hamza.
+const domainAcceptsMail = async domain => {
+    const lookup = async type => {
+        const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`,
+            { headers: { accept: 'application/dns-json' }, signal: AbortSignal.timeout(4000) })
+        return response.json()
+    }
+    try {
+        const mx = await lookup('MX')
+        if (mx.Status === 3) return false // NXDOMAIN: the domain does not exist
+        const servers = (mx.Answer || []).filter(record => record.type === 15)
+        // A "null MX" (RFC 7505: "0 .") says the domain accepts no mail.
+        if (servers.length) return !servers.every(record => /^0 \.?$/.test(record.data.trim()))
+        // No MX at all: mail falls back to the domain's own address (RFC 5321).
+        const a = await lookup('A')
+        return (a.Answer || []).some(record => record.type === 1)
+    } catch {
+        return true
+    }
+}
+
+// Offers the corrected address; pressing Send again keeps it as typed.
+const showTypoHint = (emailInput, suggestion) => {
+    const fixed = `${emailInput.value.trim().split('@')[0]}@${suggestion}`
+    const use = document.createElement('button')
+    use.type = 'button'
+    use.className = 'contact__suggestion'
+    use.textContent = fixed
+    use.addEventListener('click', () => {
+        emailInput.value = fixed
+        contactMessage.textContent = ''
+        emailInput.focus()
+    })
+    contactMessage.replaceChildren('Did you mean ', use, '? Or press Send again to keep it as typed.')
+}
+
 // Send email to yourself
-const sendEmail = (event) => {
+const sendEmail = async (event) => {
     event.preventDefault()
+
+    const emailInput = document.getElementById('email')
+    const domain = emailInput.value.trim().split('@').pop().toLowerCase()
+    const suggestion = suggestDomain(domain)
+    if (suggestion && typoWarnedFor !== emailInput.value) {
+        typoWarnedFor = emailInput.value
+        showTypoHint(emailInput, suggestion)
+        return
+    }
+    contactMessage.textContent = 'Checking your email address…'
+    if (!(await domainAcceptsMail(domain))) {
+        contactMessage.textContent = `"${domain}" can't receive email. Please check your address ❌`
+        return
+    }
+    contactMessage.textContent = 'Sending…'
 
     // Send email to yourself. emailjs.send with the fields' values, not
     // sendForm: a submitted form turns each line break into \r\n, which the

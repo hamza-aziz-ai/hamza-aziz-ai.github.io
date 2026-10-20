@@ -1263,6 +1263,18 @@ body.dark-theme {
     left: 0;
 }
 
+/* "Did you mean …?" address in the contact message: a link-like button. */
+.contact__suggestion {
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: var(--font-semi-bold);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .dark-theme .contact__data {
     box-shadow: 0 8px 16px hsla(0, 0%, 4%, 0.3);
 }
