@@ -26,9 +26,15 @@ REDACTIONS = PRIVATE / "redactions.txt"
 DROP_SECTION = re.compile(
     r"security|trust|privacy|credential|secret|unauthenticat|key in query|plaintext|port and protocol"
     r"|evidence legend|how to read|uncertainty|open questions"
-    r"|not verified|source register|sources|appendix|contents",
+    r"|not verified|source register|sources|appendix|contents|read this first",
     re.I,
 )
+# Defect and risk registers: line-by-line bug lists that the model repeats to
+# recruiters as "critical defects". What Hamza would change survives in the
+# target-architecture and roadmap sections. Sections about decisions stay
+# even when their title also mentions risks.
+DEFECT_SECTION = re.compile(r"risk|defect|tech-debt|failure|repair|\bgaps?\b", re.I)
+KEEP_SECTION = re.compile(r"decision", re.I)
 # Single lines dropped wherever they appear.
 DROP_LINE = re.compile(
     r"password|credential|secret|plaintext|unauthenticat|no auth|without auth|authenticat"
@@ -52,6 +58,7 @@ PORT = re.compile(
 BARE_LINES = re.compile(r"(?<![\w)]):\d+(?:[–-]\d+)?")
 LINE_REF = re.compile(r"\(?\bL\d+(?:-\d+)?\)?")
 IP = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?\b|\blocalhost:\d+\b")
+DEFECT_ID = re.compile(r"\s*\((?:D|R)\d+(?:[–\s,-]+(?:D|R)?\d+)*\)")
 COMMIT = re.compile(r"\b(?:commit|checkout|HEAD|rev\.?)\s+\**[0-9a-f]{7,40}\**", re.I)
 
 
@@ -73,10 +80,13 @@ def clean(text: str, pairs: list[tuple[str, str]]) -> str:
     for line in text.splitlines():
         heading = re.match(r"^#{1,4}\s*(.*)", line)
         if heading:
-            skipping = bool(DROP_SECTION.search(heading.group(1)))
+            title = heading.group(1)
+            skipping = bool(DROP_SECTION.search(title)) or (
+                bool(DEFECT_SECTION.search(title)) and not KEEP_SECTION.search(title)
+            )
         if skipping or DROP_LINE.search(line):
             continue
-        for rx in (FILE_REF, SHORT_REF, LINE_REF, IP, PORT, BARE_LINES, COMMIT):
+        for rx in (FILE_REF, SHORT_REF, LINE_REF, IP, PORT, BARE_LINES, DEFECT_ID, COMMIT):
             line = rx.sub("", line)
         # Tidy what the removals leave behind: "()", "; ;", doubled spaces.
         line = re.sub(r"\(\s*[;,]?\s*\)", "", line)
@@ -84,8 +94,9 @@ def clean(text: str, pairs: list[tuple[str, str]]) -> str:
         line = re.sub(r"[ \t]{2,}", " ", line).rstrip(" ·;,")
         out.append(line)
     text = "\n".join(out)
+    # Whole words only: "SUA" must not rewrite "usually" or "visual".
     for term, repl in pairs:
-        text = re.sub(re.escape(term), repl, text, flags=re.I)
+        text = re.sub(rf"(?<!\w){re.escape(term)}(?!\w)", repl, text, flags=re.I)
     return re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
 
 
@@ -98,7 +109,10 @@ def main() -> int:
         dst = PRIVATE / src.name
         dst.write_text(clean(src.read_text(encoding="utf-8"), pairs), encoding="utf-8")
         print(f"{src.name}: {len(src.read_text(encoding='utf-8')):,} -> {len(dst.read_text(encoding='utf-8')):,} chars")
-    left = [t for t, _ in pairs for f in PRIVATE.glob("*.md") if t.lower() in f.read_text(encoding="utf-8").lower()]
+    left = [
+        t for t, _ in pairs for f in PRIVATE.glob("*.md")
+        if re.search(rf"(?<!\w){re.escape(t)}(?!\w)", f.read_text(encoding="utf-8"), re.I)
+    ]
     if left:
         print(f"redacted terms still present: {sorted(set(left))}", file=sys.stderr)
         return 1
