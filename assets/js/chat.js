@@ -253,17 +253,18 @@
     }
 
     function inline(text) {
-        const INLINE = /\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)|(?<![\w*])\*(?!\s)([^*]+?)\*(?![\w*])|(?<!\w)_(?!\s)([^_]+?)_(?!\w)/g
+        const INLINE = /\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)|(?<![\w*])\*(?!\s)([^*]+?)\*(?![\w*])|(?<!\w)_(?!\s)([^_]+?)_(?!\w)|(?<![\w+])(\+\d{1,3}[ -]?\d[\d -]{6,13}\d)(?!\d)/g
         const out = []
         let last = 0
         for (const m of text.matchAll(INLINE)) {
-            const [all, bold, code, label, href, url, email, em1, em2] = m
+            const [all, bold, code, label, href, url, email, em1, em2, phone] = m
             if (m.index > last) out.push(text.slice(last, m.index))
             if (bold) out.push(el('strong', {}, inline(bold)))
             else if (code) out.push(el('code', {}, [code]))
             else if (label) out.push(link(href, inline(label)) || all)
             else if (url) out.push(link(url, [url]) || url)
             else if (email) out.push(link('mailto:' + email, [email]) || email)
+            else if (phone) out.push(link('tel:' + phone.replace(/[ -]/g, ''), [phone]) || phone)
             else out.push(el('em', {}, inline(em1 || em2)))
             last = m.index + all.length
         }
@@ -271,13 +272,13 @@
         return out
     }
 
-    // Only web and mail links; anything else (javascript:, data:) stays text.
+    // Only web, mail and phone links; anything else (javascript:, data:) stays text.
     function link(href, children) {
         let url
         try { url = new URL(href, location.href) } catch { return null }
-        if (!['https:', 'http:', 'mailto:'].includes(url.protocol)) return null
+        if (!['https:', 'http:', 'mailto:', 'tel:'].includes(url.protocol)) return null
         const a = el('a', { class: 'chat__link', href: url.href }, children)
-        if (url.protocol !== 'mailto:') { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+        if (url.protocol.startsWith('http')) { a.target = '_blank'; a.rel = 'noopener noreferrer' }
         return a
     }
 
