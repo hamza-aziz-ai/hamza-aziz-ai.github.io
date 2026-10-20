@@ -104,7 +104,9 @@
             // A failed turn is dropped from history so the next question is
             // not sent after an unanswered one.
             history.pop()
-            pending.textContent = err.message || 'The assistant is unavailable right now.'
+            // fetch() itself rejects with a TypeError ("Failed to fetch") when
+            // the network or CORS fails; only the Worker's own messages are shown.
+            pending.textContent = (!(err instanceof TypeError) && err.message) || 'The assistant is unavailable right now.'
             pending.classList.replace('chat__msg--pending', 'chat__msg--error')
         } finally {
             busy = false
