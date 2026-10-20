@@ -76,9 +76,11 @@ went wrong" or "what would he do differently" come from.
 const PROMPT_PUBLIC = RULES + KNOWLEDGE;
 const PROMPT_CORE = RULES + KNOWLEDGE_CORE;
 
+// The widget replaces MSG.limit with the reset time in the visitor's own
+// timezone, from the retryAt field sent alongside it.
 const MSG = {
-  unavailable: "The assistant is unavailable right now. Please try again later.",
-  limit: "The assistant has reached today's limit. Please try again tomorrow.",
+  unavailable: "The assistant is unavailable right now. Please drop your query at hamza.aziz.dev@gmail.com",
+  limit: "The assistant is unavailable right now. Please try again later or drop your query at hamza.aziz.dev@gmail.com",
 };
 
 export default {
@@ -130,23 +132,24 @@ export default {
 
     if (!env.GEMINI_API_KEY && !env.AI) return json({ error: "Chat is not configured." }, 503, cors);
 
-    let geminiOutcome = "skipped";
+    // Each failed backend reports its outcome and, for a quota, when it resets.
+    const failed = [];
     if (env.GEMINI_API_KEY) {
       const g = await askGemini(env, turns);
       if (g.reply) return json({ reply: g.reply }, 200, { ...cors, "X-Chat-Backend": "gemini" });
-      geminiOutcome = g.outcome;
+      failed.push(g);
     }
-
     if (env.AI) {
       const w = await askWorkersAI(env, turns);
       if (w.reply) return json({ reply: w.reply }, 200, { ...cors, "X-Chat-Backend": "workers-ai" });
-      // Both backends exhausted for the day reads better as a limit than
-      // as an outage.
-      if (geminiOutcome === "quota" || w.outcome === "quota") return json({ error: MSG.limit }, 503, cors);
-      return json({ error: MSG.unavailable }, 502, cors);
+      failed.push(w);
     }
 
-    return json({ error: geminiOutcome === "quota" ? MSG.limit : MSG.unavailable }, geminiOutcome === "quota" ? 503 : 502, cors);
+    // Out of quota reads better as "try after <time>" than as an outage. The
+    // chat is back as soon as the first exhausted backend resets.
+    const resets = failed.filter((f) => f.outcome === "quota").map((f) => f.retryAt);
+    if (!resets.length) return json({ error: MSG.unavailable }, 502, cors);
+    return json({ error: MSG.limit, retryAt: new Date(Math.min(...resets)).toISOString() }, 503, cors);
   },
 };
 
@@ -183,9 +186,10 @@ async function askGemini(env, turns) {
     // Private to the account (wrangler tail / dashboard logs), never sent to
     // the visitor. Google's status name says why: RESOURCE_EXHAUSTED,
     // PERMISSION_DENIED, INVALID_ARGUMENT, NOT_FOUND...
-    const why = await res.json().then((d) => d?.error?.status).catch(() => "");
-    console.log(`gemini ${res.status} ${why || ""}`.trim());
-    return { outcome: res.status === 429 ? "quota" : "error" };
+    const err = await res.json().then((d) => d?.error || {}).catch(() => ({}));
+    console.log(`gemini ${res.status} ${err.status || ""}`.trim());
+    if (res.status !== 429) return { outcome: "error" };
+    return { outcome: "quota", retryAt: geminiResetAt(err.details) };
   }
   const data = await res.json().catch(() => ({}));
   const reply = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
@@ -207,9 +211,39 @@ async function askWorkersAI(env, turns) {
     const reply = (out?.response ?? out?.choices?.[0]?.message?.content ?? "").trim();
     return reply ? { reply } : { outcome: "error" };
   } catch (err) {
-    // The free daily allocation running out arrives as a thrown error.
-    return { outcome: /allocation|quota|limit|429|4006/i.test(String(err && err.message)) ? "quota" : "error" };
+    // The free daily allocation running out arrives as a thrown error. It
+    // resets at 00:00 UTC.
+    return /allocation|quota|limit|429|4006/i.test(String(err && err.message))
+      ? { outcome: "quota", retryAt: nextMidnight("UTC") }
+      : { outcome: "error" };
   }
+}
+
+// When a Gemini 429 lifts, as epoch ms. A daily quota resets at midnight
+// Pacific time; a per-minute one carries a RetryInfo delay such as "34s".
+export function geminiResetAt(details, now = Date.now()) {
+  const list = Array.isArray(details) ? details : [];
+  const daily = list.some((d) => (d.violations || []).some((v) => /PerDay/i.test(v.quotaId || "")));
+  if (daily) return nextMidnight("America/Los_Angeles", now);
+  const delay = list.map((d) => parseFloat(d.retryDelay)).find((s) => s > 0);
+  return now + (delay ? Math.ceil(delay) : 60) * 1000;
+}
+
+// The next 00:00 wall-clock time in a timezone, as epoch ms.
+export function nextMidnight(timeZone, now = Date.now()) {
+  // Epoch ms of the wall-clock reading in that zone, read as if it were UTC.
+  const wall = (t) => {
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+      timeZone, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric",
+      hour: "numeric", minute: "numeric", second: "numeric",
+    }).formatToParts(t).map((x) => [x.type, Number(x.value)]));
+    return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+  };
+  const today = new Date(wall(now));
+  const target = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1);
+  const guess = target - (wall(now) - now);
+  // Re-read the offset at midnight itself, in case a DST change falls between.
+  return target - (wall(guess) - guess);
 }
 
 // Validates widget messages. Returns null on anything malformed so the

@@ -1,7 +1,7 @@
 // Self-check for the Worker's request handling. No network, no real keys:
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
-import worker, { toTurns } from "./src/index.js";
+import worker, { toTurns, nextMidnight, geminiResetAt } from "./src/index.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
 const NOTE = "Private note: the barrier token design.";
@@ -101,16 +101,28 @@ r = await worker.fetch(req(ask), env({ GEMINI_API_KEY: "", AI: ai(() => ({ respo
 assert.equal(r.status, 200);
 assert.equal(geminiCalls.length, 0);
 
-// 6. Both exhausted -> "today's limit"; both broken -> generic; nothing leaks
-reset(); gemini(429, { error: { message: "project 123" } });
+// 6. Both exhausted -> a limit with the earliest reset; both broken -> generic; nothing leaks
+reset(); gemini(429, { error: { message: "project 123", details: [{ "@type": "type.googleapis.com/google.rpc.RetryInfo", retryDelay: "34s" }] } });
+let before = Date.now();
 r = await worker.fetch(req(ask), env({ AI: ai(() => { throw new Error("4006: daily free allocation exceeded"); }) }));
 assert.equal(r.status, 503);
-const limitBody = await r.text();
-assert.ok(limitBody.includes("today's limit"));
-assert.ok(!limitBody.includes("project 123") && !limitBody.includes("4006"), "upstream details not leaked");
+const limitBody = await r.json();
+assert.ok(limitBody.error.includes("hamza.aziz.dev@gmail.com"));
+assert.ok(!JSON.stringify(limitBody).includes("project 123") && !JSON.stringify(limitBody).includes("4006"), "upstream details not leaked");
+const retryAt = Date.parse(limitBody.retryAt);
+assert.ok(retryAt >= before + 34000 && retryAt <= Date.now() + 35000, "per-minute Gemini limit beats the daily Workers AI one");
 reset(); gemini(500, {});
 r = await worker.fetch(req(ask), env({ AI: ai(() => { throw new Error("internal"); }) }));
 assert.equal(r.status, 502);
+assert.ok(!("retryAt" in (await r.json())), "an outage has no reset time");
+
+// Reset times: daily Gemini quota -> next midnight in Los Angeles; Workers AI -> next 00:00 UTC.
+const T = Date.UTC(2026, 9, 20, 3, 0);            // 20 Oct 2026 03:00 UTC = 19 Oct 20:00 PDT
+assert.equal(nextMidnight("UTC", T), Date.UTC(2026, 9, 21));
+assert.equal(nextMidnight("America/Los_Angeles", T), Date.UTC(2026, 9, 20, 7));   // 00:00 PDT
+assert.equal(nextMidnight("America/Los_Angeles", Date.UTC(2026, 10, 1, 12)), Date.UTC(2026, 10, 2, 8)); // DST ended: 00:00 PST
+assert.equal(geminiResetAt([{ violations: [{ quotaId: "GenerateRequestsPerDayPerProjectPerModel-FreeTier" }] }], T), Date.UTC(2026, 9, 20, 7));
+assert.equal(geminiResetAt([], T), T + 60000, "unknown limit: try again in a minute");
 
 // 7. Gemini only, no AI binding: quota still reported as a limit
 reset(); gemini(429, {});

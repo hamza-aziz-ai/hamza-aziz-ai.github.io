@@ -22,6 +22,7 @@
     const GREETING = "Hi, I'm Hamza's AI assistant. I answer on his behalf, from his portfolio and his own engineering notes. Ask about his projects, decisions or experience."
     // Carries the conversation into the full-page view; read once, then removed.
     const HANDOFF = 'chat-handoff'
+    const UNAVAILABLE = 'The assistant is unavailable right now. Please drop your query at hamza.aziz.dev@gmail.com'
 
     const history = []
     let busy = false
@@ -121,7 +122,7 @@
             })
             const data = await res.json().catch(() => ({}))
             const reply = res.ok ? data.reply : null
-            if (!reply) throw new Error(data.error || 'The assistant is unavailable right now.')
+            if (!reply) throw new Error(failureText(data))
             history.push({ role: 'model', text: reply })
             pending.replaceChildren(renderMarkdown(reply))
             pending.classList.remove('chat__msg--pending')
@@ -131,7 +132,7 @@
             history.pop()
             // fetch() itself rejects with a TypeError ("Failed to fetch") when
             // the network or CORS fails; only the Worker's own messages are shown.
-            pending.textContent = (!(err instanceof TypeError) && err.message) || 'The assistant is unavailable right now.'
+            pending.replaceChildren(renderMarkdown((!(err instanceof TypeError) && err.message) || UNAVAILABLE))
             pending.classList.replace('chat__msg--pending', 'chat__msg--error')
         } finally {
             busy = false
@@ -139,6 +140,20 @@
             focusInput()
             log.scrollTop = log.scrollHeight
         }
+    }
+
+    // Out of quota, the Worker sends when it resets; shown in the visitor's
+    // own timezone as "03:30 PM, Tuesday, 21 October 2026".
+    function failureText(data) {
+        // Rounded up to the minute, so "try after" is never a little early.
+        const at = new Date(Math.ceil(Date.parse(data.retryAt) / 60000) * 60000)
+        if (!data.retryAt || isNaN(at)) return data.error || UNAVAILABLE
+        const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+            hour: '2-digit', minute: '2-digit', hour12: true,
+            weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+        }).formatToParts(at).map(x => [x.type, x.value]))
+        const when = `${p.hour}:${p.minute} ${p.dayPeriod.toUpperCase()}, ${p.weekday}, ${p.day} ${p.month} ${p.year}`
+        return `The assistant is unavailable right now. Please try after ${when} or drop your query at hamza.aziz.dev@gmail.com`
     }
 
     // Replays the conversation handed over by the floating panel.
