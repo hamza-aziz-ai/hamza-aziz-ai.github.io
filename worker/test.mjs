@@ -1,7 +1,7 @@
 // Self-check for the Worker's request handling. No network, no real keys:
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
-import worker, { toTurns, nextMidnight, geminiResetAt } from "./src/index.js";
+import worker, { toTurns, nextMidnight, geminiResetAt, timeContext, visitorZone } from "./src/index.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
 const NOTE = "Private note: the barrier token design.";
@@ -76,7 +76,7 @@ assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "assistant", "user"
 assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller core prompt");
 assert.ok(msgs[0].content.includes("KNOWLEDGE"));
 // Private notes reach Gemini when present, and never the fallback.
-assert.ok(gBody.systemInstruction.parts[0].text.endsWith(NOTE), "Gemini gets the KV notes");
+assert.ok(gBody.systemInstruction.parts[0].text.includes(NOTE), "Gemini gets the KV notes");
 assert.ok(!msgs[0].content.includes("BACKGROUND (private)") && !msgs[0].content.includes(NOTE), "fallback never sees private notes");
 // No KV binding, or a KV error: Gemini still answers, from the public text.
 for (const NOTES_KV of [undefined, { get: async () => { throw new Error("kv down"); } }]) {
@@ -130,5 +130,16 @@ assert.equal(geminiResetAt([], T), T + 60000, "unknown limit: try again in a min
 // 7. Gemini only, no AI binding: quota still reported as a limit
 reset(); gemini(429, {});
 assert.equal((await worker.fetch(req(ask), env())).status, 503);
+
+
+// Current time: both prompts end with it; the visitor's zone is validated.
+reset(); geminiOK();
+await worker.fetch(req({ ...ask, tz: "Asia/Dubai" }), env());
+assert.match(JSON.parse(geminiCalls[0].init.body).systemInstruction.parts[0].text, /CURRENT TIME\nThe visitor's local time is .+ \(Asia\/Dubai\)\.\nHamza is in India, where it is .+ \(IST\)\.\n$/);
+assert.equal(visitorZone("Asia/Dubai", "Europe/London"), "Asia/Dubai");
+assert.equal(visitorZone("Not/AZone", "Europe/London"), "Europe/London", "invalid zone falls back to Cloudflare's");
+assert.equal(visitorZone(42, undefined), "UTC");
+assert.equal(timeContext("UTC", Date.UTC(2026, 9, 20, 3, 30)),
+  "\n\nCURRENT TIME\nThe visitor's local time is Tuesday, 20 October 2026 at 03:30 am (UTC).\nHamza is in India, where it is Tuesday, 20 October 2026 at 09:00 am (IST).\n");
 
 console.log("worker self-check: all assertions passed");
