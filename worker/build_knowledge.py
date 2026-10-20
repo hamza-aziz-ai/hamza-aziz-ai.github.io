@@ -52,19 +52,29 @@ def to_text(raw: str) -> str:
 
 
 def main() -> int:
-    sections = {}
+    sections, raw = {}, {}
     for title, path in LOCAL:
-        sections[title] = f"## {title}\n{to_text(path.read_text(encoding='utf-8'))}"
+        raw[title] = path.read_text(encoding="utf-8")
+        sections[title] = f"## {title}\n{to_text(raw[title])}"
     for title, url in REMOTE:
         req = urllib.request.Request(url, headers={"User-Agent": "hamzaaziz-knowledge-build"})
         with urllib.request.urlopen(req, timeout=30) as r:
-            sections[title] = f"## {title}\n{to_text(r.read().decode('utf-8'))}"
+            raw[title] = r.read().decode("utf-8")
+        sections[title] = f"## {title}\n{to_text(raw[title])}"
 
-    # Profile links sit behind icons, so to_text() drops their URLs; list
-    # them so "what's his LinkedIn?" gets the address. Professional ones only.
-    home = (ROOT / "index.html").read_text(encoding="utf-8")
-    links = sorted(set(re.findall(r'href="(https://(?:www\.)?(?:linkedin\.com|github\.com|medium\.com)/[^"]+)"', home)))
-    sections["Homepage"] += "\n\nProfiles and links:\n" + "\n".join(links) + "\nEmail: hamza.aziz.dev@gmail.com"
+    # Contact details sit behind icons and links, so to_text() drops them;
+    # list them so "what's his LinkedIn / phone?" gets an answer. Only what
+    # the homepage and CV already publish, and professional profiles only.
+    pages = raw["Homepage"] + raw["CV"]
+    links = sorted(set(re.findall(r'href="(https://(?:www\.)?(?:linkedin\.com|github\.com|medium\.com)/[^"]+)"', pages)))
+    phones = sorted(set(re.findall(r'href="tel:(\+\d{8,15})"', pages)))
+    whatsapp = sorted(set(re.findall(r'href="(https://wa\.me/\d{8,15})"', pages)))
+    contact = ["Email: hamza.aziz.dev@gmail.com"]
+    contact += [f"Phone: {p[:3]} {p[3:]}" for p in phones]
+    contact += [f"WhatsApp: {w}" for w in whatsapp]
+    sections["Homepage"] += (
+        "\n\nContact:\n" + "\n".join(contact) + "\n\nProfiles and links:\n" + "\n".join(links)
+    )
     knowledge = "\n\n".join(sections.values())
     core = "\n\n".join(sections[t] for t in CORE)
 
