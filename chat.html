@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask about Hamza | Hamza Aziz</title>
+    <!-- The full-page view of the chat; the content lives on the home page. -->
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="assets/img/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.4.0/remixicon.css" crossorigin="">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script>
+        try {
+            if (localStorage.getItem('selected-theme') === 'dark') {
+                document.documentElement.classList.add('dark-theme-preload')
+            }
+        } catch (e) { /* private mode: fall through to the light default */ }
+    </script>
+</head>
+<body class="chat-page">
+    <script src="assets/js/chat.js" data-mode="page" data-endpoint="https://hamzaaziz-chat.hamza-aziz-ai.workers.dev/chat" defer></script>
+</body>
+</html>

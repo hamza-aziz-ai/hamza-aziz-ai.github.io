@@ -1,14 +1,16 @@
 /*=============== CHAT ASSISTANT ===============*/
-// Floating "Ask about Hamza" chat. Talks to the Cloudflare Worker in
-// worker/, which holds the model key; nothing secret lives here.
+// "Ask about Hamza" chat. Talks to the Cloudflare Worker in worker/, which
+// holds the model key; nothing secret lives here.
 //
 // The Worker URL comes from this script tag's data-endpoint. While it is
 // empty the widget renders nothing, so this file can ship before the
-// Worker is deployed.
+// Worker is deployed. data-mode="page" (chat.html) renders the chat as the
+// whole page instead of a floating panel.
 (function () {
     const script = document.currentScript
     const endpoint = script && script.dataset.endpoint
     if (!endpoint) return
+    const pageMode = script.dataset.mode === 'page'
 
     const SUGGESTIONS = [
         "Tell me something that's not on your resume",
@@ -18,6 +20,8 @@
     // Greeting is UI-only and never sent upstream: the conversation sent to
     // the model must start with a visitor message.
     const GREETING = "Hi, I'm Hamza's AI assistant. I answer as Hamza would, from his portfolio and his own engineering notes. Ask about his projects, decisions or experience."
+    // Carries the conversation into the full-page view; read once, then removed.
+    const HANDOFF = 'chat-handoff'
 
     const history = []
     let busy = false
@@ -25,31 +29,44 @@
     const launcher = el('button', {
         class: 'chat__launcher', type: 'button',
         'aria-label': 'Ask about Hamza', 'aria-expanded': 'false', 'aria-controls': 'chat-panel',
-    }, [el('i', { class: 'ri-chat-3-line', 'aria-hidden': 'true' })])
+    }, [icon('ri-chat-3-line')])
 
     const log = el('div', { class: 'chat__log', 'aria-live': 'polite' })
     const input = el('textarea', {
         class: 'chat__input', rows: '1', maxlength: '800',
         placeholder: 'Ask about my projects, decisions…', 'aria-label': 'Your question',
     })
-    const send = el('button', { class: 'chat__send', type: 'submit', 'aria-label': 'Send' },
-        [el('i', { class: 'ri-send-plane-2-line', 'aria-hidden': 'true' })])
+    const send = el('button', { class: 'chat__send', type: 'submit', 'aria-label': 'Send' }, [icon('ri-send-plane-2-line')])
     const form = el('form', { class: 'chat__form' }, [input, send])
-    const close = el('button', { class: 'chat__close', type: 'button', 'aria-label': 'Close chat' },
-        [el('i', { class: 'ri-close-line', 'aria-hidden': 'true' })])
+    const expand = el('button', { class: 'chat__action', type: 'button', 'aria-label': 'Open chat in a new tab', title: 'Open in a new tab' },
+        [icon('ri-external-link-line')])
+    const close = el('button', { class: 'chat__action', type: 'button', 'aria-label': 'Close chat', title: 'Close' }, [icon('ri-close-line')])
+    const home = el('a', { class: 'chat__action', href: '/', 'aria-label': 'Back to hamzaaziz.dev', title: 'Back to hamzaaziz.dev' },
+        [icon('ri-home-4-line')])
     const chips = el('div', { class: 'chat__chips' },
         SUGGESTIONS.map(q => el('button', { class: 'chat__chip', type: 'button' }, [q])))
 
     const panel = el('section', {
-        class: 'chat__panel', id: 'chat-panel', role: 'dialog', 'aria-label': "Ask about Hamza's work", hidden: '',
+        class: pageMode ? 'chat__panel chat__panel--page' : 'chat__panel',
+        id: 'chat-panel', 'aria-label': "Ask about Hamza's work",
+        ...(pageMode ? {} : { role: 'dialog', hidden: '' }),
     }, [
-        el('header', { class: 'chat__header' }, [el('p', { class: 'chat__title' }, ['Ask about Hamza']), close]),
+        el('header', { class: 'chat__header' }, [
+            el('p', { class: 'chat__title' }, ['Ask about Hamza']),
+            el('div', { class: 'chat__actions' }, pageMode ? [home] : [expand, close]),
+        ]),
         log, chips, form,
         el('p', { class: 'chat__note' }, ['AI assistant answering in Hamza’s voice. It can be wrong.']),
     ])
 
-    document.body.append(launcher, panel)
     addMessage('model', GREETING)
+    if (pageMode) {
+        document.body.append(panel)
+        restore()
+        input.focus()
+    } else {
+        document.body.append(launcher, panel)
+    }
 
     const open = () => {
         panel.hidden = false
@@ -64,7 +81,11 @@
 
     launcher.addEventListener('click', () => (panel.hidden ? open() : hide()))
     close.addEventListener('click', hide)
-    panel.addEventListener('keydown', e => { if (e.key === 'Escape') hide() })
+    expand.addEventListener('click', () => {
+        try { localStorage.setItem(HANDOFF, JSON.stringify(history)) } catch { /* opens empty */ }
+        window.open('/chat.html', '_blank', 'noopener')
+    })
+    if (!pageMode) panel.addEventListener('keydown', e => { if (e.key === 'Escape') hide() })
     chips.addEventListener('click', e => {
         const chip = e.target.closest('.chat__chip')
         if (chip) ask(chip.textContent)
@@ -87,7 +108,6 @@
         history.push({ role: 'user', text })
         const pending = addMessage('model', 'Thinking…', 'chat__msg--pending')
 
-        let reply
         try {
             const res = await fetch(endpoint, {
                 method: 'POST',
@@ -95,10 +115,10 @@
                 body: JSON.stringify({ messages: history.slice(-8) }),
             })
             const data = await res.json().catch(() => ({}))
-            reply = res.ok ? data.reply : null
+            const reply = res.ok ? data.reply : null
             if (!reply) throw new Error(data.error || 'The assistant is unavailable right now.')
             history.push({ role: 'model', text: reply })
-            pending.textContent = reply
+            pending.replaceChildren(renderMarkdown(reply))
             pending.classList.remove('chat__msg--pending')
         } catch (err) {
             // A failed turn is dropped from history so the next question is
@@ -116,12 +136,91 @@
         }
     }
 
-    // textContent only: model output is never parsed as HTML.
+    // Replays the conversation handed over by the floating panel.
+    function restore() {
+        let saved = []
+        try {
+            saved = JSON.parse(localStorage.getItem(HANDOFF) || '[]')
+            localStorage.removeItem(HANDOFF)
+        } catch { /* storage blocked or corrupt: start fresh */ }
+        if (!Array.isArray(saved)) return
+        for (const m of saved) {
+            if (!m || (m.role !== 'user' && m.role !== 'model') || typeof m.text !== 'string') continue
+            history.push({ role: m.role, text: m.text })
+            addMessage(m.role, m.text)
+        }
+        if (history.length) chips.hidden = true
+    }
+
+    // Model replies are rendered as Markdown; visitor text stays plain.
     function addMessage(role, text, extra) {
-        const msg = el('p', { class: `chat__msg chat__msg--${role}${extra ? ' ' + extra : ''}` }, [text])
+        const msg = el('div', { class: `chat__msg chat__msg--${role}${extra ? ' ' + extra : ''}` },
+            role === 'model' && !extra ? [renderMarkdown(text)] : [text])
         log.append(msg)
         log.scrollTop = log.scrollHeight
         return msg
+    }
+
+    // Minimal Markdown built as DOM nodes: nothing the model writes is ever
+    // parsed as HTML. Covers what the model emits: paragraphs, "-" and "1."
+    // lists, headings, **bold**, *italic*, `code`, [links](url), bare URLs and
+    // email addresses.
+    function renderMarkdown(text) {
+        const frag = document.createDocumentFragment()
+        let list = null
+        let para = null
+        for (const raw of String(text).replace(/\r/g, '').split('\n')) {
+            const line = raw.trim()
+            if (!line) { list = para = null; continue }
+            const item = line.match(/^(?:[-*•]|(\d+)[.)])\s+(.*)$/)
+            if (item) {
+                const tag = item[1] ? 'ol' : 'ul'
+                if (!list || list.localName !== tag) { list = el(tag, {}); frag.append(list) }
+                list.append(el('li', {}, inline(item[2])))
+                para = null
+                continue
+            }
+            list = null
+            const heading = line.match(/^#{1,6}\s+(.*)$/)
+            const content = heading ? [el('strong', {}, inline(heading[1]))] : inline(line)
+            if (para) para.append(el('br', {}))
+            else { para = el('p', {}); frag.append(para) }
+            para.append(...content)
+        }
+        return frag
+    }
+
+    function inline(text) {
+        const INLINE = /\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"])|([\w.+-]+@[\w-]+(?:\.[\w-]+)+)|(?<![\w*])\*(?!\s)([^*]+?)\*(?![\w*])|(?<!\w)_(?!\s)([^_]+?)_(?!\w)/g
+        const out = []
+        let last = 0
+        for (const m of text.matchAll(INLINE)) {
+            const [all, bold, code, label, href, url, email, em1, em2] = m
+            if (m.index > last) out.push(text.slice(last, m.index))
+            if (bold) out.push(el('strong', {}, inline(bold)))
+            else if (code) out.push(el('code', {}, [code]))
+            else if (label) out.push(link(href, inline(label)) || all)
+            else if (url) out.push(link(url, [url]) || url)
+            else if (email) out.push(link('mailto:' + email, [email]) || email)
+            else out.push(el('em', {}, inline(em1 || em2)))
+            last = m.index + all.length
+        }
+        if (last < text.length) out.push(text.slice(last))
+        return out
+    }
+
+    // Only web and mail links; anything else (javascript:, data:) stays text.
+    function link(href, children) {
+        let url
+        try { url = new URL(href, location.href) } catch { return null }
+        if (!['https:', 'http:', 'mailto:'].includes(url.protocol)) return null
+        const a = el('a', { class: 'chat__link', href: url.href }, children)
+        if (url.protocol !== 'mailto:') { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+        return a
+    }
+
+    function icon(name) {
+        return el('i', { class: name, 'aria-hidden': 'true' })
     }
 
     function el(tag, attrs, children = []) {
