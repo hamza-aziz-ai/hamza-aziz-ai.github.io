@@ -35,7 +35,7 @@
     const launcher = el('button', {
         class: 'chat__launcher', type: 'button',
         'aria-label': 'Ask about Hamza', 'aria-expanded': 'false', 'aria-controls': 'chat-panel',
-    }, [icon('ri-robot-line')])
+    }, [icon('ri-robot-3-fill')])
 
     const log = el('div', { class: 'chat__log', 'aria-live': 'polite' })
     const input = el('textarea', {
