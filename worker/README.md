@@ -18,84 +18,61 @@ is charged, because the Google project has no billing account.
 | File | Purpose |
 |---|---|
 | `src/index.js` | The Worker: origin check, rate limit, validation, Gemini then Workers AI |
-| `src/knowledge.js` | GENERATED. The text the assistant may answer from |
-| `src/private.js` | GENERATED, gitignored. Your private notes, Gemini only |
-| `build_knowledge.py` | Regenerates both from the site's pages and `private/` |
-| `test.mjs` | Self-check with both models stubbed: `node worker/test.mjs` |
-| `wrangler.toml` | Worker config: allowed origin, models, AI binding, rate limit |
+| `src/knowledge.js` | GENERATED. The public site text the assistant may answer from |
+| `build_knowledge.py` | Regenerates `knowledge.js` from the site's pages (CI runs it) |
+| `sanitize_notes.py` | Cleans raw design docs into private notes |
+| `upload_notes.py` | Uploads the private notes to Workers KV |
+| `test.mjs` | Self-check with both models and KV stubbed: `node worker/test.mjs` |
+| `wrangler.toml` | Worker config: origin, models, AI, KV and rate-limit bindings |
+| `../.github/workflows/worker.yml` | Builds, checks and deploys on every relevant push to `main` |
 
-## Deploy (one time)
+## How it deploys
 
-1. **Gemini key.** At aistudio.google.com → **Get API key** → create it in a
-   project that has **no billing account**, so the free tier can never bill.
-   Keep it out of every repo folder.
-2. **Check the fallback model id.** Cloudflare dashboard → AI → Models. Confirm
-   `@cf/meta/llama-3.1-8b-instruct-fp8` exists, or set `FALLBACK_MODEL` in
-   `wrangler.toml` to another free `@cf/` text model. Third-party models such
-   as `anthropic/...` are billed separately; don't use them here.
-3. From the repo root (the build writes the gitignored `src/private.js`, which
-   the deploy needs even with no notes):
-   ```
-   python -I worker/build_knowledge.py
-   cd worker
-   npx wrangler login
-   npx wrangler secret put GEMINI_API_KEY     # paste the key when prompted
-   npx wrangler deploy
-   ```
-   `deploy` prints the Worker URL, e.g.
-   `https://hamzaaziz-chat.<your-subdomain>.workers.dev`.
-4. Put that URL **plus `/chat`** into the script tag at the end of
-   `index.html`:
-   ```html
-   <script src="assets/js/chat.js" data-endpoint="https://hamzaaziz-chat.<sub>.workers.dev/chat" defer></script>
-   ```
-   While `data-endpoint` is empty the widget renders nothing.
+**Automatically.** `.github/workflows/worker.yml` runs on every push to
+`main` that touches `worker/`, `index.html` or `projects/`, weekly (to pick up
+CV edits, since the CV page lives in another repo), and on demand from the
+Actions tab. It rebuilds `knowledge.js`, runs the self-check and deploys.
+It needs one repository secret, `CLOUDFLARE_API_TOKEN`: Cloudflare dashboard
+→ My Profile → API Tokens → Create Token → template **Edit Cloudflare
+Workers**, scoped to this account only.
 
-## After changing the site's content
+**By hand**, if ever needed: `python -I worker/build_knowledge.py`, then
+`cd worker && npx wrangler deploy`.
 
-The assistant only knows what was in the pages when `knowledge.js` was last
-built. After editing the homepage, a case study or the CV:
-
-```
-python -I worker/build_knowledge.py
-cd worker && npx wrangler deploy
-```
+One-time setup, already done: the `GEMINI_API_KEY` Worker secret (an AI
+Studio key in a project with **no billing account**), the `workers.dev`
+subdomain, the KV namespace in `wrangler.toml`, and the endpoint in the
+script tag at the end of `index.html`. The fallback model must be a free
+`@cf/` model; third-party models such as `anthropic/...` are billed
+separately.
 
 ## Private notes
 
 For questions the site does not answer ("tell me something that is not on
-your resume"), put Markdown files in `worker/private/`, e.g.
-`worker/private/design-decisions.md`. The file name becomes the heading.
+your resume"), the Worker adds Hamza's private notes to Gemini's prompt. They
+live in Workers KV, never in git or in the Worker's code, so CI can deploy
+without them. Only Gemini sees them; the fallback does not.
 
-- `worker/private/` and the `src/private.js` built from it are gitignored, so
-  they never reach GitHub. Only Gemini sees them; the fallback does not.
-- **Anything in them can be told to a visitor who asks.** Write only what you
-  would say in an interview: no employer or client internals under NDA, no
-  customer names, no addresses, keys or security weaknesses. The build refuses
-  notes that look like they hold an IP address, key or password.
-- Cap: 160,000 characters in total (about 40k tokens). The whole prompt goes
-  with every message, and the free tier limits tokens per minute.
-- Write prose, not diagrams: the assistant reads text only.
+- **Anything in them can be told to a visitor who asks.** No employer or
+  client internals under NDA, no customer names, no addresses, keys or
+  security weaknesses. The upload refuses notes that look like they hold an
+  IP address, key or password.
+- Cap: 160,000 characters (about 40k tokens). The whole prompt goes with
+  every message, and the free tier limits tokens per minute.
+- Prose, not diagrams: the assistant reads text only.
 
-**From raw design docs.** Put them in `worker/private/source/` (the build
-skips that subfolder) and list names to anonymise in
-`worker/private/redactions.txt`, one `term => replacement` per line. Then
-`python -I worker/sanitize_notes.py` writes a cleaned copy of each doc into
-`worker/private/`: diagrams, IP addresses, ports, file:line references,
-private links and every line about credentials, authentication or exposure
-are removed. Regexes cannot judge confidentiality, so read the output before
-building.
+Workflow:
 
-After adding or editing a note:
-
-```
-python -I worker/build_knowledge.py
-cd worker && npx wrangler deploy
-```
-
-Deploying from another machine needs the notes there too: without
-`worker/private/` the build writes empty notes, and the chat answers from the
-site alone.
+1. Raw design docs go in `worker/private/source/`; names to anonymise go in
+   `worker/private/redactions.txt`, one `term => replacement` per line. Both
+   are gitignored.
+2. `python -I worker/sanitize_notes.py` writes a cleaned copy of each doc
+   into `worker/private/`: diagrams, IP addresses, ports, file:line
+   references, private links and every line about credentials,
+   authentication or exposure are removed. Hand-written `.md` notes can sit
+   beside them. Regexes cannot judge confidentiality: read the output.
+3. `python -I worker/upload_notes.py` uploads every `worker/private/*.md`.
+   Visitors see the change within about five minutes. No deploy needed.
 
 ## Checking which backend answered
 

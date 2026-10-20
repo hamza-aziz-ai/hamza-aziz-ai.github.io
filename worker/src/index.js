@@ -16,7 +16,6 @@
 //           or 4xx/5xx {"error":"..."}
 
 import { KNOWLEDGE, KNOWLEDGE_CORE } from "./knowledge.js";
-import { PRIVATE_NOTES } from "./private.js";
 
 const MAX_TURNS = 8;          // only the last few turns are sent upstream
 const MAX_CHARS = 800;        // per message; a portfolio question fits easily
@@ -43,8 +42,9 @@ Rules:
 
 KNOWLEDGE
 `;
-// Hamza's own notes (worker/private/, kept off GitHub). Gemini only: the
-// fallback's small window holds the public core and nothing more.
+// Hamza's own notes, read from KV at request time (worker/upload_notes.py puts
+// them there; they are never in git). Gemini only: the fallback's small
+// window holds the public core and nothing more.
 const NOTES = `
 
 PRIVATE NOTES
@@ -67,7 +67,7 @@ went wrong" or "what would you do differently" come from.
   them anonymous.
 
 `;
-const PROMPT_FULL = RULES + KNOWLEDGE + (PRIVATE_NOTES ? NOTES + PRIVATE_NOTES : "");
+const PROMPT_PUBLIC = RULES + KNOWLEDGE;
 const PROMPT_CORE = RULES + KNOWLEDGE_CORE;
 
 const MSG = {
@@ -145,7 +145,15 @@ export default {
 };
 
 // Never pass upstream error bodies through: they can echo request details.
+// Edge-cached for 5 minutes, so an upload reaches visitors within minutes
+// and most requests never touch KV. No binding or no key: answer without notes.
+async function promptFull(env) {
+  const notes = env.NOTES_KV ? await env.NOTES_KV.get("notes", { cacheTtl: 300 }).catch(() => null) : null;
+  return notes ? PROMPT_PUBLIC + NOTES + notes : PROMPT_PUBLIC;
+}
+
 async function askGemini(env, turns) {
+  const system = await promptFull(env);
   let res;
   try {
     res = await fetch(
@@ -154,7 +162,7 @@ async function askGemini(env, turns) {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: PROMPT_FULL }] },
+          systemInstruction: { parts: [{ text: system }] },
           contents: turns.map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
           generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS, temperature: 0.3 },
         }),

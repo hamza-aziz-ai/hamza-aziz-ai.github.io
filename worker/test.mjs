@@ -2,10 +2,11 @@
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
 import worker, { toTurns } from "./src/index.js";
-import { PRIVATE_NOTES } from "./src/private.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
-const env = (over = {}) => ({ ALLOWED_ORIGINS: ORIGIN, MODEL: "test-model", FALLBACK_MODEL: "@cf/test", GEMINI_API_KEY: "k", ...over });
+const NOTE = "Private note: the barrier token design.";
+const env = (over = {}) => ({ ALLOWED_ORIGINS: ORIGIN, MODEL: "test-model", FALLBACK_MODEL: "@cf/test", GEMINI_API_KEY: "k",
+  NOTES_KV: { get: async (key) => (key === "notes" ? NOTE : null) }, ...over });
 const req = (body, { origin = ORIGIN, method = "POST", path = "/chat" } = {}) =>
   new Request(`https://w.example${path}`, {
     method,
@@ -72,9 +73,14 @@ assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "assistant", "user"
 assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller core prompt");
 assert.ok(msgs[0].content.includes("KNOWLEDGE"));
 // Private notes reach Gemini when present, and never the fallback.
-assert.equal(gBody.systemInstruction.parts[0].text.includes("PRIVATE NOTES"), Boolean(PRIVATE_NOTES));
-assert.ok(!msgs[0].content.includes("PRIVATE NOTES"), "fallback never sees private notes");
-if (PRIVATE_NOTES) assert.ok(!msgs[0].content.includes(PRIVATE_NOTES.slice(0, 200)));
+assert.ok(gBody.systemInstruction.parts[0].text.endsWith(NOTE), "Gemini gets the KV notes");
+assert.ok(!msgs[0].content.includes("PRIVATE NOTES") && !msgs[0].content.includes(NOTE), "fallback never sees private notes");
+// No KV binding, or a KV error: Gemini still answers, from the public text.
+for (const NOTES_KV of [undefined, { get: async () => { throw new Error("kv down"); } }]) {
+  reset(); geminiOK();
+  assert.equal((await worker.fetch(req(ask), env({ NOTES_KV }))).status, 200);
+  assert.ok(!JSON.parse(geminiCalls[0].init.body).systemInstruction.parts[0].text.includes("PRIVATE NOTES"));
+}
 
 // 3. Gemini 5xx, network error, or empty -> fallback too
 for (const setup of [() => gemini(500, {}), () => gemini(200, { candidates: [] }), () => { globalThis.fetch = async () => { throw new Error("down"); }; }]) {
