@@ -1,0 +1,42 @@
+name = "hamzaaziz-chat"
+main = "src/index.js"
+# Not a secret; lets CI deploy with an API token alone.
+account_id = "c3215d2a7ebfe71680f848d5746de7fe"
+compatibility_date = "2025-09-01"
+# Served only at hamzaaziz-chat.hamza-aziz-ai.workers.dev; no per-version
+# preview hosts, which would be extra public copies of the endpoint.
+workers_dev = true
+preview_urls = false
+
+[vars]
+# Comma-separated. Only these origins get CORS headers and are served.
+ALLOWED_ORIGINS = "https://hamzaaziz.dev"
+# Primary model. Configurable because Google retires model versions.
+MODEL = "gemini-3.5-flash-lite"
+# Workers AI fallback. Confirm the id exists in your account's catalog
+# (dashboard > AI > Models) before deploying; pick a free @cf/ model, not a
+# third-party partner model, which is billed separately.
+FALLBACK_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8"
+
+# Workers AI binding for the fallback. No key needed.
+[ai]
+binding = "AI"
+
+# Private notes (upload_notes.py writes them here; never in git). Kept out of
+# the code so CI can deploy without them.
+[[kv_namespaces]]
+binding = "NOTES_KV"
+id = "9bcc2bc6eb5a420d9b3ffc4b1133a371"
+
+# Per-visitor limit: 10 messages a minute per IP. Stops one scraper from
+# draining the free daily quota for everyone else.
+[[ratelimits]]
+name = "CHAT_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 10
+  period = 60
+
+# GEMINI_API_KEY is a secret, never in this file:
+#   npx wrangler secret put GEMINI_API_KEY

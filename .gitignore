@@ -447,3 +447,10 @@ docs/
 /assets/pdf/*backup-codes*.txt
 AGENTS.md
 CLAUDE.md
+
+# Wrangler local cache
+.wrangler/
+
+# Chat assistant private notes: never on GitHub (uploaded to Workers KV instead)
+worker/private/
+
