@@ -41,7 +41,9 @@ CORE = ("Homepage", "CV")
 OUT = ROOT / "worker/src/knowledge.js"
 PRIVATE_DIR = ROOT / "worker/private"
 PRIVATE_OUT = ROOT / "worker/src/private.js"
-PRIVATE_MAX_CHARS = 80_000  # ~20k tokens; ~12k words of notes
+# ~40k tokens. With the site text that is ~50k tokens per message: room for a
+# handful of messages a minute on the free tier before the fallback answers.
+PRIVATE_MAX_CHARS = 160_000
 LEAKY = {
     "an IPv4 address": r"\b(?:\d{1,3}\.){3}\d{1,3}\b",
     "a Google API key": r"AIza[0-9A-Za-z_-]{30,}",

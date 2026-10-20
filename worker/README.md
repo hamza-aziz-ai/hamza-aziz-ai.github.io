@@ -73,9 +73,18 @@ your resume"), put Markdown files in `worker/private/`, e.g.
   would say in an interview: no employer or client internals under NDA, no
   customer names, no addresses, keys or security weaknesses. The build refuses
   notes that look like they hold an IP address, key or password.
-- Cap: 80,000 characters in total (about 12,000 words). The whole prompt goes
+- Cap: 160,000 characters in total (about 40k tokens). The whole prompt goes
   with every message, and the free tier limits tokens per minute.
 - Write prose, not diagrams: the assistant reads text only.
+
+**From raw design docs.** Put them in `worker/private/source/` (the build
+skips that subfolder) and list names to anonymise in
+`worker/private/redactions.txt`, one `term => replacement` per line. Then
+`python -I worker/sanitize_notes.py` writes a cleaned copy of each doc into
+`worker/private/`: diagrams, IP addresses, ports, file:line references,
+private links and every line about credentials, authentication or exposure
+are removed. Regexes cannot judge confidentiality, so read the output before
+building.
 
 After adding or editing a note:
 
