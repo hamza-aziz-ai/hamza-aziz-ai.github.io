@@ -19,7 +19,8 @@ is charged, because the Google project has no billing account.
 |---|---|
 | `src/index.js` | The Worker: origin check, rate limit, validation, Gemini then Workers AI |
 | `src/knowledge.js` | GENERATED. The text the assistant may answer from |
-| `build_knowledge.py` | Regenerates `knowledge.js` from the site's own pages |
+| `src/private.js` | GENERATED, gitignored. Your private notes, Gemini only |
+| `build_knowledge.py` | Regenerates both from the site's pages and `private/` |
 | `test.mjs` | Self-check with both models stubbed: `node worker/test.mjs` |
 | `wrangler.toml` | Worker config: allowed origin, models, AI binding, rate limit |
 
@@ -32,8 +33,10 @@ is charged, because the Google project has no billing account.
    `@cf/meta/llama-3.1-8b-instruct-fp8` exists, or set `FALLBACK_MODEL` in
    `wrangler.toml` to another free `@cf/` text model. Third-party models such
    as `anthropic/...` are billed separately; don't use them here.
-3. From the repo root:
+3. From the repo root (the build writes the gitignored `src/private.js`, which
+   the deploy needs even with no notes):
    ```
+   python -I worker/build_knowledge.py
    cd worker
    npx wrangler login
    npx wrangler secret put GEMINI_API_KEY     # paste the key when prompted
@@ -57,6 +60,33 @@ built. After editing the homepage, a case study or the CV:
 python -I worker/build_knowledge.py
 cd worker && npx wrangler deploy
 ```
+
+## Private notes
+
+For questions the site does not answer ("tell me something that is not on
+your resume"), put Markdown files in `worker/private/`, e.g.
+`worker/private/design-decisions.md`. The file name becomes the heading.
+
+- `worker/private/` and the `src/private.js` built from it are gitignored, so
+  they never reach GitHub. Only Gemini sees them; the fallback does not.
+- **Anything in them can be told to a visitor who asks.** Write only what you
+  would say in an interview: no employer or client internals under NDA, no
+  customer names, no addresses, keys or security weaknesses. The build refuses
+  notes that look like they hold an IP address, key or password.
+- Cap: 80,000 characters in total (about 12,000 words). The whole prompt goes
+  with every message, and the free tier limits tokens per minute.
+- Write prose, not diagrams: the assistant reads text only.
+
+After adding or editing a note:
+
+```
+python -I worker/build_knowledge.py
+cd worker && npx wrangler deploy
+```
+
+Deploying from another machine needs the notes there too: without
+`worker/private/` the build writes empty notes, and the chat answers from the
+site alone.
 
 ## Checking which backend answered
 

@@ -16,6 +16,7 @@
 //           or 4xx/5xx {"error":"..."}
 
 import { KNOWLEDGE, KNOWLEDGE_CORE } from "./knowledge.js";
+import { PRIVATE_NOTES } from "./private.js";
 
 const MAX_TURNS = 8;          // only the last few turns are sent upstream
 const MAX_CHARS = 800;        // per message; a portfolio question fits easily
@@ -38,7 +39,19 @@ Rules:
 
 KNOWLEDGE
 `;
-const PROMPT_FULL = RULES + KNOWLEDGE;
+// Hamza's own notes (worker/private/, kept off GitHub). Gemini only: the
+// fallback's small window holds the public core and nothing more.
+const NOTES = `
+
+PRIVATE NOTES
+Hamza's own notes on design decisions, architectures, lessons and interests
+that are not on his resume. Use them to answer questions such as "tell me
+something that is not on your resume", in a few sentences in your own words.
+Never reproduce them verbatim at length, never list or summarise all of them
+at once, and never mention that they are notes or files.
+
+`;
+const PROMPT_FULL = RULES + KNOWLEDGE + (PRIVATE_NOTES ? NOTES + PRIVATE_NOTES : "");
 const PROMPT_CORE = RULES + KNOWLEDGE_CORE;
 
 const MSG = {

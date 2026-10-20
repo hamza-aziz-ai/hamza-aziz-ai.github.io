@@ -2,6 +2,7 @@
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
 import worker, { toTurns } from "./src/index.js";
+import { PRIVATE_NOTES } from "./src/private.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
 const env = (over = {}) => ({ ALLOWED_ORIGINS: ORIGIN, MODEL: "test-model", FALLBACK_MODEL: "@cf/test", GEMINI_API_KEY: "k", ...over });
@@ -70,6 +71,10 @@ const msgs = aiCalls[0].input.messages;
 assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "assistant", "user"], "model role mapped to assistant");
 assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller core prompt");
 assert.ok(msgs[0].content.includes("KNOWLEDGE"));
+// Private notes reach Gemini when present, and never the fallback.
+assert.equal(gBody.systemInstruction.parts[0].text.includes("PRIVATE NOTES"), Boolean(PRIVATE_NOTES));
+assert.ok(!msgs[0].content.includes("PRIVATE NOTES"), "fallback never sees private notes");
+if (PRIVATE_NOTES) assert.ok(!msgs[0].content.includes(PRIVATE_NOTES.slice(0, 200)));
 
 // 3. Gemini 5xx, network error, or empty -> fallback too
 for (const setup of [() => gemini(500, {}), () => gemini(200, { candidates: [] }), () => { globalThis.fetch = async () => { throw new Error("down"); }; }]) {

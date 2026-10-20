@@ -450,3 +450,7 @@ CLAUDE.md
 
 # Wrangler local cache
 .wrangler/
+
+# Chat assistant private notes and the file built from them: never on GitHub
+worker/private/
+worker/src/private.js
