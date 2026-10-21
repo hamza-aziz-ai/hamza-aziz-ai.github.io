@@ -22,9 +22,14 @@ ENTRY = re.compile(r"(<loc>" + re.escape(SITE) + r"([^<]*)</loc>\s*<lastmod>)([^
 
 
 def file_for(path: str) -> pathlib.Path:
-    # "" is the homepage; "dir/" is that directory's index.html.
+    # "" is the homepage; "dir/" is that directory's index.html; an extensionless
+    # "page" is page.html (GitHub Pages serves /matrimony from matrimony.html, even
+    # though a matrimony/ redirect directory also exists).
     if path == "" or path.endswith("/"):
         return pathlib.Path(path) / "index.html"
+    html = pathlib.Path(path + ".html")
+    if "." not in pathlib.Path(path).name and html.is_file():
+        return html
     return pathlib.Path(path)
 
 
