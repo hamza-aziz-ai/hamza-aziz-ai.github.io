@@ -83,3 +83,9 @@ transitionLinks.forEach(link => {
         startTransition(url)
     })
 })
+
+// Back/forward restores this page from the bfcache exactly as it was left,
+// overlay still covering it; clear the transition so the page shows.
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) document.body.classList.remove('is-transitioning')
+})
