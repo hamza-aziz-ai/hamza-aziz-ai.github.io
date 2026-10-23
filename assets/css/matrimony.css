@@ -680,6 +680,45 @@ img {
     margin-top: 1.5rem;
 }
 
+/* Jump links to each section; targets clear the sticky header */
+.page-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: 1.25rem;
+}
+
+.page-nav a {
+    padding: .45rem .9rem;
+    border-radius: 999px;
+    background: var(--container-color);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--title-color);
+    font-size: var(--small-font-size);
+    font-weight: var(--font-semi-bold);
+    transition: background-color .2s, color .2s;
+}
+
+.page-nav a:hover {
+    background: var(--first-color);
+    color: var(--white-color);
+}
+
+#about,
+#photos,
+#snapshot,
+#preferences,
+#family,
+#contact {
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
 .inline-link {
     color: var(--title-color);
     text-decoration: none;
