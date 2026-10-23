@@ -669,10 +669,15 @@ img {
     color: var(--title-color);
 }
 
-.contact__links {
+.contact__links,
+.hero__actions {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+.hero__actions {
+    margin-top: 1.5rem;
 }
 
 .inline-link {
@@ -1061,12 +1066,14 @@ img {
         grid-template-columns: 1fr;
     }
 
-    .contact__links {
+    .contact__links,
+    .hero__actions {
         flex-direction: column;
     }
 
     .contact__links .button,
-    .contact__links .button--ghost {
+    .contact__links .button--ghost,
+    .hero__actions .button {
         width: 100%;
         justify-content: center;
     }
