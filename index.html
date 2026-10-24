@@ -857,6 +857,138 @@
 
                 <article class="projects__card">
                     <div class="projects__image">
+                        <img src="assets/img/projects/clinic-voice-receptionist-optimized.webp" alt="Clinic voice receptionist"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+
+                        <a href="https://github.com/hamza-aziz-ai/Clinic-Voice-Receptionist" target="_blank"
+                            class="projects__button button">
+                            <i class="ri-arrow-right-up-line"></i>
+                        </a>
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">Clinic Voice Receptionist &mdash; Multilingual Voice Booking</h2>
+
+                        <p class="projects__description">
+                            An inbound voice agent for dental clinics that books appointments in <b>English, Hindi, Tamil, Kannada
+                            and Malayalam</b> and follows up over WhatsApp. On <b>FastAPI</b>, a local <b>Whisper</b> model on the GPU
+                            transcribes each turn, an LLM slot extractor (<b>LangChain + Ollama</b>, with a rule-based fallback) pulls
+                            out the booking details, and <b>Piper</b> and <b>MMS-TTS</b> speak the reply &mdash; 0.8&ndash;1.0 s per
+                            turn on an RTX 4050. The rule that matters: it never books on a detail it isn't sure it heard, and reads
+                            low-confidence ones back first. On an 11-utterance test set with simulated transcription errors up to 50%,
+                            accuracy falls to 74.4% but no wrong detail goes unflagged. Telephony (Bolna), WhatsApp (AiSensy) and
+                            <b>n8n</b> routing are built against their documented payloads.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <a href="https://github.com/hamza-aziz-ai/Clinic-Voice-Receptionist" target="_blank"
+                            class="projects__link">
+                            <i class="ri-github-fill"></i> View
+                        </a>
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/agencyops-orchestrator-optimized.webp" alt="AgencyOps Orchestrator"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+
+                        <a href="https://github.com/hamza-aziz-ai/AgencyOps-Orchestrator" target="_blank"
+                            class="projects__button button">
+                            <i class="ri-arrow-right-up-line"></i>
+                        </a>
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">AgencyOps Orchestrator &mdash; Agentic Workflows, Human Approval</h2>
+
+                        <p class="projects__description">
+                            Agentic workflow automation for an eCommerce marketing agency, built against a real published brief: it
+                            drafts weekly client performance reports and ad-creative variants. <b>LangGraph</b> state graphs with
+                            bounded revise loops do the drafting, and nothing reaches a client or an external tool until a person
+                            approves it in a <b>FastAPI</b> review console &mdash; workflows only propose external writes, and one
+                            dispatch path runs them after approval. All arithmetic is deterministic Python; the LLM (<b>Ollama</b> or
+                            <b>Gemini</b>, with an offline fallback) only writes the prose, and a verify gate rejects any narrative
+                            that contradicts the numbers, such as &ldquo;CPA fell&rdquo; when it rose. <b>Meta Ads</b>, Harvest,
+                            Slack and Trello connectors; the demo and tests run offline with no credentials.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <a href="https://github.com/hamza-aziz-ai/AgencyOps-Orchestrator" target="_blank"
+                            class="projects__link">
+                            <i class="ri-github-fill"></i> View
+                        </a>
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/dubai-irrigation-advisor-optimized.webp" alt="Dubai smart irrigation advisor"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+
+                        <a href="https://github.com/hamza-aziz-ai/Dubai-Irrigation-Advisor" target="_blank"
+                            class="projects__button button">
+                            <i class="ri-arrow-right-up-line"></i>
+                        </a>
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">Dubai Smart Irrigation Advisor &mdash; Cheapest Beats Most Accurate</h2>
+
+                        <p class="projects__description">
+                            Decides when to irrigate in Dubai's desert climate, and ranks six predictors by what they cost to run in
+                            AED rather than by prediction error. The physics core is <b>FAO-56 Penman&ndash;Monteith</b> ET0 with a
+                            root-zone soil water balance; it reproduces FAO-56's worked examples exactly and agrees with published
+                            Dubai climate normals to 2.3% over <b>30 years of NASA POWER</b> data. Against it run <b>scikit-learn</b>,
+                            <b>XGBoost</b> and <b>PyTorch</b> LSTM/GRU models. XGBoost has the best error, yet costs 391 AED more over a
+                            simulated 120-day season because it over-waters. A <b>Streamlit</b> dashboard shows the decisions, with
+                            optional plain-language explanations from a local LLM whose every number is checked against the facts.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <a href="https://github.com/hamza-aziz-ai/Dubai-Irrigation-Advisor" target="_blank"
+                            class="projects__link">
+                            <i class="ri-github-fill"></i> View
+                        </a>
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/career-growth-ai-optimized.webp" alt="Career Growth AI for Kids"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">Career Growth AI for Kids &mdash; Built for Children's Data</h2>
+
+                        <p class="projects__description">
+                            A web app where parents build profiles for their children &mdash; age band, grade, interests and
+                            strengths &mdash; and get AI-generated career-exploration ideas. Children never log in, and parents own all
+                            the data. <b>FastAPI</b> with async <b>SQLAlchemy</b> over <b>PostgreSQL</b>, a <b>React 19 +
+                            TypeScript</b> front end, and an <b>Ollama</b>-served model. The care went into handling children's data:
+                            a child's name is never sent to the AI (a unit test enforces it), only the birth year is stored, and a
+                            parent asking for another parent's child gets a 404. Auth uses short-lived <b>JWTs</b> in httpOnly
+                            cookies and hashed, rotating refresh tokens &mdash; reuse one and every session is revoked &mdash; with
+                            per-user rate limits on login and AI generation.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <!-- private repo; no public link -->
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
                         <img src="assets/img/projects/ppe-violation-optimized.webp" alt="PPE Violation" class="projects__img" width="1200" height="675" loading="lazy">
 
                     </div>
