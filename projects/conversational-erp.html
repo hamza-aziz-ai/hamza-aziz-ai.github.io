@@ -32,8 +32,11 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'GT-T5PL6LBH');
-        gtag('config', 'G-KJ0EQRJDCN');
+        // Measure the live site only; local copies opened while testing are not visits.
+        if (location.hostname === 'hamzaaziz.dev') {
+            gtag('config', 'GT-T5PL6LBH');
+            gtag('config', 'G-KJ0EQRJDCN');
+        }
     </script>
 </head>
 <body>

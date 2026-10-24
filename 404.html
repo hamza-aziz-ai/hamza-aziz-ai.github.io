@@ -18,7 +18,10 @@
       }
       gtag("js", new Date());
 
-      gtag("config", "G-KJ0EQRJDCN");
+      // Measure the live site only; local copies opened while testing are not visits.
+      if (location.hostname === "hamzaaziz.dev") {
+        gtag("config", "G-KJ0EQRJDCN");
+      }
     </script>
 
     <!--==================== FAVICON ====================-->
