@@ -882,8 +882,8 @@
                             and Malayalam</b> and follows up over WhatsApp. On <b>FastAPI</b>, a local <b>Whisper</b> model on the GPU
                             transcribes each turn, an LLM slot extractor (<b>LangChain + Ollama</b>, with a rule-based fallback) pulls
                             out the booking details, and <b>Piper</b> and <b>MMS-TTS</b> speak the reply &mdash; 0.8&ndash;1.0 s per
-                            turn on an RTX 4050. The rule that matters: it never books on a detail it isn't sure it heard, and reads
-                            low-confidence ones back first. On an 11-utterance test set with simulated transcription errors up to 50%,
+                            turn on an RTX 4050. The rule that matters: details it heard with low confidence are read back to the caller
+                            before anything is booked. On its own 11-utterance test set with simulated transcription errors up to 50%,
                             accuracy falls to 74.4% but no wrong detail goes unflagged. Telephony (Bolna), WhatsApp (AiSensy) and
                             <b>n8n</b> routing are built against their documented payloads.
                         </p>
