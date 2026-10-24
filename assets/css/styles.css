@@ -1999,6 +1999,14 @@ body.dark-theme {
     color: var(--text-color);
 }
 
+/* Long paragraphs are justified (D-017); hyphenation keeps narrow
+   columns from opening gaps between words. */
+.projects__description,
+.case p:not([class]) {
+    text-align: justify;
+    hyphens: auto;
+}
+
 .case strong {
     color: var(--title-color);
 }
