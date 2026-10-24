@@ -945,15 +945,15 @@
 
                     <div class="projects__content">
                         <h3 class="projects__subtitle">Personal Project</h3>
-                        <h2 class="projects__title">Dubai Smart Irrigation Advisor &mdash; Cheapest Beats Most Accurate</h2>
+                        <h2 class="projects__title">Dubai Smart Irrigation Advisor &mdash; Ranked by Cost, Not Error</h2>
 
                         <p class="projects__description">
                             Built against a real published brief, it decides when to irrigate in Dubai's desert climate, and ranks six predictors by what they cost to run in
                             AED rather than by prediction error. The physics core is <b>FAO-56 Penman&ndash;Monteith</b> ET0 with a
                             root-zone soil water balance; it reproduces FAO-56's worked examples exactly and agrees with published
                             Dubai climate normals to 2.3% over <b>30 years of NASA POWER</b> data. Against it run <b>scikit-learn</b>,
-                            <b>XGBoost</b> and <b>PyTorch</b> LSTM/GRU models. XGBoost has the best error, yet costs 391 AED more over a
-                            simulated 120-day season because it over-waters. A <b>Streamlit</b> dashboard shows the decisions, with
+                            <b>XGBoost</b> and <b>PyTorch</b> LSTM/GRU models, each scored by what its decisions cost in water and AED over a
+                            simulated 120-day season. A <b>Streamlit</b> dashboard shows the decisions, with
                             optional plain-language explanations from a local LLM whose every number is checked against the facts.
                         </p>
                     </div>
