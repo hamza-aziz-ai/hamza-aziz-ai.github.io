@@ -956,7 +956,8 @@
                             root-zone soil water balance; it reproduces FAO-56's worked examples exactly and agrees with published
                             Dubai climate normals to 2.3% over <b>30 years of NASA POWER</b> data. Against it run <b>scikit-learn</b>,
                             <b>XGBoost</b> and <b>PyTorch</b> LSTM/GRU models, each scored by what its decisions cost in water and AED over a
-                            simulated 120-day season. A <b>Streamlit</b> dashboard shows the decisions, with
+                            simulated 120-day season. The best learned model comes within 5% of the physics baseline, which also
+                            drives the simulator; acting on the raw soil sensor alone costs 6.7 times as much. A <b>Streamlit</b> dashboard shows the decisions, with
                             optional plain-language explanations from a local LLM whose every number is checked against the facts.
                         </p>
                     </div>
@@ -989,7 +990,7 @@
                             strengths &mdash; and get AI-generated career-exploration ideas. Children never log in, and parents own all
                             the data. <b>FastAPI</b> with async <b>SQLAlchemy</b> over <b>PostgreSQL</b>, a <b>React 19 +
                             TypeScript</b> front end, and an <b>Ollama</b>-served model. The care went into handling children's data:
-                            a child's name is never sent to the AI (a unit test covers it), only the birth year is stored, and a
+                            a child's name and the parent's notes are never sent to the AI (unit tests enforce it), only the birth year is stored, and a
                             parent asking for another parent's child gets a 404. Auth uses short-lived <b>JWTs</b> in httpOnly
                             cookies and hashed, rotating refresh tokens &mdash; reuse one and every session is revoked &mdash; with
                             per-user rate limits on login and AI generation.
