@@ -990,7 +990,7 @@
                             strengths &mdash; and get AI-generated career-exploration ideas. Children never log in, and parents own all
                             the data. <b>FastAPI</b> with async <b>SQLAlchemy</b> over <b>PostgreSQL</b>, a <b>React 19 +
                             TypeScript</b> front end, and an <b>Ollama</b>-served model. The care went into handling children's data:
-                            a child's name and the parent's notes are never sent to the AI (unit tests enforce it), only the birth year is stored, and a
+                            a child's name and the parent's notes are never sent to the AI (tests enforce it), only the birth year is stored, and a
                             parent asking for another parent's child gets a 404. Auth uses short-lived <b>JWTs</b> in httpOnly
                             cookies and hashed, rotating refresh tokens &mdash; reuse one and every session is revoked &mdash; with
                             per-user rate limits on login and AI generation.
