@@ -36,8 +36,12 @@ jobs:
       - name: HTML balances on every page
         run: python -I .github/scripts/html_balance.py *.html projects/*.html
 
-      - name: Every local file a page references exists
-        run: python -I .github/scripts/assets_check.py *.html projects/*.html
+      # Checked against the staged copy deploy.yml publishes, so a page that
+      # links a file left out of the allowlist fails here.
+      - name: Every local file a page references is published
+        run: |
+          sh .github/scripts/stage_site.sh
+          cd _site && python -I ../.github/scripts/assets_check.py *.html projects/*.html hamza-aziz-resume/index.html matrimony/index.html
 
       - name: JavaScript parses
         run: for f in assets/js/*.js; do node --check "$f"; done

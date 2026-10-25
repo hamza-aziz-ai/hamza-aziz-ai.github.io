@@ -454,3 +454,6 @@ CLAUDE.md
 # Chat assistant private notes: never on GitHub (uploaded to Workers KV instead)
 worker/private/
 
+
+# Built Pages artifact (.github/scripts/stage_site.sh)
+_site/
