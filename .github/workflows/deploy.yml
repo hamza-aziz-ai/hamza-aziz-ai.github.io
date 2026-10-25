@@ -42,12 +42,14 @@ jobs:
       - name: Set sitemap lastmod from git history (built copy only)
         run: python .github/scripts/sitemap_lastmod.py
 
+      - name: Stage the public files
+        run: sh .github/scripts/stage_site.sh
+
       - uses: actions/configure-pages@v5
 
-      # Excludes .git and .github; .nojekyll keeps the files served as-is.
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - id: deployment
         uses: actions/deploy-pages@v4
