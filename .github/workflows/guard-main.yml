@@ -1,0 +1,27 @@
+# Changes reach main only through a PR that CI merges (D-019). CI merges with
+# GITHUB_TOKEN, which raises no push event, so this workflow never runs for
+# them: any push to main it does see came from somewhere else, a direct push
+# or a hand merge in the web UI. The plan has no branch protection, so it
+# cannot block the push; it opens an issue (GitHub emails it) so the push
+# does not go unnoticed (D-020).
+name: Guard main
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Open an issue for the push
+        run: |
+          gh issue create --repo "${{ github.repository }}" \
+            --title "main changed outside CI: push by ${{ github.actor }}" \
+            --body "A push to main did not come from CI's merge job (D-019). Before: ${{ github.event.before }} After: ${{ github.sha }} Compare: ${{ github.event.compare }}. If it was intended, close this issue; otherwise revert it through a PR."
