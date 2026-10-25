@@ -75,7 +75,6 @@ jobs:
       contents: write        # merge into main
       pull-requests: write   # merge and delete the branch
       actions: write         # start the push-to-main workflows below
-      pages: write           # request a Pages build
     env:
       GH_TOKEN: ${{ github.token }}
       PR: ${{ github.event.pull_request.number }}
@@ -90,9 +89,8 @@ jobs:
       # normally runs on a push to main starts by itself. Start it here.
       - name: Start the push-to-main workflows
         run: |
-          gh workflow run sitemap.yml --repo "$REPO" --ref main
+          gh workflow run deploy.yml --repo "$REPO" --ref main
           if gh pr diff "$PR" --repo "$REPO" --name-only \
               | grep -qE '^(worker/|index\.html$|projects/|assets/pdf/|sitemap\.xml$|\.github/workflows/worker\.yml$)'; then
             gh workflow run worker.yml --repo "$REPO" --ref main
           fi
-          gh api -X POST "repos/$REPO/pages/builds"

@@ -1,0 +1,92 @@
+# Deploy the site to GitHub Pages on every push to main, and when CI's merge
+# job dispatches it (a merge made with GITHUB_TOKEN raises no push event).
+# sitemap.xml's <lastmod> values are set from git history in the built copy
+# only, so nothing is committed back to main and PRs may edit sitemap.xml.
+# After the deploy, both sitemaps are resubmitted to Search Console so Google
+# re-crawls whatever changed. Scripts live in .github/scripts/.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a queued one waits rather than cancelling a live one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write      # deploy to Pages
+      id-token: write   # deploy-pages proves its identity with OIDC
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # lastmod comes from `git log`, which needs full history
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set sitemap lastmod from git history (built copy only)
+        run: python .github/scripts/sitemap_lastmod.py
+
+      - uses: actions/configure-pages@v5
+
+      # Excludes .git and .github; .nojekyll keeps the files served as-is.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  search-console:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Rebuild the same sitemap the deploy served, to compare with the live one.
+      - name: Set sitemap lastmod from git history
+        run: python .github/scripts/sitemap_lastmod.py
+
+      # Resubmitting before the new sitemap is live would hand Google the old
+      # one (the CDN can lag the deploy). Compare the served bytes.
+      - name: Wait until the live sitemap matches this deploy
+        run: |
+          for i in $(seq 1 40); do
+            if curl -fsS "https://hamzaaziz.dev/sitemap.xml?cb=$(date +%s)" | cmp -s - sitemap.xml; then
+              echo "live sitemap matches after ~$(( (i-1)*15 ))s"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::live sitemap.xml did not match this deploy within 10 minutes"
+          exit 1
+
+      - name: Install Google auth
+        run: pip install --quiet google-auth requests
+
+      - name: Resubmit sitemaps to Search Console
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+        run: python .github/scripts/submit_sitemaps.py
