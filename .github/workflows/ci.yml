@@ -75,6 +75,7 @@ jobs:
       contents: write        # merge into main
       pull-requests: write   # merge and delete the branch
       actions: write         # start the push-to-main workflows below
+      issues: write          # report a failed merge
     env:
       GH_TOKEN: ${{ github.token }}
       PR: ${{ github.event.pull_request.number }}
@@ -83,6 +84,7 @@ jobs:
       # --match-head-commit refuses to merge if the branch moved after the
       # commit these checks ran on.
       - name: Merge the PR
+        id: merge
         run: gh pr merge "$PR" --repo "$REPO" --rebase --delete-branch --match-head-commit "${{ github.event.pull_request.head.sha }}"
 
       # A merge made with GITHUB_TOKEN raises no push event, so nothing that
@@ -94,3 +96,12 @@ jobs:
               | grep -qE '^(worker/|index\.html$|projects/|assets/pdf/|sitemap\.xml$|\.github/workflows/worker\.yml$)'; then
             gh workflow run worker.yml --repo "$REPO" --ref main
           fi
+
+      # Nothing retries a merge that fails (in practice a conflict with main),
+      # so make it loud: a PR comment and an issue, which GitHub emails out.
+      - name: Report a failed merge
+        if: failure() && steps.merge.outcome == 'failure'
+        run: |
+          msg="The checks passed but the automatic merge of #$PR failed, usually because main changed and the rebase conflicts. Rebase the branch on main and push; that reruns CI. Run: $GITHUB_SERVER_URL/$REPO/actions/runs/$GITHUB_RUN_ID"
+          gh pr comment "$PR" --repo "$REPO" --body "$msg"
+          gh issue create --repo "$REPO" --title "Automatic merge failed: PR #$PR" --body "$msg"
