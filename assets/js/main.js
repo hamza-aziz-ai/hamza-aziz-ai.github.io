@@ -37,6 +37,26 @@ const shadowHeader = () => {
 }
 window.addEventListener('scroll', shadowHeader)
 
+/*=============== CV BY REGION ===============*/
+// The HTML gives everyone the UAE CV, so crawlers, link previews and an
+// unknown time zone get it. A visitor whose time zone is outside the Gulf
+// gets the AI Engineer resume from Download CV instead, and the line above
+// the buttons offers the UAE CV. See DECISIONS.md D-018.
+const gulfZones = ['Asia/Dubai', 'Asia/Muscat', 'Asia/Qatar', 'Asia/Bahrain', 'Asia/Kuwait', 'Asia/Riyadh'],
+    cvDownload = document.querySelector('[data-cv-download]'),
+    cvAlt = document.querySelector('[data-cv-alt]')
+
+let visitorZone = ''
+try { visitorZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '' } catch { }
+
+if (cvDownload && cvAlt && visitorZone && !gulfZones.includes(visitorZone)) {
+    const uaeCv = cvDownload.getAttribute('href')
+    cvDownload.setAttribute('href', cvAlt.getAttribute('href'))
+    cvAlt.setAttribute('href', uaeCv)
+    document.querySelector('[data-cv-alt-question]').textContent = 'Hiring in the Gulf?'
+    cvAlt.textContent = 'Get my UAE CV (PDF)'
+}
+
 /*=============== EMAIL JS ===============*/
 const contactForm = document.getElementById('contact-form'),
     contactMessage = document.getElementById('contact-message')
