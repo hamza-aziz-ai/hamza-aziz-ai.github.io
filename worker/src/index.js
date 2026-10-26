@@ -221,7 +221,7 @@ async function logTurn(env, request, body, turns, { answer, status, backend, ms 
   const cf = request.cf || {};
   const session = SESSION_ID.test(body.session) ? body.session : crypto.randomUUID();
   const page = typeof body.page === "string" && body.page.startsWith("/") ? body.page.slice(0, 200) : null;
-  const source = body.source === "eval" ? "eval" : "visitor";
+  const source = body.source === "eval" ? "eval" : isHome(env, request) ? "internal" : "visitor";
   const ua = (request.headers.get("User-Agent") || "").slice(0, 300);
   const at = new Date().toISOString();
   const question = turns[turns.length - 1].text;
@@ -236,6 +236,16 @@ async function logTurn(env, request, body, turns, { answer, status, backend, ms 
       `INSERT INTO messages (session_id, at, question, answer, status, backend, ms) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
     ).bind(session, at, question, answer || null, status, backend, ms),
   ]);
+}
+
+// Hamza's own chats from home are kept but tagged 'internal', so the
+// visitor filter (source = 'visitor') leaves them out. HOME_IP_PREFIXES is a
+// secret, a comma-separated list matched against the start of the IP, the
+// same addresses as the GA4 "Home" rule and the Cloudflare rewrite (D-021).
+function isHome(env, request) {
+  const ip = request.headers.get("CF-Connecting-IP") || "";
+  return !!ip && String(env.HOME_IP_PREFIXES || "").split(",").map((p) => p.trim()).filter(Boolean)
+    .some((prefix) => ip.toLowerCase().startsWith(prefix.toLowerCase()));
 }
 
 // Salted, so a hash cannot be reversed by hashing every IPv4 address. No
