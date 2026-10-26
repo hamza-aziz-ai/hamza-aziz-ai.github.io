@@ -191,6 +191,7 @@ async function promptFull(env) {
 
 async function askGemini(env, turns, now) {
   const system = (await promptFull(env)) + now;
+  const started = Date.now();
   let res;
   try {
     res = await fetch(
@@ -220,6 +221,10 @@ async function askGemini(env, turns, now) {
     return { outcome: "quota", retryAt: geminiResetAt(err.details) };
   }
   const data = await res.json().catch(() => ({}));
+  // Private (wrangler tail / dashboard logs): where a slow reply spends its
+  // time, and how much of the prompt Google served from its cache.
+  const u = data.usageMetadata || {};
+  console.log(`gemini ok ${Date.now() - started}ms in=${u.promptTokenCount} cached=${u.cachedContentTokenCount || 0} think=${u.thoughtsTokenCount || 0} out=${u.candidatesTokenCount}`);
   const reply = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
   return reply ? { reply } : { outcome: "error" };
 }
