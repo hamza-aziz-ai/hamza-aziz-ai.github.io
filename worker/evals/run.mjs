@@ -9,8 +9,10 @@ import { appendFileSync } from "node:fs";
 
 const ENDPOINT = process.env.ENDPOINT || "https://hamzaaziz-chat.hamza-aziz-ai.workers.dev/chat";
 const ORIGIN = "https://hamzaaziz.dev";
-// The Worker allows 10 messages a minute per IP; stay under it.
-const MIN_GAP_MS = 6500;
+// Each question sends ~51k prompt tokens; asked every 6.5 s, Gemini's free
+// per-minute token limit answered 429 and the fallback took over (26 Oct).
+// 15 s apart keeps Gemini answering, and under the Worker's 10/minute limit.
+const MIN_GAP_MS = 15000;
 // Gemini answers in ~20 s on the free key and is cut off at 45 s (then the
 // fallback has 25 s), so a reply slower than this means Gemini has slowed
 // further or the limits are broken.
