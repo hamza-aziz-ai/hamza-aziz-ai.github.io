@@ -1,18 +1,15 @@
 # Answer checks against the live chat assistant (D-023): the questions in
 # worker/evals/cases.mjs, their required facts, reply time and which backend
-# answered. Runs weekly, by hand, and after a Chat Worker deploy that came
-# from a change to the Worker itself. Not after every site deploy: each run
-# asks 15+ questions, and the Workers AI fallback's free allocation is small
-# (D-024). A failing run opens an issue, which GitHub emails.
+# answered. Runs weekly, by hand, and when worker.yml starts it after a
+# deploy that changed the Worker. Not after every site deploy: each run asks
+# 15+ questions of the free model allowances (D-024). A failing run opens an
+# issue, which GitHub emails.
 name: Chat answer checks
 
 on:
   schedule:
     - cron: "0 4 * * 1"   # Mondays, after the weekly knowledge rebuild at 03:30
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Chat Worker deploy"]
-    types: [completed]
 
 permissions:
   contents: read
@@ -23,7 +20,6 @@ concurrency:
 
 jobs:
   evals:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -31,30 +27,12 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-          fetch-depth: 2
-
-      # After a deploy, only check when the deployed commit changed the
-      # Worker, its prompt rules or these checks.
-      - name: Decide whether to run
-        id: gate
-        run: |
-          if [ "${{ github.event_name }}" != "workflow_run" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if git diff --name-only HEAD~1 HEAD | grep -qE '^(worker/src/index\.js|worker/wrangler\.toml|worker/evals/)'; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Deploy did not change the Worker; skipping." >> "$GITHUB_STEP_SUMMARY"
-          fi
 
       - uses: actions/setup-node@v4
-        if: steps.gate.outputs.run == 'true'
         with:
           node-version: "22"
 
       - name: Ask the live assistant
-        if: steps.gate.outputs.run == 'true'
         run: node worker/evals/run.mjs
 
       - name: Open an issue for a failed run
