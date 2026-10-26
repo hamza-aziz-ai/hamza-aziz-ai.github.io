@@ -18,6 +18,8 @@ const MIN_GAP_MS = 15000;
 // further or the limits are broken.
 const MAX_REPLY_MS = 50000;
 
+// One logged session per run, marked as an eval so it is easy to filter out (D-025).
+const SESSION = crypto.randomUUID();
 let lastStart = 0;
 async function ask(q) {
   const wait = lastStart + MIN_GAP_MS - Date.now();
@@ -26,7 +28,7 @@ async function ask(q) {
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json", Origin: ORIGIN },
-    body: JSON.stringify({ messages: [{ role: "user", text: q }], tz: "Asia/Kolkata" }),
+    body: JSON.stringify({ messages: [{ role: "user", text: q }], tz: "Asia/Kolkata", session: SESSION, source: "eval" }),
     signal: AbortSignal.timeout(90000),
   }).catch((err) => ({ ok: false, status: 0, headers: new Headers(), json: async () => ({ error: String(err) }) }));
   const ms = Date.now() - lastStart;

@@ -38,5 +38,18 @@ namespace_id = "1001"
   limit = 10
   period = 60
 
+# Chat session logs (DECISIONS D-025). Schema in migrations/; apply with
+#   npx wrangler d1 migrations apply hamzaaziz-chat-logs --remote
+[[d1_databases]]
+binding = "CHAT_LOGS"
+database_name = "hamzaaziz-chat-logs"
+database_id = "df14b45b-ab3b-4e76-ace2-dd70fcb566eb"
+migrations_dir = "migrations"
+
+# Daily at 02:15 UTC: delete chat sessions older than a year (D-025).
+[triggers]
+crons = ["15 2 * * *"]
+
+# LOG_SALT is a secret too: it keys the one-way IP hash in the chat logs.
 # GEMINI_API_KEY is a secret, never in this file:
 #   npx wrangler secret put GEMINI_API_KEY

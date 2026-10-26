@@ -79,3 +79,18 @@ Workflow:
 Every reply carries an `X-Chat-Backend: gemini` or `workers-ai` header.
 Seeing `workers-ai` during the day means Gemini's free quota ran out or
 Gemini errored, and the fallback is doing its job.
+
+## Chat session logs
+
+Every chat turn is stored in the D1 database `hamzaaziz-chat-logs` (DECISIONS D-025): `sessions` (one row per chat: times, page, country/region/city, network operator and ASN, hashed IP, device, user agent, `source` visitor|eval) and `messages` (question, answer, HTTP status, backend, ms). Kept 365 days; a daily cron purges older sessions. The schema is in `migrations/`; a new migration is applied with `npx wrangler d1 migrations apply hamzaaziz-chat-logs --remote`.
+
+Read them in the Cloudflare dashboard (Storage & Databases → D1 → hamzaaziz-chat-logs → Console) or from `worker/`:
+
+```bash
+# Latest visitor sessions
+npx wrangler d1 execute hamzaaziz-chat-logs --remote --command \
+  "SELECT id, started_at, ended_at, messages, country, city, as_org, page FROM sessions WHERE source='visitor' ORDER BY started_at DESC LIMIT 20"
+# One conversation
+npx wrangler d1 execute hamzaaziz-chat-logs --remote --command \
+  "SELECT at, question, answer, backend, ms FROM messages WHERE session_id='<id>' ORDER BY at"
+```

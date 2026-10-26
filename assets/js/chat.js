@@ -26,6 +26,11 @@
 
     const history = []
     let busy = false
+    // One chat is one logged session (D-025): a random id made when the chat
+    // starts, sent with every question, and closed with a beacon when the
+    // visitor leaves the page. The full-page view continues the same session.
+    let session = crypto.randomUUID()
+    let handedOff = false
     let lastDay = ''
     // Touch screens: focusing the field pops the on-screen keyboard over the
     // answer, so it opens only when the visitor taps the field themselves.
@@ -63,7 +68,7 @@
             el('div', { class: 'chat__actions' }, pageMode ? [home] : [expand, close]),
         ]),
         log, chips, form,
-        el('p', { class: 'chat__note' }, ['AI assistant answering on Hamza’s behalf. It can be wrong.']),
+        el('p', { class: 'chat__note' }, ['AI assistant answering on Hamza’s behalf. It can be wrong. Chats are recorded, with approximate location, to improve it.']),
     ])
 
     addMessage('model', GREETING)
@@ -93,7 +98,11 @@
     for (const cta of document.querySelectorAll('[data-chat-cta]')) cta.hidden = false
     for (const btn of document.querySelectorAll('[data-chat-open]')) btn.addEventListener('click', open)
     expand.addEventListener('click', () => {
-        try { localStorage.setItem(HANDOFF, JSON.stringify(history)) } catch { /* opens empty */ }
+        try {
+            localStorage.setItem(HANDOFF, JSON.stringify(history))
+            localStorage.setItem(HANDOFF + '-session', session)
+            handedOff = true  // the chat goes on in the new tab, so leaving this page does not end it
+        } catch { /* opens empty */ }
         window.open('/chat.html', '_blank', 'noopener')
     })
     if (!pageMode) panel.addEventListener('keydown', e => { if (e.key === 'Escape') hide() })
@@ -106,6 +115,12 @@
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit() }
     })
     form.addEventListener('submit', e => { e.preventDefault(); ask(input.value) })
+    // Leaving the page ends the chat. sendBeacon survives the unload and
+    // sends text/plain, so it needs no CORS preflight.
+    addEventListener('pagehide', () => {
+        if (handedOff || !history.some(m => m.role === 'user')) return
+        navigator.sendBeacon(endpoint + '/end', JSON.stringify({ session }))
+    })
 
     async function ask(raw) {
         const text = raw.trim()
@@ -132,6 +147,8 @@
                 body: JSON.stringify({
                     messages: history.slice(-8).map(({ role, text }) => ({ role, text })),
                     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    session,
+                    page: location.pathname,
                 }),
             })
             const data = await res.json().catch(() => ({}))
@@ -193,7 +210,9 @@
         let saved = []
         try {
             saved = JSON.parse(localStorage.getItem(HANDOFF) || '[]')
+            session = localStorage.getItem(HANDOFF + '-session') || session
             localStorage.removeItem(HANDOFF)
+            localStorage.removeItem(HANDOFF + '-session')
         } catch { /* storage blocked or corrupt: start fresh */ }
         if (!Array.isArray(saved)) return
         for (const m of saved) {

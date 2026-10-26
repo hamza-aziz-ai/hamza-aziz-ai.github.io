@@ -7,13 +7,16 @@
 //
 // Backends, in order:
 //   1. Gemini (GEMINI_API_KEY secret) with the full knowledge.
-//   2. Workers AI (the AI binding) with the core knowledge, used when Gemini
+//   2. Workers AI (the AI binding) with the public knowledge, used when Gemini
 //      is unconfigured, out of free quota, or failing. It costs nothing
 //      extra and needs no key, so the chat keeps answering.
 //
-// Request:  POST /chat  {"messages":[{"role":"user"|"model","text":"..."}]}
+// Request:  POST /chat  {"messages":[{"role":"user"|"model","text":"..."}],
+//                        "session":"<uuid>","page":"/path","tz":"Area/City"}
 // Response: 200 {"reply":"..."} with header X-Chat-Backend: gemini|workers-ai
 //           or 4xx/5xx {"error":"..."}
+//           POST /chat/end {"session":"<uuid>"} -> 204, marks the session ended
+// Every turn is logged to D1 after the reply (session logs, D-025).
 
 import { KNOWLEDGE } from "./knowledge.js";
 
@@ -117,7 +120,12 @@ const MSG = {
 };
 
 export default {
-  async fetch(request, env) {
+  // Daily cron (wrangler.toml): chat sessions are kept a year (D-025).
+  async scheduled(event, env) {
+    if (env.CHAT_LOGS) await purgeOldLogs(env.CHAT_LOGS);
+  },
+
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
     const allowed = (env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
     const cors = allowed.includes(origin)
@@ -125,6 +133,7 @@ export default {
       : {};
 
     const url = new URL(request.url);
+    if (url.pathname === "/chat/end") return endSession(request, env, cors);
     if (url.pathname !== "/chat") return json({ error: "Not found" }, 404, cors);
 
     if (request.method === "OPTIONS") {
@@ -166,26 +175,100 @@ export default {
     if (!env.GEMINI_API_KEY && !env.AI) return json({ error: "Chat is not configured." }, 503, cors);
     const now = timeContext(visitorZone(body.tz, request.cf && request.cf.timezone));
 
+    // Every answered or failed turn is logged after the reply is sent (D-025).
+    const started = Date.now();
+    const answer = (obj, status, backend, headers) => {
+      if (env.CHAT_LOGS && ctx) {
+        ctx.waitUntil(logTurn(env, request, body, turns, {
+          answer: obj.reply ?? obj.error, status, backend, ms: Date.now() - started,
+        }).catch((err) => console.log(`chat log failed: ${err && err.message}`)));
+      }
+      return json(obj, status, headers);
+    };
+
     // Each failed backend reports its outcome and, for a quota, when it resets.
     const failed = [];
     if (env.GEMINI_API_KEY) {
       const g = await askGemini(env, turns, now);
-      if (g.reply) return json({ reply: g.reply }, 200, { ...cors, "X-Chat-Backend": "gemini" });
+      if (g.reply) return answer({ reply: g.reply }, 200, "gemini", { ...cors, "X-Chat-Backend": "gemini" });
       failed.push(g);
     }
     if (env.AI) {
       const w = await askWorkersAI(env, turns, now);
-      if (w.reply) return json({ reply: w.reply }, 200, { ...cors, "X-Chat-Backend": "workers-ai" });
+      if (w.reply) return answer({ reply: w.reply }, 200, "workers-ai", { ...cors, "X-Chat-Backend": "workers-ai" });
       failed.push(w);
     }
 
     // Out of quota reads better as "try after <time>" than as an outage. The
     // chat is back as soon as the first exhausted backend resets.
     const resets = failed.filter((f) => f.outcome === "quota").map((f) => f.retryAt);
-    if (!resets.length) return json({ error: MSG.unavailable }, 502, cors);
-    return json({ error: MSG.limit, retryAt: new Date(Math.min(...resets)).toISOString() }, 503, cors);
+    if (!resets.length) return answer({ error: MSG.unavailable }, 502, null, cors);
+    return answer({ error: MSG.limit, retryAt: new Date(Math.min(...resets)).toISOString() }, 503, null, cors);
   },
 };
+
+// --- Chat session logs (D-025) -------------------------------------------
+// A session is one chat: the widget makes a random id when a chat starts,
+// sends it with every question, and calls /chat/end when the visitor leaves
+// the page. Stored per session: when, the page, Cloudflare's location and
+// network (operator name and ASN), a salted one-way hash of the IP (never
+// the IP), device type and user agent; per message: question, answer, HTTP
+// status, backend and time taken. Visitors are told in the chat panel.
+const SESSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const KEEP_DAYS = 365;
+
+async function logTurn(env, request, body, turns, { answer, status, backend, ms }) {
+  const cf = request.cf || {};
+  const session = SESSION_ID.test(body.session) ? body.session : crypto.randomUUID();
+  const page = typeof body.page === "string" && body.page.startsWith("/") ? body.page.slice(0, 200) : null;
+  const source = body.source === "eval" ? "eval" : "visitor";
+  const ua = (request.headers.get("User-Agent") || "").slice(0, 300);
+  const at = new Date().toISOString();
+  const question = turns[turns.length - 1].text;
+  await env.CHAT_LOGS.batch([
+    env.CHAT_LOGS.prepare(
+      `INSERT INTO sessions (id, started_at, last_at, messages, source, page, country, region, city, timezone, as_org, asn, ip_hash, device, user_agent)
+       VALUES (?1, ?2, ?2, 1, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+       ON CONFLICT(id) DO UPDATE SET last_at = excluded.last_at, messages = sessions.messages + 1`,
+    ).bind(session, at, source, page, cf.country || null, cf.region || null, cf.city || null, cf.timezone || null,
+      cf.asOrganization || null, cf.asn || null, await ipHash(env, request), /Mobi|Android|iPhone|iPad/i.test(ua) ? "mobile" : "desktop", ua),
+    env.CHAT_LOGS.prepare(
+      `INSERT INTO messages (session_id, at, question, answer, status, backend, ms) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
+    ).bind(session, at, question, answer || null, status, backend, ms),
+  ]);
+}
+
+// Salted, so a hash cannot be reversed by hashing every IPv4 address. No
+// salt configured: no hash.
+async function ipHash(env, request) {
+  const ip = request.headers.get("CF-Connecting-IP");
+  if (!env.LOG_SALT || !ip) return null;
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(env.LOG_SALT + ip));
+  return [...new Uint8Array(digest)].slice(0, 8).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// Called with navigator.sendBeacon when the visitor leaves the page. The
+// beacon sends text/plain, so there is no preflight; only the allowed origin
+// may end a session, and it can only set ended_at on a session that exists.
+async function endSession(request, env, cors) {
+  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405, cors);
+  if (!cors["Access-Control-Allow-Origin"]) return json({ error: "Origin not allowed" }, 403);
+  let body = {};
+  try { body = JSON.parse(await request.text()); } catch { /* treated as no session */ }
+  if (env.CHAT_LOGS && SESSION_ID.test(body.session)) {
+    await env.CHAT_LOGS.prepare("UPDATE sessions SET ended_at = ?2 WHERE id = ?1 AND ended_at IS NULL")
+      .bind(body.session, new Date().toISOString()).run();
+  }
+  return new Response(null, { status: 204, headers: cors });
+}
+
+export async function purgeOldLogs(db, now = Date.now()) {
+  const cutoff = new Date(now - KEEP_DAYS * 86400000).toISOString();
+  await db.batch([
+    db.prepare("DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE last_at < ?1)").bind(cutoff),
+    db.prepare("DELETE FROM sessions WHERE last_at < ?1").bind(cutoff),
+  ]);
+}
 
 // Never pass upstream error bodies through: they can echo request details.
 // Edge-cached for 5 minutes, so an upload reaches visitors within minutes
