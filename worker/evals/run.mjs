@@ -11,9 +11,10 @@ const ENDPOINT = process.env.ENDPOINT || "https://hamzaaziz-chat.hamza-aziz-ai.w
 const ORIGIN = "https://hamzaaziz.dev";
 // The Worker allows 10 messages a minute per IP; stay under it.
 const MIN_GAP_MS = 6500;
-// Gemini gives up at 8 s and the fallback answers in a few seconds, so a
-// reply slower than this means the timeout or the fallback is broken.
-const MAX_REPLY_MS = 20000;
+// Gemini answers in ~20 s on the free key and is cut off at 45 s (then the
+// fallback has 25 s), so a reply slower than this means Gemini has slowed
+// further or the limits are broken.
+const MAX_REPLY_MS = 50000;
 
 let lastStart = 0;
 async function ask(q) {
@@ -24,7 +25,7 @@ async function ask(q) {
     method: "POST",
     headers: { "Content-Type": "application/json", Origin: ORIGIN },
     body: JSON.stringify({ messages: [{ role: "user", text: q }], tz: "Asia/Kolkata" }),
-    signal: AbortSignal.timeout(60000),
+    signal: AbortSignal.timeout(90000),
   }).catch((err) => ({ ok: false, status: 0, headers: new Headers(), json: async () => ({ error: String(err) }) }));
   const ms = Date.now() - lastStart;
   const data = await res.json().catch(() => ({}));
