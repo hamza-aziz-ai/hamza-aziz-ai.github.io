@@ -119,7 +119,10 @@
         const sentAt = Date.now()
         addMessage('user', text, '', sentAt)
         history.push({ role: 'user', text, at: sentAt })
-        const pending = addMessage('model', 'Thinking…', 'chat__msg--pending')
+        const pending = addMessage('model', 'Thinking', 'chat__msg--pending')
+        // Three dots that bounce in turn (CSS), so the wait reads as work.
+        pending.querySelector('.chat__body').append(
+            ...[1, 2, 3].map(() => el('span', { class: 'chat__dot', 'aria-hidden': 'true' }, ['.'])))
 
         try {
             const res = await fetch(endpoint, {
@@ -202,31 +205,31 @@
         if (history.length) chips.hidden = true
     }
 
-    // A new reply is revealed a few words at a time instead of appearing as
-    // one block: about 60 steps, so even a long answer finishes in ~1.5 s.
-    // Instant for visitors who ask for reduced motion. The bubble is
-    // aria-busy meanwhile, so a screen reader reads the whole reply once.
+    // A new reply appears word by word at a steady 5 words a second, however
+    // long it is. Instant for visitors who ask for reduced motion. The bubble
+    // is aria-busy meanwhile, so a screen reader reads the whole reply once.
     // Restored history is never animated.
+    const WORDS_PER_SECOND = 5
     function reveal(msg, text) {
         const body = msg.querySelector('.chat__body')
-        const parts = text.split(/(\s+)/)  // the separators keep spacing and line breaks
-        if (reducedMotion.matches || parts.length < 12) {
+        // Words at even indices, the spacing and line breaks between them at odd.
+        const parts = text.split(/(\s+)/)
+        if (reducedMotion.matches) {
             body.replaceChildren(renderMarkdown(text))
             return Promise.resolve()
         }
-        const step = Math.max(2, Math.ceil(parts.length / 60))
         msg.setAttribute('aria-busy', 'true')
         return new Promise(done => {
             let shown = 0
             const tick = () => {
-                shown = Math.min(parts.length, shown + step)
+                shown = Math.min(parts.length, shown + 2)  // one word and the space after it
                 let partial = parts.slice(0, shown).join('')
                 // Close a half-shown **bold** so it renders bold, not as "**".
                 if ((partial.match(/\*\*/g) || []).length % 2) partial += '**'
                 const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40
                 body.replaceChildren(renderMarkdown(partial))
                 if (atBottom) log.scrollTop = log.scrollHeight
-                if (shown < parts.length) return setTimeout(tick, 25)
+                if (shown < parts.length) return setTimeout(tick, 1000 / WORDS_PER_SECOND)
                 msg.removeAttribute('aria-busy')
                 done()
             }
