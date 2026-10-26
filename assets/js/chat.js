@@ -30,6 +30,7 @@
     // Touch screens: focusing the field pops the on-screen keyboard over the
     // answer, so it opens only when the visitor taps the field themselves.
     const touch = matchMedia('(pointer: coarse)').matches
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
     const focusInput = () => { if (!touch) input.focus() }
 
     const launcher = el('button', {
@@ -133,8 +134,9 @@
             const data = await res.json().catch(() => ({}))
             const reply = res.ok ? data.reply : null
             if (!reply) throw new Error(failureText(data))
-            history.push({ role: 'model', text: reply, at: settle(pending, renderMarkdown(reply)) })
+            history.push({ role: 'model', text: reply, at: settle(pending, '') })
             pending.classList.remove('chat__msg--pending')
+            await reveal(pending, reply)
         } catch (err) {
             // A failed turn is dropped from history so the next question is
             // not sent after an unanswered one.
@@ -198,6 +200,38 @@
             addMessage(m.role, m.text, '', at)
         }
         if (history.length) chips.hidden = true
+    }
+
+    // A new reply is revealed a few words at a time instead of appearing as
+    // one block: about 60 steps, so even a long answer finishes in ~1.5 s.
+    // Instant for visitors who ask for reduced motion. The bubble is
+    // aria-busy meanwhile, so a screen reader reads the whole reply once.
+    // Restored history is never animated.
+    function reveal(msg, text) {
+        const body = msg.querySelector('.chat__body')
+        const parts = text.split(/(\s+)/)  // the separators keep spacing and line breaks
+        if (reducedMotion.matches || parts.length < 12) {
+            body.replaceChildren(renderMarkdown(text))
+            return Promise.resolve()
+        }
+        const step = Math.max(2, Math.ceil(parts.length / 60))
+        msg.setAttribute('aria-busy', 'true')
+        return new Promise(done => {
+            let shown = 0
+            const tick = () => {
+                shown = Math.min(parts.length, shown + step)
+                let partial = parts.slice(0, shown).join('')
+                // Close a half-shown **bold** so it renders bold, not as "**".
+                if ((partial.match(/\*\*/g) || []).length % 2) partial += '**'
+                const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40
+                body.replaceChildren(renderMarkdown(partial))
+                if (atBottom) log.scrollTop = log.scrollHeight
+                if (shown < parts.length) return setTimeout(tick, 25)
+                msg.removeAttribute('aria-busy')
+                done()
+            }
+            tick()
+        })
     }
 
     // Model replies are rendered as Markdown; visitor text stays plain. Each
