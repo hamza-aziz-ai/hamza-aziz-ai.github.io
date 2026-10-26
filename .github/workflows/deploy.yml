@@ -92,3 +92,18 @@ jobs:
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
         run: python .github/scripts/submit_sitemaps.py
+
+  # The chat worker's knowledge is rebuilt from the live pages, so it must
+  # start only after the deploy is live. Started here rather than by CI's
+  # merge job, which used to race the deploy and read the old site.
+  chat-knowledge:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Start the chat worker rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run worker.yml --repo "${{ github.repository }}" --ref main
