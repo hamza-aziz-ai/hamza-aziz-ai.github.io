@@ -2498,27 +2498,28 @@ body.dark-theme .chat__panel {
     .projects__card {
         display: grid;
         grid-template-columns: 58% 1fr;
-        grid-template-rows: 1fr auto;
+        /* The outer 1fr rows split any spare height evenly, so the text and
+           its links sit centred against the banner as one block. Every slide
+           is as tall as the tallest one, so without them the text sank. */
+        grid-template-rows: 1fr auto auto 1fr;
         column-gap: 2rem;
         align-content: center;
     }
 
     .projects__image {
         grid-column: 1;
-        grid-row: 1 / 3;
+        grid-row: 1 / -1;
         align-self: center;
         margin-bottom: 0;
     }
 
     .projects__content {
         grid-column: 2;
-        grid-row: 1;
-        align-self: end;
+        grid-row: 2;
     }
 
     .projects__buttons {
         grid-column: 2;
-        grid-row: 2;
-        align-self: start;
+        grid-row: 3;
     }
 }
