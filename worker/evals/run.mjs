@@ -49,6 +49,8 @@ for (const c of cases) {
   let bad = problems(c, a);
   let note = "";
   if (bad.length) {
+    // Logged so a case that keeps needing its retry can be diagnosed.
+    console.log(`retry ${c.id}: ${bad.join("; ")} | first reply: ${a.reply.replace(/\s+/g, " ").slice(0, 300)}`);
     const retry = await ask(c.q);
     const badRetry = problems(c, retry);
     note = badRetry.length ? "failed twice" : "passed on retry";
