@@ -205,31 +205,36 @@
         if (history.length) chips.hidden = true
     }
 
-    // A new reply appears word by word at a steady 5 words a second, however
-    // long it is. Instant for visitors who ask for reduced motion. The bubble
-    // is aria-busy meanwhile, so a screen reader reads the whole reply once.
+    // A new reply appears at a steady 250 characters a second, however long
+    // it is. Paced by elapsed time, so a slow timer never slows the reading
+    // speed. Instant for visitors who ask for reduced motion. The bubble is
+    // aria-busy meanwhile, so a screen reader reads the whole reply once.
     // Restored history is never animated.
-    const WORDS_PER_SECOND = 5
+    const CHARS_PER_SECOND = 250
     function reveal(msg, text) {
         const body = msg.querySelector('.chat__body')
-        // Words at even indices, the spacing and line breaks between them at odd.
-        const parts = text.split(/(\s+)/)
         if (reducedMotion.matches) {
             body.replaceChildren(renderMarkdown(text))
             return Promise.resolve()
         }
         msg.setAttribute('aria-busy', 'true')
+        const start = performance.now()
         return new Promise(done => {
-            let shown = 0
             const tick = () => {
-                shown = Math.min(parts.length, shown + 2)  // one word and the space after it
-                let partial = parts.slice(0, shown).join('')
-                // Close a half-shown **bold** so it renders bold, not as "**".
-                if ((partial.match(/\*\*/g) || []).length % 2) partial += '**'
+                const shown = Math.min(text.length, Math.floor((performance.now() - start) / 1000 * CHARS_PER_SECOND))
+                let partial = text.slice(0, shown)
+                if (shown < text.length) {
+                    // Hold back a [link](url) until it is complete, so its
+                    // brackets never flash on screen.
+                    const open = partial.lastIndexOf('[')
+                    if (open > partial.lastIndexOf(')')) partial = partial.slice(0, open)
+                    // Close a half-shown **bold** so it renders bold, not as "**".
+                    if ((partial.match(/\*\*/g) || []).length % 2) partial += '**'
+                }
                 const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40
                 body.replaceChildren(renderMarkdown(partial))
                 if (atBottom) log.scrollTop = log.scrollHeight
-                if (shown < parts.length) return setTimeout(tick, 1000 / WORDS_PER_SECOND)
+                if (shown < text.length) return setTimeout(tick, 30)
                 msg.removeAttribute('aria-busy')
                 done()
             }
