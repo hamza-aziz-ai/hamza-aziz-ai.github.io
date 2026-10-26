@@ -226,7 +226,7 @@ async function askGemini(env, turns, now) {
   const u = data.usageMetadata || {};
   console.log(`gemini ok ${Date.now() - started}ms in=${u.promptTokenCount} cached=${u.cachedContentTokenCount || 0} think=${u.thoughtsTokenCount || 0} out=${u.candidatesTokenCount}`);
   const reply = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || "").join("").trim();
-  return reply ? { reply } : { outcome: "error" };
+  return reply ? { reply: fixLinks(reply, system) } : { outcome: "error" };
 }
 
 async function askWorkersAI(env, turns, now) {
@@ -242,7 +242,7 @@ async function askWorkersAI(env, turns, now) {
     // Older Workers AI text models return {response}; OpenAI-compatible ones
     // return {choices}. Accept either so a model swap in wrangler.toml works.
     const reply = (out?.response ?? out?.choices?.[0]?.message?.content ?? "").trim();
-    return reply ? { reply } : { outcome: "error" };
+    return reply ? { reply: fixLinks(reply, PROMPT_CORE + now) } : { outcome: "error" };
   } catch (err) {
     // The free daily allocation running out arrives as a thrown error. It
     // resets at 00:00 UTC.
@@ -301,6 +301,56 @@ export function nextMidnight(timeZone, now = Date.now()) {
   const guess = target - (wall(now) - now);
   // Re-read the offset at midnight itself, in case a DST change falls between.
   return target - (wall(guess) - guess);
+}
+
+// Models misspell links ("Medical-Medical-ChatBot" for "Medical-ChatBot"),
+// so every URL in a reply is checked against the URLs in the prompt it was
+// written from. A near miss (same host, path within 30% edits) becomes the
+// known URL; anything else is dropped, keeping a Markdown link's text.
+const URL_RE = /https?:\/\/[^\s<>()"'\]]+/g;
+const TRAILING = /[.,;:!?]+$/;
+export function fixLinks(reply, source) {
+  const known = [...new Set((source.match(URL_RE) || []).map((u) => u.replace(TRAILING, "")))];
+  const norm = (u) => u.replace(/\/$/, "").toLowerCase();
+  const knownSet = new Set(known.map(norm));
+  const resolve = (url) => {
+    if (knownSet.has(norm(url))) return url;
+    let parsed;
+    try { parsed = new URL(url); } catch { return null; }
+    let best = null, bestDist = Infinity;
+    for (const k of known) {
+      let kp;
+      try { kp = new URL(k); } catch { continue; }
+      if (kp.host !== parsed.host) continue;
+      const d = editDistance(norm(parsed.pathname), norm(kp.pathname));
+      if (d < bestDist) { best = k; bestDist = d; }
+    }
+    return best && bestDist <= 0.3 * Math.max(parsed.pathname.length, 1) ? best : null;
+  };
+  // [text](url) first, so a dropped link keeps its text.
+  const withMd = reply.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (m, text, url) => {
+    const fixed = resolve(url);
+    return fixed ? `[${text}](${fixed})` : text;
+  });
+  return withMd.replace(URL_RE, (raw, offset, whole) => {
+    if (whole[offset - 1] === "(" && whole[offset - 2] === "]") return raw;  // already checked above
+    const tail = raw.match(TRAILING)?.[0] || "";
+    const url = tail ? raw.slice(0, -tail.length) : raw;
+    const fixed = resolve(url);
+    return fixed ? fixed + tail : tail;
+  });
+}
+
+function editDistance(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
 }
 
 // Validates widget messages. Returns null on anything malformed so the
