@@ -1048,13 +1048,16 @@
                         <h2 class="projects__title">Mr. Healthcare - Medical Chatbot</h2>
 
                         <p class="projects__description">
-                            A knowledge-graph question-answering bot over a curated medical dataset. An <b>Aho-Corasick</b> automaton
-                            matches free text against roughly <b>2,800</b> disease, symptom and department terms, rule-based intent
-                            detection works out which of ten questions is being asked &mdash; causes, prevention, treatment,
-                            complications, which specialist to see &mdash; and the pair compiles into templated <b>Cypher</b> over a
-                            <b>Neo4j</b> graph, with returned rows formatted back into sentences. An offline ETL builds the graph from
-                            the source dataset, diseases as nodes and symptoms as edges. Deterministic and inspectable throughout, with
-                            no LLM in the loop. <b>Vue</b> front end on a <b>Flask</b> API.
+                            A medical question-answering chatbot over a <b>Neo4j</b> knowledge graph of <b>658</b> diseases that
+                            says plainly when it cannot answer. A <b>Vue 3</b> page talks to a <b>Flask</b> API, which finds disease and
+                            symptom names with an <b>Aho-Corasick</b> automaton and answers only through fixed, parameterized
+                            <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
+                            next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
+                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer;
+                            if it is slow or unsure, the rules answer. On a fresh, frozen test set it understood far more phrasings with
+                            no new wrong-subject answers, though it has not yet met its reliability and latency targets. Path-filtered
+                            <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
+                            Local prototype; not medical advice.
                         </p>
                     </div>
 
