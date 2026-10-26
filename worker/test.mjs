@@ -1,7 +1,7 @@
 // Self-check for the Worker's request handling. No network, no real keys:
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
-import worker, { toTurns, nextMidnight, geminiResetAt, timeContext, visitorZone } from "./src/index.js";
+import worker, { toTurns, nextMidnight, geminiResetAt, timeContext, visitorZone, fixLinks } from "./src/index.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
 const NOTE = "Private note: the barrier token design.";
@@ -143,3 +143,22 @@ assert.equal(timeContext("UTC", Date.UTC(2026, 9, 20, 3, 30)),
   "\n\nCURRENT TIME\nThe visitor's local time is Tuesday, 20 October 2026 at 03:30 am (UTC).\nHamza is in India, where it is Tuesday, 20 October 2026 at 09:00 am (IST).\n");
 
 console.log("worker self-check: all assertions passed");
+
+// Links: only URLs from the prompt survive; near misses are repaired.
+{
+  const src = "Repos: https://github.com/hamza-aziz-ai/Medical-ChatBot and https://github.com/hamza-aziz-ai/HalalLens\nSite: https://hamzaaziz.dev/projects/voice-ai.html.";
+  assert.equal(fixLinks("Here: https://github.com/hamza-aziz-ai/Medical-Medical-ChatBot", src),
+    "Here: https://github.com/hamza-aziz-ai/Medical-ChatBot", "near-miss repo link repaired");
+  assert.equal(fixLinks("See [the repo](https://github.com/hamza-aziz-ai/Medical-Medical-ChatBot).", src),
+    "See [the repo](https://github.com/hamza-aziz-ai/Medical-ChatBot).", "Markdown link repaired");
+  assert.equal(fixLinks("Code: https://github.com/hamza-aziz-ai/CCTV-Attendance.", src), "Code: .", "unknown link dropped");
+  assert.equal(fixLinks("See [code](https://github.com/hamza-aziz-ai/CCTV-Attendance)", src), "See code", "unknown Markdown link keeps its text");
+  assert.equal(fixLinks("Read https://hamzaaziz.dev/projects/voice-ai.html.", src), "Read https://hamzaaziz.dev/projects/voice-ai.html.", "known link and its full stop kept");
+  assert.equal(fixLinks("https://evil.example/hamza-aziz-ai/Medical-ChatBot", src), "", "other host never repaired");
+  assert.equal(fixLinks("No links here.", src), "No links here.");
+  reset();
+  gemini(200, { candidates: [{ content: { parts: [{ text: "Repo: https://github.com/hamza-aziz-ai/Medical-Medical-ChatBot" }] } }] });
+  const fixed = await (await worker.fetch(req(ask), env())).json();
+  assert.equal(fixed.reply, "Repo: https://github.com/hamza-aziz-ai/Medical-ChatBot", "Worker repairs a Gemini link from the real knowledge");
+}
+console.log("link checks passed");
