@@ -82,7 +82,7 @@ Gemini errored, and the fallback is doing its job.
 
 ## Chat session logs
 
-Every chat turn is stored in the D1 database `hamzaaziz-chat-logs` (DECISIONS D-025): `sessions` (one row per chat: times, page, country/region/city, network operator and ASN, hashed IP, device, user agent, `source` visitor|eval) and `messages` (question, answer, HTTP status, backend, ms). Kept 365 days; a daily cron purges older sessions. The schema is in `migrations/`; a new migration is applied with `npx wrangler d1 migrations apply hamzaaziz-chat-logs --remote`.
+Every chat turn is stored in the D1 database `hamzaaziz-chat-logs` (DECISIONS D-025): `sessions` (one row per chat: times, page, country/region/city, network operator and ASN, hashed IP, device, user agent, `source` visitor|internal|eval: internal = Hamza's home network, from the secret HOME_IP_PREFIXES) and `messages` (question, answer, HTTP status, backend, ms). Kept 365 days; a daily cron purges older sessions. The schema is in `migrations/`; a new migration is applied with `npx wrangler d1 migrations apply hamzaaziz-chat-logs --remote`.
 
 Read them in the Cloudflare dashboard (Storage & Databases → D1 → hamzaaziz-chat-logs → Console) or from `worker/`:
 

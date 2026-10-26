@@ -270,4 +270,18 @@ console.log("timeout checks passed");
   assert.equal(db.ran[0].args[0], "2026-10-27T00:00:00.000Z");
   assert.match(db.ran[1].sql, /DELETE FROM sessions/);
 }
+// Chats from a home IP prefix are tagged 'internal'; others stay 'visitor'.
+{
+  const seen = [];
+  const db = { prepare: (sql) => ({ bind: (...args) => ({ sql, args }) }), batch: async (stmts) => { seen.push(stmts[0].args[2]); } };
+  const homeReq = (ip) => new Request("https://w.example/chat", { method: "POST",
+    headers: { "Content-Type": "application/json", Origin: ORIGIN, "CF-Connecting-IP": ip }, body: JSON.stringify(ask) });
+  for (const ip of ["203.0.113.7", "2401:9640:2800:A145:1:2:3:4", "198.51.100.9"]) {
+    reset(); geminiOK();
+    const c = { pending: [], waitUntil: (p) => c.pending.push(p) };
+    await worker.fetch(homeReq(ip), env({ CHAT_LOGS: db, HOME_IP_PREFIXES: "203.0.113.7, 2401:9640:2800:a145:" }), c);
+    await Promise.all(c.pending);
+  }
+  assert.deepEqual(seen, ["internal", "internal", "visitor"], "home IPv4 and IPv6 prefix tagged internal");
+}
 console.log("session log checks passed");
