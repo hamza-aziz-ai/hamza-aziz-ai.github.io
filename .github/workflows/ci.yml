@@ -95,11 +95,9 @@ jobs:
       # normally runs on a push to main starts by itself. Start it here.
       - name: Start the push-to-main workflows
         run: |
+          # deploy.yml starts the chat worker rebuild itself once the site is
+          # live, because the rebuild reads the live pages.
           gh workflow run deploy.yml --repo "$REPO" --ref main
-          if gh pr diff "$PR" --repo "$REPO" --name-only \
-              | grep -qE '^(worker/|index\.html$|projects/|assets/pdf/|sitemap\.xml$|\.github/workflows/worker\.yml$)'; then
-            gh workflow run worker.yml --repo "$REPO" --ref main
-          fi
 
       # Nothing retries a merge that fails (in practice a conflict with main),
       # so make it loud: a PR comment and an issue, which GitHub emails out.
