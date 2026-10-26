@@ -181,5 +181,13 @@ console.log("link checks passed");
   assert.equal(aiCalls.length, 1);
   clearTimeout(keepAlive);
 }
+// A hung fallback is given up too: the visitor gets "unavailable", fast.
+{
+  reset(); gemini(500, {});
+  const t0 = Date.now();
+  const r = await worker.fetch(req(ask), env({ WORKERS_AI_TIMEOUT_MS: "50", AI: { run: () => new Promise(() => {}) } }));
+  assert.equal(r.status, 502, "hung fallback ends as unavailable");
+  assert.ok(Date.now() - t0 < 2000, "gave up on Workers AI at its limit");
+}
 console.log("timeout checks passed");
 
