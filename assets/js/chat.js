@@ -71,16 +71,25 @@
         el('p', { class: 'chat__note' }, ['AI assistant answering on Hamza’s behalf. It can be wrong. Chats are recorded, with approximate location, to improve it.']),
     ])
 
+    // GA4 events for the chat. Never the question text: GA4 must not receive
+    // what visitors type (it can hold personal details); that stays in the
+    // session logs (D-025). chat_session joins a GA event to its logged chat.
+    const track = (name, params = {}) => {
+        if (typeof gtag === 'function') gtag('event', name, { chat_mode: pageMode ? 'page' : 'panel', ...params })
+    }
+
     addMessage('model', GREETING)
     if (pageMode) {
         document.body.append(panel)
         restore()
         focusInput()
+        track('chat_open')
     } else {
         document.body.append(launcher, panel)
     }
 
     const open = () => {
+        if (panel.hidden) track('chat_open')
         panel.hidden = false
         launcher.setAttribute('aria-expanded', 'true')
         focusInput()
@@ -103,12 +112,13 @@
             localStorage.setItem(HANDOFF + '-session', session)
             handedOff = true  // the chat goes on in the new tab, so leaving this page does not end it
         } catch { /* opens empty */ }
+        track('chat_expand', { chat_session: session })
         window.open('/chat.html', '_blank', 'noopener')
     })
     if (!pageMode) panel.addEventListener('keydown', e => { if (e.key === 'Escape') hide() })
     chips.addEventListener('click', e => {
         const chip = e.target.closest('.chat__chip')
-        if (chip) ask(chip.textContent)
+        if (chip) ask(chip.textContent, 'suggestion')
     })
     input.addEventListener('keydown', e => {
         // Enter sends, Shift+Enter adds a line.
@@ -122,7 +132,7 @@
         navigator.sendBeacon(endpoint + '/end', JSON.stringify({ session }))
     })
 
-    async function ask(raw) {
+    async function ask(raw, source = 'typed') {
         const text = raw.trim()
         if (!text || busy) return
         busy = true
@@ -134,13 +144,25 @@
         const sentAt = Date.now()
         addMessage('user', text, '', sentAt)
         history.push({ role: 'user', text, at: sentAt })
+        track('chat_question', {
+            chat_session: session,
+            question_number: history.filter(m => m.role === 'user').length,
+            question_source: source,
+        })
         const pending = addMessage('model', 'Thinking', 'chat__msg--pending')
         // Three dots that bounce in turn (CSS), so the wait reads as work.
         pending.querySelector('.chat__body').append(
             ...[1, 2, 3].map(() => el('span', { class: 'chat__dot', 'aria-hidden': 'true' }, ['.'])))
 
+        let res
+        const replied = (outcome) => track('chat_reply', {
+            chat_session: session,
+            outcome,
+            backend: (res && res.headers.get('X-Chat-Backend')) || 'none',
+            reply_seconds: Math.round((Date.now() - sentAt) / 1000),
+        })
         try {
-            const res = await fetch(endpoint, {
+            res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // The visitor's timezone lets the assistant tell their local time.
@@ -154,6 +176,7 @@
             const data = await res.json().catch(() => ({}))
             const reply = res.ok ? data.reply : null
             if (!reply) throw new Error(failureText(data))
+            replied('answered')
             history.push({ role: 'model', text: reply, at: settle(pending, '') })
             pending.classList.remove('chat__msg--pending')
             await reveal(pending, reply)
@@ -161,6 +184,7 @@
             // A failed turn is dropped from history so the next question is
             // not sent after an unanswered one.
             history.pop()
+            replied('error')
             // fetch() itself rejects with a TypeError ("Failed to fetch") when
             // the network or CORS fails; only the Worker's own messages are shown.
             settle(pending, renderMarkdown((!(err instanceof TypeError) && err.message) || UNAVAILABLE))
