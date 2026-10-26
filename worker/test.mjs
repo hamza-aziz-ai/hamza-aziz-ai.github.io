@@ -1,7 +1,7 @@
 // Self-check for the Worker's request handling. No network, no real keys:
 // Gemini and Workers AI are both stubs. Run:  node worker/test.mjs
 import assert from "node:assert/strict";
-import worker, { toTurns, nextMidnight, geminiResetAt, timeContext, visitorZone, fixLinks } from "./src/index.js";
+import worker, { toTurns, nextMidnight, geminiResetAt, timeContext, visitorZone, fixLinks, purgeOldLogs } from "./src/index.js";
 
 const ORIGIN = "https://hamzaaziz.dev";
 const NOTE = "Private note: the barrier token design.";
@@ -191,3 +191,83 @@ console.log("link checks passed");
 }
 console.log("timeout checks passed");
 
+
+// Session logs (D-025): one session row and one message row per turn,
+// written after the reply; /chat/end closes a session; old rows are purged.
+{
+  const fakeDb = () => {
+    const db = { ran: [], prepare: (sql) => ({ bind: (...args) => ({ sql, args, run: async () => { db.ran.push({ sql, args }); } }) }),
+      batch: async (stmts) => { for (const s of stmts) db.ran.push({ sql: s.sql, args: s.args }); } };
+    return db;
+  };
+  const ctx = () => { const c = { pending: [], waitUntil: (p) => c.pending.push(p) }; return c; };
+  const SID = "123e4567-e89b-42d3-a456-426614174000";
+  const logReq = (body, path = "/chat") => {
+    const r = new Request(`https://w.example${path}`, { method: "POST",
+      headers: { "Content-Type": "text/plain", Origin: ORIGIN, "CF-Connecting-IP": "203.0.113.7", "User-Agent": "Mozilla/5.0 (iPhone)" },
+      body: JSON.stringify(body) });
+    Object.defineProperty(r, "cf", { value: { country: "AE", region: "Dubai", city: "Dubai", timezone: "Asia/Dubai", asOrganization: "Example Bank", asn: 64500 } });
+    return r;
+  };
+
+  reset(); geminiOK();
+  let db = fakeDb(), c = ctx();
+  let r = await worker.fetch(logReq({ ...ask, session: SID, page: "/projects/voice-ai.html" }), env({ CHAT_LOGS: db, LOG_SALT: "s" }), c);
+  assert.equal(r.status, 200);
+  await Promise.all(c.pending);
+  assert.equal(db.ran.length, 2, "session upsert + message insert");
+  const [sess, msg] = db.ran;
+  assert.match(sess.sql, /INSERT INTO sessions[\s\S]*ON CONFLICT\(id\) DO UPDATE/);
+  assert.equal(sess.args[0], SID);
+  assert.equal(sess.args[2], "visitor");
+  assert.equal(sess.args[3], "/projects/voice-ai.html");
+  assert.deepEqual(sess.args.slice(4, 10), ["AE", "Dubai", "Dubai", "Asia/Dubai", "Example Bank", 64500]);
+  assert.match(sess.args[10], /^[0-9a-f]{16}$/, "IP stored only as a salted hash");
+  assert.ok(!JSON.stringify(sess.args).includes("203.0.113.7"), "raw IP never stored");
+  assert.equal(sess.args[11], "mobile");
+  assert.equal(msg.args[0], SID);
+  assert.equal(msg.args[2], "What does Hamza work on?");
+  assert.equal(msg.args[3], "From Gemini.");
+  assert.equal(msg.args[4], 200);
+  assert.equal(msg.args[5], "gemini");
+
+  // No salt: no hash. Bad session id: a fresh one, never the caller's string.
+  reset(); geminiOK(); db = fakeDb(); c = ctx();
+  await worker.fetch(logReq({ ...ask, session: "x'); DROP TABLE sessions;--", source: "eval" }), env({ CHAT_LOGS: db }), c);
+  await Promise.all(c.pending);
+  assert.match(db.ran[0].args[0], /^[0-9a-f-]{36}$/);
+  assert.equal(db.ran[0].args[2], "eval");
+  assert.equal(db.ran[0].args[10], null);
+
+  // A failed turn is logged with its status and no backend.
+  reset(); gemini(500, {}); db = fakeDb(); c = ctx();
+  r = await worker.fetch(logReq({ ...ask, session: SID }), env({ CHAT_LOGS: db }), c);
+  assert.equal(r.status, 502);
+  await Promise.all(c.pending);
+  assert.equal(db.ran[1].args[4], 502);
+  assert.equal(db.ran[1].args[5], null);
+
+  // No database bound: the chat still answers.
+  reset(); geminiOK();
+  assert.equal((await worker.fetch(logReq({ ...ask, session: SID }), env(), ctx())).status, 200);
+
+  // /chat/end closes the session; other origins and bad ids are refused or ignored.
+  db = fakeDb();
+  r = await worker.fetch(logReq({ session: SID }, "/chat/end"), env({ CHAT_LOGS: db }));
+  assert.equal(r.status, 204);
+  assert.match(db.ran[0].sql, /UPDATE sessions SET ended_at/);
+  assert.equal(db.ran[0].args[0], SID);
+  db = fakeDb();
+  await worker.fetch(logReq({ session: "nope" }, "/chat/end"), env({ CHAT_LOGS: db }));
+  assert.equal(db.ran.length, 0);
+  const foreign = new Request("https://w.example/chat/end", { method: "POST", headers: { Origin: "https://evil.example" }, body: JSON.stringify({ session: SID }) });
+  assert.equal((await worker.fetch(foreign, env({ CHAT_LOGS: fakeDb() }))).status, 403);
+
+  // Daily purge deletes sessions and their messages older than 365 days.
+  db = fakeDb();
+  await purgeOldLogs(db, Date.parse("2027-10-27T00:00:00Z"));
+  assert.equal(db.ran.length, 2);
+  assert.equal(db.ran[0].args[0], "2026-10-27T00:00:00.000Z");
+  assert.match(db.ran[1].sql, /DELETE FROM sessions/);
+}
+console.log("session log checks passed");
