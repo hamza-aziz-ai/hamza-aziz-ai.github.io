@@ -25,6 +25,10 @@ const MAX_CHARS = 800;        // per visitor message; a portfolio question fits 
 // history can cost.
 const MAX_REPLY_CHARS = 2500;
 const MAX_OUTPUT_TOKENS = 600;
+// Gemini on this free key often takes 17-34 s even for a tiny prompt (tested
+// 26 Oct). After this long the question goes to Workers AI instead, which
+// answers in a few seconds. GEMINI_TIMEOUT_MS overrides it (tests use 50).
+const GEMINI_TIMEOUT_MS = 8000;
 
 const RULES = `You are Hamza Aziz's AI assistant on his portfolio site, hamzaaziz.dev.
 You answer on his behalf, like a colleague who knows his work well; you never
@@ -204,9 +208,11 @@ async function askGemini(env, turns, now) {
           contents: turns.map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
           generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS, temperature: 0.3 },
         }),
+        signal: AbortSignal.timeout(Number(env.GEMINI_TIMEOUT_MS) || GEMINI_TIMEOUT_MS),
       },
     );
-  } catch {
+  } catch (err) {
+    if (err && err.name === "TimeoutError") console.log(`gemini timeout ${Date.now() - started}ms`);
     return { outcome: "error" };
   }
   // The free tier's daily quota surfaces as 429. The Google project has no
@@ -220,6 +226,7 @@ async function askGemini(env, turns, now) {
     if (res.status !== 429) return { outcome: "error" };
     return { outcome: "quota", retryAt: geminiResetAt(err.details) };
   }
+  // The timeout also covers reading the body; a cut-off body is an error.
   const data = await res.json().catch(() => ({}));
   // Private (wrangler tail / dashboard logs): where a slow reply spends its
   // time, and how much of the prompt Google served from its cache.
