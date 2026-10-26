@@ -64,7 +64,7 @@ const gBody = JSON.parse(geminiCalls[0].init.body);
 assert.deepEqual(gBody.contents.map((c) => c.role), ["user", "model", "user"]);
 const fullPromptLen = gBody.systemInstruction.parts[0].text.length;
 
-// 2. Gemini out of quota -> Workers AI answers with the CORE prompt
+// 2. Gemini out of quota -> Workers AI answers with the public prompt
 reset(); gemini(429, { error: { message: "quota exceeded for project 123" } });
 r = await worker.fetch(req(ask), env({ AI: ai(() => ({ response: "From Workers AI." })) }));
 assert.equal(r.status, 200);
@@ -73,7 +73,7 @@ assert.equal(r.headers.get("X-Chat-Backend"), "workers-ai");
 assert.equal(aiCalls[0].model, "@cf/test");
 const msgs = aiCalls[0].input.messages;
 assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "assistant", "user"], "model role mapped to assistant");
-assert.ok(msgs[0].content.length < fullPromptLen / 2, "fallback gets the smaller core prompt");
+assert.ok(msgs[0].content.includes("Medical-ChatBot") && msgs[0].content.length < fullPromptLen, "fallback gets the public knowledge, without the notes");
 assert.ok(msgs[0].content.includes("KNOWLEDGE"));
 // Private notes reach Gemini when present, and never the fallback.
 assert.ok(gBody.systemInstruction.parts[0].text.includes(NOTE), "Gemini gets the KV notes");

@@ -15,7 +15,7 @@
 // Response: 200 {"reply":"..."} with header X-Chat-Backend: gemini|workers-ai
 //           or 4xx/5xx {"error":"..."}
 
-import { KNOWLEDGE, KNOWLEDGE_CORE } from "./knowledge.js";
+import { KNOWLEDGE } from "./knowledge.js";
 
 const MAX_TURNS = 8;          // only the last few turns are sent upstream
 const MAX_CHARS = 800;        // per visitor message; a portfolio question fits easily
@@ -81,8 +81,8 @@ How to answer:
 KNOWLEDGE
 `;
 // Hamza's own notes, read from KV at request time (worker/upload_notes.py puts
-// them there; they are never in git). Gemini only: the fallback's small
-// window holds the public core and nothing more.
+// them there; they are never in git). Gemini only: the Workers AI fallback
+// gets the public knowledge and never the notes.
 const NOTES = `
 
 BACKGROUND (private)
@@ -105,7 +105,6 @@ differently", always in the recruiter-friendly style above.
 
 `;
 const PROMPT_PUBLIC = RULES + KNOWLEDGE;
-const PROMPT_CORE = RULES + KNOWLEDGE_CORE;
 
 // The widget replaces MSG.limit with the reset time in the visitor's own
 // timezone, from the retryAt field sent alongside it.
@@ -240,7 +239,7 @@ async function askWorkersAI(env, turns, now) {
   try {
     const out = await env.AI.run(env.FALLBACK_MODEL, {
       messages: [
-        { role: "system", content: PROMPT_CORE + now },
+        { role: "system", content: PROMPT_PUBLIC + now },
         ...turns.map((t) => ({ role: t.role === "model" ? "assistant" : "user", content: t.text })),
       ],
       max_tokens: MAX_OUTPUT_TOKENS,
@@ -249,7 +248,7 @@ async function askWorkersAI(env, turns, now) {
     // Older Workers AI text models return {response}; OpenAI-compatible ones
     // return {choices}. Accept either so a model swap in wrangler.toml works.
     const reply = (out?.response ?? out?.choices?.[0]?.message?.content ?? "").trim();
-    return reply ? { reply: fixLinks(reply, PROMPT_CORE + now) } : { outcome: "error" };
+    return reply ? { reply: fixLinks(reply, PROMPT_PUBLIC + now) } : { outcome: "error" };
   } catch (err) {
     // The free daily allocation running out arrives as a thrown error. It
     // resets at 00:00 UTC.
