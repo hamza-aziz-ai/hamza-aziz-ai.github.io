@@ -11,7 +11,7 @@ export default [
   { id: "g6-role", q: "Did Hamza lead the team that built the G6 voice ERP assistant?",
     must: [/team/i],
     mustNot: [/\b(he|Hamza) (led|headed) (the |a )?(G6|team|development)/i, /^\s*yes\b/i, /\bas (the )?team lead/i] },
-  { id: "cctv-solo", q: "Who built the CCTV face-recognition attendance system?",
+  { id: "cctv-solo", q: "Did Hamza build the CCTV face-recognition attendance system alone or with a team?",
     must: [/\b(sole|solo|alone|single-handed(ly)?|by himself|on his own|only developer)\b/i] },
   { id: "mtech", q: "Has Hamza completed his M.Tech?",
     must: [/in progress|ongoing|currently|pursuing|2027|not (yet )?(complete|finish)/i],
