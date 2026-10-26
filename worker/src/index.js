@@ -25,10 +25,13 @@ const MAX_CHARS = 800;        // per visitor message; a portfolio question fits 
 // history can cost.
 const MAX_REPLY_CHARS = 2500;
 const MAX_OUTPUT_TOKENS = 600;
-// Gemini on this free key often takes 17-34 s even for a tiny prompt (tested
-// 26 Oct). After this long the question goes to Workers AI instead, which
-// answers in a few seconds. GEMINI_TIMEOUT_MS overrides it (tests use 50).
-const GEMINI_TIMEOUT_MS = 8000;
+// Gemini is the main model even though this free key takes 17-34 s a reply
+// (tested 26 Oct; Hamza chose its answers over speed). These limits only stop
+// a hung request: past them the question goes to Workers AI, and past the
+// fallback's own limit the visitor gets the "unavailable" message instead of
+// waiting. GEMINI_TIMEOUT_MS / WORKERS_AI_TIMEOUT_MS override them in tests.
+const GEMINI_TIMEOUT_MS = 45000;
+const WORKERS_AI_TIMEOUT_MS = 25000;
 
 const RULES = `You are Hamza Aziz's AI assistant on his portfolio site, hamzaaziz.dev.
 You answer on his behalf, like a colleague who knows his work well; you never
@@ -236,25 +239,37 @@ async function askGemini(env, turns, now) {
 }
 
 async function askWorkersAI(env, turns, now) {
+  let timer;
   try {
-    const out = await env.AI.run(env.FALLBACK_MODEL, {
+    // env.AI.run takes no abort signal, so the limit is a race.
+    const limit = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error("workers-ai timeout")), Number(env.WORKERS_AI_TIMEOUT_MS) || WORKERS_AI_TIMEOUT_MS);
+    });
+    const out = await Promise.race([limit, env.AI.run(env.FALLBACK_MODEL, {
       messages: [
         { role: "system", content: PROMPT_PUBLIC + now },
         ...turns.map((t) => ({ role: t.role === "model" ? "assistant" : "user", content: t.text })),
       ],
       max_tokens: MAX_OUTPUT_TOKENS,
       temperature: 0.3,
-    });
+    })]);
     // Older Workers AI text models return {response}; OpenAI-compatible ones
     // return {choices}. Accept either so a model swap in wrangler.toml works.
     const reply = (out?.response ?? out?.choices?.[0]?.message?.content ?? "").trim();
     return reply ? { reply: fixLinks(reply, PROMPT_PUBLIC + now) } : { outcome: "error" };
   } catch (err) {
+    const message = String(err && err.message);
+    if (message === "workers-ai timeout") {
+      console.log("workers-ai timeout");
+      return { outcome: "error" };
+    }
     // The free daily allocation running out arrives as a thrown error. It
     // resets at 00:00 UTC.
-    return /allocation|quota|limit|429|4006/i.test(String(err && err.message))
+    return /allocation|quota|limit|429|4006/i.test(message)
       ? { outcome: "quota", retryAt: nextMidnight("UTC") }
       : { outcome: "error" };
+  } finally {
+    clearTimeout(timer);
   }
 }
 
