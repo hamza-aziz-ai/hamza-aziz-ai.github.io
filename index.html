@@ -1054,8 +1054,10 @@
                             <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
                             next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
                             paraphrases and negation, but it only chooses among the names the rules found and never writes an answer;
-                            if it is slow or unsure, the rules answer. On a fresh, frozen test set it understood far more phrasings with
-                            no new wrong-subject answers, though it has not yet met its reliability and latency targets. Path-filtered
+                            if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
+                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject
+                            answers, but missed its reliability (98.1% usable replies against 99%) and latency (p95 1.56 s against 1 s)
+                            targets. Path-filtered
                             <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
                             Local prototype; not medical advice.
                         </p>
