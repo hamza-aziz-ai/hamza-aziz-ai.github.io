@@ -12,7 +12,7 @@ preview_urls = false
 # Comma-separated. Only these origins get CORS headers and are served.
 ALLOWED_ORIGINS = "https://hamzaaziz.dev"
 # Primary model. Configurable because Google retires model versions.
-MODEL = "gemini-2.5-flash-lite"
+MODEL = "gemini-3.5-flash-lite"
 # Workers AI fallback. Confirm the id exists in your account's catalog
 # (dashboard > AI > Models) before deploying; pick a free @cf/ model, not a
 # third-party partner model, which is billed separately.
