@@ -162,3 +162,24 @@ console.log("worker self-check: all assertions passed");
   assert.equal(fixed.reply, "Repo: https://github.com/hamza-aziz-ai/Medical-ChatBot", "Worker repairs a Gemini link from the real knowledge");
 }
 console.log("link checks passed");
+
+// A slow Gemini is abandoned after the timeout and Workers AI answers.
+{
+  reset();
+  globalThis.fetch = (url, init) => {
+    geminiCalls.push({ url, init });
+    return new Promise((_, reject) => init.signal.addEventListener("abort", () => reject(init.signal.reason)));
+  };
+  // Node does not let AbortSignal.timeout keep the process alive; Workers do.
+  const keepAlive = setTimeout(() => {}, 5000);
+  const t0 = Date.now();
+  const r = await worker.fetch(req(ask), env({ GEMINI_TIMEOUT_MS: "50", AI: ai(() => ({ response: "From Workers AI." })) }));
+  assert.equal(r.status, 200, "slow Gemini still gets an answer");
+  assert.deepEqual(await r.json(), { reply: "From Workers AI." });
+  assert.equal(r.headers.get("X-Chat-Backend"), "workers-ai");
+  assert.ok(Date.now() - t0 < 2000, "gave up on Gemini at the timeout");
+  assert.equal(aiCalls.length, 1);
+  clearTimeout(keepAlive);
+}
+console.log("timeout checks passed");
+
