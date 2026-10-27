@@ -722,33 +722,36 @@
 
                 <article class="projects__card">
                     <div class="projects__image">
-                        <img src="assets/img/projects/halal-lens-optimized.webp" alt="HalalLens" class="projects__img" width="1200" height="675" loading="lazy">
+                        <img src="assets/img/projects/medical-chatbot-optimized.webp" alt="medical chatbot" class="projects__img" width="1200" height="675" loading="lazy">
 
-                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank"
-                            class="projects__button button">
-                            <i class="ri-arrow-right-up-line"></i>
-                        </a>
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Personal Project</h3>
-                        <h2 class="projects__title">HalalLens &mdash; Halal Investment Research Copilot</h2>
+                        <h3 class="projects__subtitle">Final-Year Project | ABESIT</h3>
+                        <h2 class="projects__title">Mr. Healthcare - Medical Chatbot</h2>
 
                         <p class="projects__description">
-                            A full-stack <b>Shariah-compliance research platform</b> for Indian equities. A <b>FastAPI</b> backend (34
-                            REST endpoints) and a <b>Next.js 14 + TypeScript</b> front end sit over <b>PostgreSQL</b>, with an
-                            AAOIFI-style ratio engine deciding whether a stock screens clean. The piece worth building twice is the
-                            <b>&ldquo;Explain Why&rdquo;</b> narrator: it runs on deterministic rules by default, each verdict citing
-                            the filing date and the figures it was computed from, with an optional <b>vLLM / OpenAI-compatible</b> mode
-                            behind a config flag. Separate ingestion and evaluation containers crawl <b>BSE</b> announcements, pull
-                            financials out of PDF and XBRL filings, and refresh verdicts on a schedule.
+                            A medical question-answering chatbot over a <b>Neo4j</b> knowledge graph of <b>658</b> diseases that
+                            says plainly when it cannot answer. A <b>Vue 3</b> page talks to a <b>Flask</b> API, which finds disease and
+                            symptom names with an <b>Aho-Corasick</b> automaton and answers only through fixed, parameterized
+                            <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
+                            next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
+                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer;
+                            if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
+                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject
+                            answers, but missed its reliability (98.1% usable replies against 99%) and latency (p95 1.56 s against 1 s)
+                            targets. Path-filtered
+                            <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
+                            Live demo answers from the graph only, with the language model off. Not medical advice.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank"
-                            class="projects__link">
+                        <a href="https://github.com/hamza-aziz-ai/Medical-ChatBot" target="_blank" class="projects__link">
                             <i class="ri-github-fill"></i> View
+                        </a>
+                        <a href="https://medical.hamzaaziz.dev" target="_blank" class="projects__link">
+                            <i class="ri-external-link-line"></i> Live demo
                         </a>
                     </div>
                 </article>
@@ -1040,36 +1043,33 @@
 
                 <article class="projects__card">
                     <div class="projects__image">
-                        <img src="assets/img/projects/medical-chatbot-optimized.webp" alt="medical chatbot" class="projects__img" width="1200" height="675" loading="lazy">
+                        <img src="assets/img/projects/halal-lens-optimized.webp" alt="HalalLens" class="projects__img" width="1200" height="675" loading="lazy">
 
+                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank"
+                            class="projects__button button">
+                            <i class="ri-arrow-right-up-line"></i>
+                        </a>
                     </div>
 
                     <div class="projects__content">
-                        <h3 class="projects__subtitle">Final-Year Project | ABESIT</h3>
-                        <h2 class="projects__title">Mr. Healthcare - Medical Chatbot</h2>
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">HalalLens &mdash; Halal Investment Research Copilot</h2>
 
                         <p class="projects__description">
-                            A medical question-answering chatbot over a <b>Neo4j</b> knowledge graph of <b>658</b> diseases that
-                            says plainly when it cannot answer. A <b>Vue 3</b> page talks to a <b>Flask</b> API, which finds disease and
-                            symptom names with an <b>Aho-Corasick</b> automaton and answers only through fixed, parameterized
-                            <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
-                            next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
-                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer;
-                            if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
-                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject
-                            answers, but missed its reliability (98.1% usable replies against 99%) and latency (p95 1.56 s against 1 s)
-                            targets. Path-filtered
-                            <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
-                            Live demo answers from the graph only, with the language model off. Not medical advice.
+                            A full-stack <b>Shariah-compliance research platform</b> for Indian equities. A <b>FastAPI</b> backend (34
+                            REST endpoints) and a <b>Next.js 14 + TypeScript</b> front end sit over <b>PostgreSQL</b>, with an
+                            AAOIFI-style ratio engine deciding whether a stock screens clean. The piece worth building twice is the
+                            <b>&ldquo;Explain Why&rdquo;</b> narrator: it runs on deterministic rules by default, each verdict citing
+                            the filing date and the figures it was computed from, with an optional <b>vLLM / OpenAI-compatible</b> mode
+                            behind a config flag. Separate ingestion and evaluation containers crawl <b>BSE</b> announcements, pull
+                            financials out of PDF and XBRL filings, and refresh verdicts on a schedule.
                         </p>
                     </div>
 
                     <div class="projects__buttons">
-                        <a href="https://github.com/hamza-aziz-ai/Medical-ChatBot" target="_blank" class="projects__link">
+                        <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank"
+                            class="projects__link">
                             <i class="ri-github-fill"></i> View
-                        </a>
-                        <a href="https://medical.hamzaaziz.dev" target="_blank" class="projects__link">
-                            <i class="ri-external-link-line"></i> Live demo
                         </a>
                     </div>
                 </article>
