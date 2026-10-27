@@ -772,8 +772,9 @@
                             An open-source <b>plugin and MCP server</b> that puts one question to both <b>ChatGPT</b> (via the Codex
                             CLI) and <b>Claude</b> (via Claude Code). They answer independently, then reply to each other round after
                             round until they agree &mdash; one model writes the final answer while the other checks it. Built on
-                            <b>Node.js 20+</b> with zero runtime dependencies, speaking <b>MCP</b> over JSON-RPC/stdio, it runs locally
-                            on existing subscriptions with no API keys, across Claude Code, Codex, Claude Desktop and the ChatGPT app.
+                            <b>Node.js 20+</b> and speaking <b>MCP</b> over JSON-RPC/stdio, it runs locally on your own plans by default;
+                            either side can take an API key instead, or skip its CLI and run through the OpenAI or Anthropic API. It works
+                            across Claude Code, Codex, Claude Desktop and the ChatGPT app.
                             On a 24-question benchmark of deliberately tricky programs, run from fresh sessions with no web search, it
                             scored <b>24/24</b>, matching the best single model while catching the other's one miss.
                         </p>
