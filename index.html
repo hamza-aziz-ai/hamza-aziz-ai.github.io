@@ -736,7 +736,7 @@
                             symptom names with an <b>Aho-Corasick</b> automaton and answers only through fixed, parameterized
                             <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
                             next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
-                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer;
+                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer at question time;
                             if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
                             understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject
                             answers, but missed its reliability (98.1% usable replies against 99%) and latency (p95 1.56 s against 1 s)
