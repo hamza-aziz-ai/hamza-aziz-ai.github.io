@@ -1056,13 +1056,15 @@
                         <h2 class="projects__title">HalalLens &mdash; Halal Investment Research Copilot</h2>
 
                         <p class="projects__description">
-                            A full-stack <b>Shariah-compliance research platform</b> for Indian equities. A <b>FastAPI</b> backend (34
-                            REST endpoints) and a <b>Next.js 14 + TypeScript</b> front end sit over <b>PostgreSQL</b>, with an
-                            AAOIFI-style ratio engine deciding whether a stock screens clean. The piece worth building twice is the
-                            <b>&ldquo;Explain Why&rdquo;</b> narrator: it runs on deterministic rules by default, each verdict citing
-                            the filing date and the figures it was computed from, with an optional <b>vLLM / OpenAI-compatible</b> mode
-                            behind a config flag. Separate ingestion and evaluation containers crawl <b>BSE</b> announcements, pull
-                            financials out of PDF and XBRL filings, and refresh verdicts on a schedule.
+                            A full-stack <b>Shariah-compliance screener</b> for BSE-listed Indian equities. A <b>FastAPI</b> backend (39
+                            REST endpoints) and a <b>Next.js 16</b> static front end sit over <b>PostgreSQL</b>, with an AAOIFI-style
+                            ratio engine that answers compliant, non-compliant or insufficient data, so partial figures never pass as
+                            compliant. The <b>&ldquo;Explain Why&rdquo;</b> narrator runs on deterministic rules by default, each verdict
+                            citing the filing date and the figures it was computed from, with an optional <b>vLLM / OpenAI-compatible</b>
+                            mode behind a config flag. Automatic releases publish multi-arch <b>Docker</b> images, Trivy-scanned with SBOM
+                            and provenance, and a health-checked script deploys them to an Oracle Cloud VM behind a Cloudflare Tunnel;
+                            806 backend tests in CI, plus opt-in real-Postgres tests that prove the race-condition fixes. Production holds no BSE
+                            filings yet, while a permitted data source is pending.
                         </p>
                     </div>
 
@@ -1070,6 +1072,9 @@
                         <a href="https://github.com/hamza-aziz-ai/HalalLens" target="_blank"
                             class="projects__link">
                             <i class="ri-github-fill"></i> View
+                        </a>
+                        <a href="https://halallens.in" target="_blank" class="projects__link">
+                            <i class="ri-external-link-line"></i> Live
                         </a>
                     </div>
                 </article>
