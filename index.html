@@ -675,13 +675,11 @@
                         <h2 class="projects__title">DriveThru Voice Ordering Modernization</h2>
 
                         <p class="projects__description">
-                            A real-time voice agent that takes DriveThru orders and files them into the POS, across multiple QSR brands. Helped lift live ordering success from ~25&ndash;30% to 60%+ across 2 live restaurants.
-                            On <b>FastAPI + Socket.IO</b>, a speech layer streams the customer's words in, <b>Gemini 2.5 Flash-Lite</b>
-                            extracts menu items, an order agent replies from a cached menu-aware prompt, and a second model turns each
-                            spoken confirmation into <b>Redis</b> cart operations. The hard part is making a non-deterministic model
-                            safe to bill on: required-choice and per-item limit enforcement, a final cart check before submission, and
-                            staff handoff after repeated failures &mdash; deterministic code, validated against replays of real calls.
-                            <b>MongoDB</b> records, <b>Jinja2</b> per-brand prompts, four POS integrations.
+                            Helped lift live ordering success from ~25&ndash;30% to <b>60%+</b> across 2 live restaurants. A real-time
+                            voice agent that takes drive-thru orders and files them into 4 POS systems: <b>FastAPI + Socket.IO</b>,
+                            <b>Gemini 2.5 Flash</b> on Vertex AI with per-store context caching, and <b>Redis</b> cart state. The model
+                            handles language; deterministic code owns pricing, required choices and the final cart check, validated
+                            against replays of real calls.
                         </p>
                     </div>
 
@@ -701,16 +699,12 @@
                         <h2 class="projects__title">Mr. Healthcare - The Medical ChatBot</h2>
 
                         <p class="projects__description">
-                            A medical question-answering chatbot over a <b>Neo4j</b> knowledge graph of <b>658</b> diseases that
-                            says plainly when it cannot answer. A <b>Vue 3</b> page talks to a <b>Flask</b> API, which finds disease and
-                            symptom names with an <b>Aho-Corasick</b> automaton and answers only through fixed, parameterized
-                            <b>Cypher</b> queries, with follow-ups (&ldquo;what causes it?&rdquo;), clarifying questions and suggested
-                            next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
-                            paraphrases and negation, but it only chooses among the names the rules found and never writes an answer at question time;
-                            if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
-                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject answers. Path-filtered
-                            <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
-                            Built with Mahak Agrawal.
+                            Answers medical questions only from a <b>Neo4j</b> knowledge graph of 658 diseases, and says so when it
+                            cannot. A <b>Flask</b> API matches names with an Aho-Corasick automaton and answers through fixed,
+                            parameterized <b>Cypher</b>; a language model (<b>gpt-oss</b> via Ollama) resolves paraphrases and negation
+                            but never writes an answer. It lifted complete understanding of paraphrases and follow-ups from 54.7% to
+                            <b>70.9%</b> with no new wrong-subject answers. <b>Vue 3</b>, CI with a knowledge-graph gate, Docker images on
+                            GHCR. Built with Mahak Agrawal.
                         </p>
                     </div>
 
@@ -739,17 +733,11 @@
                         <h2 class="projects__title">HalalLens - The Shariah Compliance Screener</h2>
 
                         <p class="projects__description">
-                            A full-stack <b>Shariah-compliance screener</b> for BSE-listed Indian equities: a <b>FastAPI</b> backend and a
-                            <b>Next.js 16</b> front end over <b>PostgreSQL 17</b>. Every verdict, from the API or a scheduled job, is
-                            published by one function under a Postgres advisory lock; a missing input gives insufficient data rather
-                            than a guess, an open data-quality issue gives needs-review, and a compliant verdict needs an
-                            admin-supplied prohibited-income base. The <b>&ldquo;Explain Why&rdquo;</b> narrator runs on deterministic
-                            rules by default, citing the filing date and figures, with an optional <b>vLLM / OpenAI-compatible</b> mode.
-                            Subscribers get compliance-flip alert emails with at-least-once delivery, and a <b>Razorpay</b> billing
-                            ledger, on test keys only, handles plans, refunds, a reconciler for missed webhooks and credited Lifetime
-                            upgrades. Releases publish <b>Docker</b> images, deployed to an Oracle Cloud VM behind a Cloudflare Tunnel,
-                            with nightly backups and uptime checks; 1,092 backend and 47 UI tests in CI, plus opt-in real-Postgres
-                            locking tests.
+                            Live at halallens.in: screens BSE-listed Indian stocks for Shariah compliance and explains every verdict
+                            with the filing date and figures behind it. <b>FastAPI</b>, <b>Next.js 16</b> and <b>PostgreSQL 17</b>,
+                            with every verdict published under one advisory lock, so a missing input gives insufficient data, never a
+                            guess. Compliance-flip email alerts, a <b>Razorpay</b> billing ledger on test keys, <b>Docker</b> releases
+                            to Oracle Cloud behind a Cloudflare Tunnel, and 1,092 backend and 47 UI tests in CI.
                         </p>
                     </div>
 
@@ -780,14 +768,11 @@
                         <h2 class="projects__title">Codex&ndash;Claude Council &mdash; Two AIs, One Answer</h2>
 
                         <p class="projects__description">
-                            An open-source <b>plugin and MCP server</b> that puts one question to both <b>ChatGPT</b> (via the Codex
-                            CLI) and <b>Claude</b> (via Claude Code). They answer independently, then reply to each other round after
-                            round until they agree &mdash; one model writes the final answer while the other checks it. Built on
-                            <b>Node.js 20+</b> and speaking <b>MCP</b> over JSON-RPC/stdio, it runs locally on your own plans by default;
-                            either side can take an API key instead, or skip its CLI and run through the OpenAI or Anthropic API. It works
-                            across Claude Code, Codex, Claude Desktop and the ChatGPT app.
-                            On a 24-question benchmark of deliberately tricky programs, run from fresh sessions with no web search, it
-                            scored <b>24/24</b>, matching the best single model while catching the other's one miss.
+                            Published on <b>npm</b> and listed in the MCP Registry, awesome-mcp-servers and Smithery: a plugin and
+                            <b>MCP server</b> that puts one question to both <b>ChatGPT</b> (Codex CLI) and <b>Claude</b> (Claude Code),
+                            lets them reply to each other until they agree, and returns one checked answer. On a 24-question
+                            benchmark of deliberately tricky programs it scored <b>24/24</b>, matching the best single model while
+                            catching the other's one miss. <b>Node.js</b> 20+, MCP over JSON-RPC/stdio, on your own plans or API keys.
                         </p>
                     </div>
 
@@ -800,6 +785,30 @@
                             class="projects__link">
                             <i class="ri-npmjs-fill"></i> npm
                         </a>
+                    </div>
+                </article>
+
+                <article class="projects__card">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/face-recognition-optimized.webp" alt="CCTV face recognition"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Global InfoVentures Pvt. Ltd.</h3>
+                        <h2 class="projects__title">CCTV Face Recognition Attendance &mdash; Multi-Stream</h2>
+
+                        <p class="projects__description">
+                            Attendance at a 20-camera main gate (~2,000 people a day) from <b>20+</b> live <b>RTSP</b> streams, at
+                            <b>&gt;99.99%</b> accuracy against the attendance register in controlled UAT; sole developer. 32-frame
+                            batches go to <b>InsightFace-REST</b> (<b>SCRFD</b> + w600k_r50) on <b>TensorRT</b> replicas across A100 MIG
+                            slices behind <b>nginx</b>, with cosine search in <b>Milvus</b>; a nightly gallery update lifted real-world
+                            accuracy from 85% to 99%. <b>PostgreSQL</b>, ERP sync and <b>Kafka</b> to on-site displays.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <a href="projects/cctv-face-recognition.html" target="_blank" class="projects__link">Read case study</a>
                     </div>
                 </article>
 
@@ -856,32 +865,6 @@
                     </div>
                 </article>
 
-                <article class="projects__card">
-                    <div class="projects__image">
-                        <img src="assets/img/projects/face-recognition-optimized.webp" alt="CCTV face recognition"
-                            class="projects__img" width="1200" height="675" loading="lazy">
-                    </div>
-
-                    <div class="projects__content">
-                        <h3 class="projects__subtitle">Global InfoVentures Pvt. Ltd.</h3>
-                        <h2 class="projects__title">CCTV Face Recognition Attendance &mdash; Multi-Stream</h2>
-
-                        <p class="projects__description">
-                            The multi-stream sibling to the PTZ system. A producer process decodes <b>20+</b> live <b>RTSP</b> camera
-                            feeds &mdash; ROI crop and lighting check per frame &mdash; into a shared in-memory queue; a consumer
-                            batches 32 frames per request to <b>InsightFace-REST</b>, running as two <b>TensorRT</b> replicas on
-                            separate MIG slices behind <b>nginx</b>, where <b>SCRFD</b> (<code>scrfd_10g_gnkps</code>) detects and
-                            <b>w600k_r50</b> embeds. Identities resolve by cosine search over a GPU-indexed <b>Milvus</b> collection.
-                            The gallery improves itself: high-confidence crops land in a staging collection that a nightly job folds
-                            into the index. Results persist to <b>PostgreSQL</b>, sync to the institute ERP, and stream back to on-site
-                            displays over <b>Kafka</b>.
-                        </p>
-                    </div>
-
-                    <div class="projects__buttons">
-                        <a href="projects/cctv-face-recognition.html" target="_blank" class="projects__link">Read case study</a>
-                    </div>
-                </article>
 
                 <article class="projects__card" id="jetson-nano-attendance">
                     <div class="projects__image">
