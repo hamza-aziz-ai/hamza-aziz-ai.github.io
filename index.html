@@ -886,7 +886,7 @@
                             inference. One C++ <b>DeepStream 6</b> pipeline takes an RTSP, USB, CSI or uploaded-file source and runs
                             <b>SCRFD-10G</b> detection and <b>ArcFace</b> (w600k_r50) embedding as <b>TensorRT FP16</b> engines, with
                             5-point alignment and IOU tracking, writing a dated attendance log with a face snapshot and an event clip.
-                            Measured on the board: 15 fps end to end on a 1080p camera, two concurrent camera streams in one process, and adaptive detection that leaves the GPU idle on an empty scene. A
+                            Measured on the board: 15 fps end to end on a 1080p camera, up from 12.2 fps, after moving detection into an adaptive pad probe that takes idle GPU load from 89&ndash;99% to near zero. A
                             password-protected dashboard in standard-library <b>Python</b> serves the logs from flat files, and
                             CI-tagged releases install themselves with a health check and automatic rollback.
                         </p>
