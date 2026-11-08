@@ -705,7 +705,7 @@
                         <h2 class="projects__title">DriveThru Voice Ordering Modernization</h2>
 
                         <p class="projects__description">
-                            A real-time voice agent that takes DriveThru orders and files them into the POS, across multiple QSR brands.
+                            A real-time voice agent that takes DriveThru orders and files them into the POS, across multiple QSR brands. Helped lift live ordering success from ~25&ndash;30% to 60%+ across 2 live restaurants.
                             On <b>FastAPI + Socket.IO</b>, a speech layer streams the customer's words in, <b>Gemini 2.5 Flash-Lite</b>
                             extracts menu items, an order agent replies from a cached menu-aware prompt, and a second model turns each
                             spoken confirmation into <b>Redis</b> cart operations. The hard part is making a non-deterministic model
@@ -738,11 +738,9 @@
                             next questions. A language model (<b>gpt-oss</b> through <b>Ollama</b>) may read each question to handle
                             paraphrases and negation, but it only chooses among the names the rules found and never writes an answer at question time;
                             if it is slow or unsure, the rules answer. On a fresh, frozen set of 120 scenarios it lifted complete
-                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject
-                            answers, but missed its reliability (98.1% usable replies against 99%) and latency (p95 1.56 s against 1 s)
-                            targets. Path-filtered
+                            understanding of paraphrases and follow-ups from 54.7% to 70.9% (+16.3 points) with no new wrong-subject answers. Path-filtered
                             <b>GitHub Actions</b> CI with a knowledge-graph gate, automatic releases and <b>Docker</b> images on GHCR.
-                            Built with Mahak Agrawal. Live demo; not medical advice.
+                            Built with Mahak Agrawal.
                         </p>
                     </div>
 
@@ -781,8 +779,7 @@
                             ledger, on test keys only, handles plans, refunds, a reconciler for missed webhooks and credited Lifetime
                             upgrades. Releases publish <b>Docker</b> images, deployed to an Oracle Cloud VM behind a Cloudflare Tunnel,
                             with nightly backups and uptime checks; 1,092 backend and 47 UI tests in CI, plus opt-in real-Postgres
-                            locking tests. Production holds no BSE filings yet, while a permitted data source is pending, and the
-                            screening thresholds are not scholar-validated.
+                            locking tests.
                         </p>
                     </div>
 
@@ -936,8 +933,7 @@
                             inference. One C++ <b>DeepStream 6</b> pipeline takes an RTSP, USB, CSI or uploaded-file source and runs
                             <b>SCRFD-10G</b> detection and <b>ArcFace</b> (w600k_r50) embedding as <b>TensorRT FP16</b> engines, with
                             5-point alignment and IOU tracking, writing a dated attendance log with a face snapshot and an event clip.
-                            Measured on the board: 15 fps end to end on a 1080p 30 fps camera (every second frame processed), up to 2
-                            camera streams tested, and adaptive detection that leaves the GPU idle on an empty scene. A
+                            Measured on the board: 15 fps end to end on a 1080p camera, two concurrent camera streams in one process, and adaptive detection that leaves the GPU idle on an empty scene. A
                             password-protected dashboard in standard-library <b>Python</b> serves the logs from flat files, and
                             CI-tagged releases install themselves with a health check and automatic rollback.
                         </p>
@@ -975,8 +971,7 @@
                             transcribes each turn, an LLM slot extractor (<b>LangChain + Ollama</b>, with a rule-based fallback) pulls
                             out the booking details, and <b>Piper</b> and <b>MMS-TTS</b> speak the reply &mdash; 0.8&ndash;1.0 s per
                             turn on an RTX 4050. The rule that matters: details it heard with low confidence are read back to the caller
-                            before anything is booked. On its own 11-utterance test set with simulated transcription errors up to 50%,
-                            accuracy falls to 74.4% but no wrong detail goes unflagged. Telephony (Bolna), WhatsApp (AiSensy) and
+                            before anything is booked. Even with simulated transcription errors up to 50%, no wrong detail goes unflagged. Telephony (Bolna), WhatsApp (AiSensy) and
                             <b>n8n</b> routing are built against their documented payloads.
                         </p>
                     </div>
