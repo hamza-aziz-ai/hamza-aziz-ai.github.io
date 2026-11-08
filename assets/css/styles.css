@@ -947,6 +947,14 @@ body.dark-theme {
     margin-bottom: 0.25rem;
 }
 
+.qualification__result {
+    display: block;
+    margin-top: 0.25rem;
+    max-width: 20rem;
+    font-size: var(--small-font-size);
+    color: var(--text-color);
+}
+
 .qualification__container .geometric-box {
     position: absolute;
     left: 1.5rem;
