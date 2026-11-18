@@ -2097,6 +2097,164 @@ body.dark-theme {
     }
 }
 
+/* Case study polish (D-029): a back link, a results strip and a stack row
+   under the title, decision paragraphs as cards, styled code and lists, and
+   the closing links as a call to action. Same tokens as the homepage, so
+   both themes follow automatically. */
+.case__crumb a::before {
+    content: "\2190 ";
+    margin-right: 0.4rem;
+}
+
+.case__meta {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 1.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--smaller-font-size);
+    font-weight: var(--font-semi-bold);
+    color: var(--first-color);
+}
+
+.case__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.case__stat {
+    background-color: var(--container-color);
+    border-radius: 0.75rem;
+    padding: 1rem 1.125rem;
+    border-top: 3px solid var(--first-color);
+}
+
+.case__stat dt {
+    font-size: 1.5rem;
+    font-weight: var(--font-bold);
+    color: var(--title-color);
+    line-height: 1.2;
+}
+
+.case__stat dd {
+    margin: 0.35rem 0 0;
+    font-size: var(--small-font-size);
+    line-height: 1.45;
+    color: var(--text-color);
+}
+
+.case__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.5rem;
+}
+
+.case__stack li {
+    font-size: var(--smaller-font-size);
+    font-weight: var(--font-medium);
+    color: var(--title-color);
+    border: 1px solid var(--text-color-light);
+    border-radius: 2rem;
+    padding: 0.3rem 0.75rem;
+}
+
+.case__banner {
+    border-radius: 0.875rem;
+    box-shadow: 0 12px 32px hsla(0, 0%, 0%, 0.18);
+}
+
+.case p.case__point {
+    background-color: var(--container-color);
+    border-left: 3px solid var(--first-color);
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1.125rem 1.25rem;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.case p.case__point strong:first-child {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 1.0625rem;
+}
+
+.case code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.875em;
+    background-color: var(--container-color);
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.3rem;
+    color: var(--title-color);
+}
+
+.case ul:not([class]) {
+    margin: 0 0 1.25rem;
+    padding-left: 1.25rem;
+    list-style: none;
+}
+
+.case ul:not([class]) li {
+    position: relative;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+}
+
+.case ul:not([class]) li::before {
+    content: '';
+    position: absolute;
+    left: -1.1rem;
+    top: 0.7em;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--first-color);
+}
+
+.case__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    background-color: var(--container-color);
+    border: none;
+    border-radius: 0.875rem;
+    padding: 1.5rem;
+    font-size: var(--small-font-size);
+    color: transparent;              /* hides the middot separators */
+}
+
+.case__links a {
+    color: var(--title-color);
+    border: 1px solid var(--text-color-light);
+    border-radius: 2rem;
+    padding: 0.55rem 1rem;
+    font-weight: var(--font-medium);
+}
+
+.case__links a:last-child {
+    background-color: var(--first-color);
+    border-color: var(--first-color);
+    color: hsl(0, 0%, 100%);
+}
+
+.case__links a:hover {
+    text-decoration: none;
+    border-color: var(--first-color);
+}
+
+@media screen and (min-width: 768px) {
+    .case__stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 /*=============== CHAT ASSISTANT ===============*/
 /* Built by assets/js/chat.js. The panel sits on its own surface so it stands
    out from the page in both themes: white on the light grey body, a raised
