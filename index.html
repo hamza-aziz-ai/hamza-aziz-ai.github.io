@@ -704,9 +704,11 @@
                         <p class="projects__description">
                             Attendance at a 20-camera main gate (~2,000 people a day) from <b>20+</b> live <b>RTSP</b> streams, at
                             <b>&gt;99.99%</b> accuracy against the attendance register in controlled UAT; sole developer. 32-frame
-                            batches go to <b>InsightFace-REST</b> (<b>SCRFD</b> + w600k_r50) on <b>TensorRT</b> replicas across A100 MIG
-                            slices behind <b>nginx</b>, with cosine search in <b>Milvus</b>; a nightly gallery update lifted real-world
-                            accuracy from 85% to 99%. <b>PostgreSQL</b>, ERP sync and <b>Kafka</b> to on-site displays.
+                            batches went to <b>InsightFace-REST</b> (<b>SCRFD</b> + w600k_r50) on <b>TensorRT</b> replicas across A100 MIG
+                            slices, with cosine search in <b>Milvus</b>; a nightly gallery update lifted real-world accuracy from 85% to
+                            99%. Since productised: automated releases with self-rolling-back deploys, multi-tenant stacks, compiled
+                            images, an Android enrolment app (<b>Kotlin</b>, CameraX), <b>Kafka</b>-fed live displays, and a
+                            <b>DeepStream</b> tier tested at 16 &times; 1080p30 streams on a 6 GB laptop GPU.
                         </p>
                     </div>
 
@@ -853,13 +855,14 @@
                         <h2 class="projects__title">PTZ Classroom Attendance &mdash; One Camera per Room</h2>
 
                         <p class="projects__description">
-                            Classroom attendance from a <b>single PTZ camera per room</b> instead of a wall of fixed cameras. The system
-                            drives one <b>ONVIF</b> camera through a timed preset sweep &mdash; dedicated faculty captures at lecture
-                            start and end, then a <b>23-preset trace</b> across the seats &mdash; with zoom and focus settling budgeted
-                            into every hop. Frames go to a <b>TensorRT</b>-backed <b>InsightFace-REST</b> service for detection and
-                            embedding, and identities come from a top-1 <b>Milvus</b> search over 512-d vectors. A separate
-                            <b>YOLOv9</b> service counts heads independently; the two are reconciled per lecture and synced to the
-                            institute ERP. Four Dockerised services on a MIG-partitioned GPU, with <b>PostgreSQL</b> attendance logs.
+                            Classroom attendance from a <b>single PTZ camera per room</b> instead of a wall of fixed cameras. The deployed
+                            system drove one <b>ONVIF</b> camera through a timed preset sweep &mdash; faculty captures at lecture start
+                            and end, then a <b>23-preset trace</b> across the seats &mdash; with zoom and focus settling budgeted into every
+                            hop. Frames went to a <b>TensorRT</b>-backed <b>InsightFace-REST</b> service, identities came from a top-1
+                            <b>Milvus</b> search over 512-d vectors, and a separate <b>YOLOv9</b> service counted heads independently; the
+                            two were reconciled per lecture and synced to the institute ERP. Since rebuilt as the second app of the CCTV
+                            platform: <b>YOLO26</b> headcount about 3&times; faster on CPU, per-lecture unique-face counts and isolated
+                            per-client databases.
                         </p>
                     </div>
 
@@ -884,13 +887,13 @@
                         <h2 class="projects__title">Jetson Nano Face Attendance &mdash; Offline, On-Device</h2>
 
                         <p class="projects__description">
-                            A standalone face-attendance system on a single <b>Jetson Nano 4 GB</b>, fully offline with no cloud
-                            inference. One C++ <b>DeepStream 6</b> pipeline takes an RTSP, USB, CSI or uploaded-file source and runs
-                            <b>SCRFD-10G</b> detection and <b>ArcFace</b> (w600k_r50) embedding as <b>TensorRT FP16</b> engines, with
-                            5-point alignment and IOU tracking, writing a dated attendance log with a face snapshot and an event clip.
-                            Measured on the board: 15 fps end to end on a 1080p camera, up from 12.2 fps, after moving detection into an adaptive pad probe that takes idle GPU load from 89&ndash;99% to near zero. A
-                            password-protected dashboard in standard-library <b>Python</b> serves the logs from flat files, and
-                            CI-tagged releases install themselves with a health check and automatic rollback.
+                            A standalone face-attendance system on a single <b>Jetson Nano 4 GB</b>, fully offline. One C++
+                            <b>DeepStream 6</b> pipeline runs <b>SCRFD-10G</b> and <b>ArcFace</b> as <b>TensorRT FP16</b> engines on two
+                            network cameras and a video upload at once: 14.4 fps per camera in 2.3 GB of RAM, and 15 fps on one 1080p
+                            camera (up from 12.2 fps after an adaptive pad probe took idle GPU load from 89&ndash;99% to near zero).
+                            Admin and viewer accounts, stranger IDs that count distinct faces per day, face snapshots deleted after 30
+                            days, remote access through a <b>Cloudflare Tunnel</b> with no open port, and compiled releases that install
+                            themselves with a health check and automatic rollback.
                         </p>
                     </div>
 
@@ -899,7 +902,38 @@
                             class="projects__link">
                             <i class="ri-github-fill"></i> Source code
                         </a>
-                        <a href="https://attendance.hamzaaziz.dev" target="_blank" class="projects__link">
+                        <a href="https://attendance.hamzaaziz.dev/demo/" target="_blank" class="projects__link">
+                            <i class="ri-external-link-line"></i> Live demo
+                        </a>
+                    </div>
+                </article>
+                <article class="projects__card" id="edge-vision-attendance">
+                    <div class="projects__image">
+                        <img src="assets/img/projects/edge-vision-attendance-optimized.webp" alt="Edge Vision Attendance Platform banner: 8 cameras on one Jetson Orin Nano"
+                            class="projects__img" width="1200" height="675" loading="lazy">
+
+                        <a href="https://evap.hamzaaziz.dev/demo/" target="_blank"
+                            class="projects__button button" aria-label="Edge Vision Attendance Platform live demo">
+                            <i class="ri-arrow-right-up-line"></i>
+                        </a>
+                    </div>
+
+                    <div class="projects__content">
+                        <h3 class="projects__subtitle">Personal Project</h3>
+                        <h2 class="projects__title">Edge Vision Attendance &mdash; 8 Cameras on a Jetson Orin Nano</h2>
+
+                        <p class="projects__description">
+                            The same problem rebuilt for many cameras on a <b>Jetson Orin Nano Super 8 GB</b>: a C++
+                            <b>DeepStream 9</b> pipeline with <b>SCRFD-10G</b> and <b>ArcFace</b> on <b>TensorRT 10</b>, GPU face
+                            alignment and NvDCF tracking. Measured on the board with the whole system running: <b>8 &times; 720p30</b>
+                            RTSP cameras at 30 fps each in 5.0 GB of RAM, peak GPU 76%; SCRFD 3.47 ms per frame, ArcFace 1.69 ms per
+                            face. Per-visit evidence (snapshot, face crop, 9-second clip), roles, self-deploy with rollback, and an
+                            amd64 build that serves as the CCTV system's central tier.
+                        </p>
+                    </div>
+
+                    <div class="projects__buttons">
+                        <a href="https://evap.hamzaaziz.dev/demo/" target="_blank" class="projects__link">
                             <i class="ri-external-link-line"></i> Live demo
                         </a>
                     </div>
