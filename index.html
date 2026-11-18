@@ -828,13 +828,11 @@
                         <h2 class="projects__title">Conversational AI for College ERP</h2>
 
                         <p class="projects__description">
-                            A voice- and text-driven assistant that answers questions against live college ERP data across multiple
-                            client institutes. Audio is transcribed server-side through a <b>FastAPI</b> gateway, then a two-stage
-                            <b>Rasa</b> router picks the ERP module &mdash; asking a clarifying question and re-classifying when
-                            confidence is low, so an ambiguous query never reaches the LLM. Schema grounding is the hard part: each
+                            A voice- and text-driven assistant that answers questions over college ERP data, built for and deployed across multiple client institutes. Audio is transcribed server-side through a <b>FastAPI</b> gateway, then a two-stage
+                            <b>Rasa</b> router picks the ERP module &mdash; routing and disambiguating the module before any retrieval. Schema grounding is the hard part: each
                             institute's hundreds of field mappings are embedded into <b>Milvus</b> and retrieved alongside similar
                             few-shot examples, so <b>Gemini 2.5 Flash</b> emits constrained SQL fragments into a fixed payload contract
-                            instead of free-form SQL. The ERP executes it and a second model summarises the rows.
+                            instead of free-form SQL. A validator checks every fragment before the ERP executes it, a second LLM call summarises the rows, and every release passes NLU and embedding-parity gates with automatic rollback.
                         </p>
                     </div>
 
@@ -905,6 +903,7 @@
                         <a href="https://attendance.hamzaaziz.dev/demo/" target="_blank" class="projects__link">
                             <i class="ri-external-link-line"></i> Live demo
                         </a>
+                        <a href="projects/edge-face-attendance.html" target="_blank" class="projects__link">Read case study</a>
                     </div>
                 </article>
                 <article class="projects__card" id="edge-vision-attendance">
@@ -936,6 +935,7 @@
                         <a href="https://evap.hamzaaziz.dev/demo/" target="_blank" class="projects__link">
                             <i class="ri-external-link-line"></i> Live demo
                         </a>
+                        <a href="projects/edge-face-attendance.html" target="_blank" class="projects__link">Read case study</a>
                     </div>
                 </article>
 
