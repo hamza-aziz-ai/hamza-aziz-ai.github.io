@@ -48,6 +48,13 @@
         <nav class="case__crumb" aria-label="Breadcrumb"><a href="../#projects">Hamza Aziz / Projects</a></nav>
         <h1>Face recognition attendance on a Jetson: from one Nano to eight cameras on an Orin Nano</h1>
         <p class="case__meta">Personal project &middot; edge AI &middot; offline, on-device face attendance with DeepStream and TensorRT</p>
+        <dl class="case__stats">
+            <div class="case__stat"><dt>15 fps</dt><dd>Jetson Nano, 1080p camera, every second frame processed</dd></div>
+            <div class="case__stat"><dt>2 &times; 14.4 fps</dt><dd>two cameras in one process in 2.3 GB of RAM</dd></div>
+            <div class="case__stat"><dt>8 &times; 720p30</dt><dd>cameras on one Orin Nano, 5.0 GB RAM, 76% peak GPU</dd></div>
+            <div class="case__stat"><dt>3.47 ms</dt><dd>SCRFD-10G per frame on the Orin Nano, FP16</dd></div>
+        </dl>
+        <ul class="case__stack" aria-label="Technologies"><li>Jetson Nano</li><li>Jetson Orin Nano</li><li>DeepStream</li><li>TensorRT</li><li>SCRFD</li><li>ArcFace</li><li>C++</li><li>Nuitka</li><li>Cloudflare Tunnel</li></ul>
         <img class="case__banner" src="../assets/img/projects/jetson-nano-attendance-optimized.webp" alt="Jetson Nano offline face attendance" width="1200" height="675" fetchpriority="high">
         <h2>The problem</h2>
         <p>A site wants to know who came in and when. The usual answer sends every frame to a server or a cloud API, so a face leaves the building, a network outage means no attendance, and the per-camera bill never stops. I took the opposite constraint: camera in, verified attendance out, on one board, with nothing leaving the device. That is a privacy position before it is an engineering one, and it is what makes the rest hard.</p>
