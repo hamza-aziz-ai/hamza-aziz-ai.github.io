@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Farewell, Khyati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: one folded card on a dusk ground; the inside opens on click, with a confetti send-off. Single deliberate look. */
+:root {
+  --ground: #1f1b2e;
+  --ground-2: #2b2540;
+  --paper: #fbf7ef;
+  --ink: #2a2433;
+  --muted: #6d6578;
+  --marigold: #f2a93b;
+  --rose: #e46f7f;
+  --display: "Young Serif", Georgia, serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --hand: "Caveat", "Segoe Script", cursive;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: radial-gradient(120% 90% at 50% 0%, var(--ground-2), var(--ground) 70%);
+  color: var(--paper);
+  font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 48px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+.wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 20px; justify-items: center; }
+.eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--marigold); }
+.card {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.35), 0 2px 0 rgba(255,255,255,.4) inset;
+  position: relative;
+  overflow: hidden;
+}
+.cover {
+  padding: clamp(28px, 6vw, 56px);
+  display: grid; gap: 14px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(242,169,59,.25) 0 70px, transparent 71px),
+    radial-gradient(circle at 8% 92%, rgba(228,111,127,.18) 0 90px, transparent 91px),
+    var(--paper);
+}
+.cover h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 11vw, 84px);
+  line-height: .95;
+  margin: 0;
+  text-wrap: balance;
+}
+.cover h1 em { font-style: normal; color: var(--rose); }
+.cover p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; max-width: 34ch; }
+.date { font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ticket {
+  margin-top: 10px; max-width: 360px;
+  font: 500 14px ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  background: #fff; color: var(--ink);
+  border: 1px dashed rgba(42,36,51,.3); border-radius: 4px;
+  padding: 14px 16px; display: grid; gap: 6px;
+  transform: rotate(-1.5deg);
+}
+.ticket__head, .ticket__row, .ticket__total { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ticket__head { font-size: 12px; color: var(--muted); border-bottom: 1px dashed rgba(42,36,51,.25); padding-bottom: 6px; }
+.ticket__row span:last-child { color: var(--muted); }
+.ticket__total { border-top: 1px dashed rgba(42,36,51,.25); padding-top: 6px; font-weight: 700; color: var(--rose); }
+.inside {
+  border-top: 2px dashed rgba(42,36,51,.15);
+  padding: clamp(28px, 6vw, 56px);
+  display: grid; gap: 18px;
+}
+.inside[hidden] { display: none !important; }
+.inside p { margin: 0; font-size: 17px; line-height: 1.7; }
+.wishes { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 4px 0 0; }
+.wishes li { font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 999px; background: #f3e9d6; color: var(--ink); }
+.sign { font-family: var(--hand); font-size: 34px; color: var(--rose); margin-top: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+button {
+  font: 600 15px var(--body);
+  border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer;
+  background: var(--marigold); color: #2a1c05;
+  transition: transform .15s ease;
+}
+button.ghost { background: transparent; color: var(--paper); box-shadow: inset 0 0 0 1.5px rgba(251,247,239,.4); }
+button:hover { transform: translateY(-1px); }
+button:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Last working day &middot; 20 November 2026</div>
+  <article class="card" aria-label="Farewell card for Khyati">
+    <section class="cover">
+      <span class="date">To Khyati Khaitan &middot; AI Product Engineer</span>
+      <h1>Lane 1 is still<br><em>listening.</em></h1>
+      <p>Your last day at VoicePlug, and the drive-thru lanes are about to get a lot quieter.</p>
+      <div class="ticket" aria-label="Order ticket">
+        <div class="ticket__head"><span>ORDER #KK-001</span><span>LANE 1</span><span>20 NOV 2026</span></div>
+        <div class="ticket__row"><span>1&times; Thank you</span><span>large</span></div>
+        <div class="ticket__row"><span>1&times; Good luck</span><span>extra</span></div>
+        <div class="ticket__row"><span>1&times; Stay in touch</span><span>no substitutions</span></div>
+        <div class="ticket__row"><span>SHIFT</span><span>DEC 2025 &ndash; NOV 2026</span></div>
+        <div class="ticket__total"><span>STATUS</span><span>ACCEPTED BY POS &#10003;</span></div>
+      </div>
+    </section>
+    <section class="inside" id="inside" hidden>
+      <p>Dear Khyati,</p>
+      <p>From the day you joined in December 2025, you worked the hardest part of this job alongside me: the mishearings, the vague menu names, and the orders a POS would refuse. Together we took live ordering from 25&ndash;30% to more than 60% across real restaurants. A good part of that number is yours, and it leaves with you.</p>
+      <p>Endings at work don't always arrive the way we would choose them. Whatever the circumstances, they say nothing about what you are worth. Your record speaks for itself, from the Gold Award at Bank of America to the fixes you shipped here and the 570+ problems on LeetCode.</p>
+      <p>The next team you join is lucky. Keep in touch, and if I can ever help with a referral, a reference or a mock interview, just ask.</p>
+      <ul class="wishes" aria-label="Wishes">
+        <li>Thank you</li><li>Stay in touch</li><li>Big things ahead</li><li>I'll miss working with you</li>
+      </ul>
+      <div class="sign">Your teammate, Hamza</div>
+    </section>
+  </article>
+  <div class="actions">
+    <button id="open" type="button">Open the card</button>
+    <button id="cheer" class="ghost" type="button">Send good wishes</button>
+  </div>
+</div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  const inside = document.getElementById('inside');
+  const openBtn = document.getElementById('open');
+  const fx = document.getElementById('fx');
+  const ctx = fx.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let bits = [], running = false;
+
+  function size() { fx.width = innerWidth * devicePixelRatio; fx.height = innerHeight * devicePixelRatio; }
+  addEventListener('resize', size); size();
+
+  function burst() {
+    if (reduce) return;
+    const colors = ['#f2a93b', '#e46f7f', '#fbf7ef', '#8fd3c1', '#b9a4f5'];
+    for (let i = 0; i < 160; i++) {
+      bits.push({
+        x: fx.width / 2, y: fx.height * 0.45,
+        vx: (Math.random() - 0.5) * 18 * devicePixelRatio,
+        vy: (Math.random() * -16 - 4) * devicePixelRatio,
+        r: (Math.random() * 5 + 3) * devicePixelRatio,
+        c: colors[i % colors.length], a: Math.random() * 6, life: 0
+      });
+    }
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+  function tick() {
+    ctx.clearRect(0, 0, fx.width, fx.height);
+    bits.forEach(b => { b.vy += 0.45 * devicePixelRatio; b.x += b.vx; b.y += b.vy; b.a += 0.12; b.life++;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a); ctx.fillStyle = b.c; ctx.fillRect(-b.r, -b.r / 2, b.r * 2, b.r); ctx.restore(); });
+    bits = bits.filter(b => b.y < fx.height + 40 && b.life < 240);
+    if (bits.length) requestAnimationFrame(tick); else { running = false; ctx.clearRect(0, 0, fx.width, fx.height); }
+  }
+
+  openBtn.addEventListener('click', () => {
+    const show = inside.hidden;
+    inside.hidden = !show;
+    openBtn.textContent = show ? 'Close the card' : 'Open the card';
+    if (show) { burst(); inside.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); }
+  });
+  document.getElementById('cheer').addEventListener('click', burst);
+})();
+</script>
+</body>
+</html>
