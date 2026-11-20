@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Lane 1 is still listening. A farewell card for Khyati, from Hamza.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Farewell, Khyati">
+<meta property="og:description" content="Lane 1 is still listening. A farewell card from Hamza, open it.">
+<meta property="og:url" content="https://hamzaaziz.dev/for-khyati-team-vp096/">
+<meta property="og:image" content="https://hamzaaziz.dev/for-khyati-team-vp096/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Farewell card: Lane 1 is still listening, with an order ticket">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hamzaaziz.dev/for-khyati-team-vp096/preview.png">
+<title>Farewell, Khyati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: one folded card on a dusk ground; the inside opens on click, with a confetti send-off. Single deliberate look. */
+:root {
+  --ground: #1f1b2e;
+  --ground-2: #2b2540;
+  --paper: #fbf7ef;
+  --ink: #2a2433;
+  --muted: #6d6578;
+  --marigold: #f2a93b;
+  --rose: #e46f7f;
+  --display: "Young Serif", Georgia, serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --hand: "Caveat", "Segoe Script", cursive;
+  color-scheme: dark;
+}
+html { min-height: 100%; }
+body {
+  background: radial-gradient(120% 90% at 50% 0%, var(--ground-2), var(--ground) 70%);
+  color: var(--paper);
+  font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 48px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+.wrap { max-width: 640px; margin: 0 auto; display: grid; gap: 20px; justify-items: center; }
+.eyebrow { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--marigold); }
+.card {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 6px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.35), 0 2px 0 rgba(255,255,255,.4) inset;
+  position: relative;
+  overflow: hidden;
+}
+.cover {
+  padding: clamp(28px, 6vw, 56px);
+  display: grid; gap: 14px;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(242,169,59,.25) 0 70px, transparent 71px),
+    radial-gradient(circle at 8% 92%, rgba(228,111,127,.18) 0 90px, transparent 91px),
+    var(--paper);
+}
+.cover h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 11vw, 84px);
+  line-height: .95;
+  margin: 0;
+  text-wrap: balance;
+}
+.cover h1 em { font-style: normal; color: var(--rose); }
+.cover p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; max-width: 34ch; }
+.date { font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ticket {
+  margin-top: 10px; max-width: 360px;
+  font: 500 14px ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  background: #fff; color: var(--ink);
+  border: 1px dashed rgba(42,36,51,.3); border-radius: 4px;
+  padding: 14px 16px; display: grid; gap: 6px;
+  transform: rotate(-1.5deg);
+}
+.ticket__head, .ticket__row, .ticket__total { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ticket__head { font-size: 12px; color: var(--muted); border-bottom: 1px dashed rgba(42,36,51,.25); padding-bottom: 6px; }
+.ticket__row span:last-child { color: var(--muted); }
+.ticket__total { border-top: 1px dashed rgba(42,36,51,.25); padding-top: 6px; font-weight: 700; color: var(--rose); }
+.inside {
+  border-top: 2px dashed rgba(42,36,51,.15);
+  padding: clamp(28px, 6vw, 56px);
+  display: grid; gap: 18px;
+}
+.inside[hidden] { display: none !important; }
+.inside p { margin: 0; font-size: 17px; line-height: 1.7; }
+.wishes { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 4px 0 0; }
+.wishes li { font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 999px; background: #f3e9d6; color: var(--ink); }
+.memories__title { font-family: var(--display); font-weight: 400; font-size: 24px; margin: 8px 0 0; color: var(--ink); }
+.memories { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.memories li { font-size: 16px; line-height: 1.6; padding: 12px 14px 12px 16px; background: #f6efe2; border-left: 3px solid var(--marigold); border-radius: 0 8px 8px 0; }
+.ps5 { color: var(--rose); font-weight: 600; }
+.love { font-family: var(--hand); font-size: 40px; color: var(--rose); margin: 8px 0 0; line-height: 1.1; }
+.sign { font-family: var(--hand); font-size: 34px; color: var(--rose); margin-top: 6px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-bottom: 72px; }
+button {
+  font: 600 15px var(--body);
+  border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer;
+  background: var(--marigold); color: #2a1c05;
+  transition: transform .15s ease;
+}
+button.ghost { background: transparent; color: var(--paper); box-shadow: inset 0 0 0 1.5px rgba(251,247,239,.4); }
+button:hover { transform: translateY(-1px); }
+button:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+.lock { padding-top: 18vh; text-align: center; }
+.lock p { color: var(--paper); opacity: .8; margin: 0; }
+.lock form { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.lock input { font: 15px var(--body); padding: 12px 16px; border-radius: 999px; border: 1.5px solid rgba(251,247,239,.4); background: transparent; color: var(--paper); min-width: 240px; }
+.lock .err { color: var(--rose); opacity: 1; }
+</style>
+</head>
+<body>
+<div class="wrap lock" id="lock">
+  <div class="eyebrow">Private card</div>
+  <p>This card opens only with its private link.</p>
+  <form id="keyform"><input id="keyin" aria-label="Access key" placeholder="Paste the access key" autocomplete="off"> <button type="submit">Unlock</button></form>
+  <p id="keyerr" class="err" hidden>That key doesn't open this card.</p>
+</div>
+<div id="card"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script>
+const BLOB = "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";
+function b64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+async function unlock(k) {
+  const raw = b64(k.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - k.length % 4) % 4));
+  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  const data = b64(BLOB);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: data.slice(0, 12) }, key, data.slice(12));
+  document.getElementById('lock').remove();
+  document.getElementById('card').innerHTML = new TextDecoder().decode(plain);
+  start();
+}
+function tryKey(k) { return unlock(k.trim()).then(() => true, () => false); }
+const fromHash = new URLSearchParams(location.hash.slice(1)).get('k');
+if (fromHash) tryKey(fromHash).then(ok => { if (!ok) document.getElementById('keyerr').hidden = false; });
+document.getElementById('keyform').addEventListener('submit', e => {
+  e.preventDefault();
+  const k = document.getElementById('keyin').value;
+  tryKey(k).then(ok => { if (ok) history.replaceState(null, '', '#k=' + k.trim()); else document.getElementById('keyerr').hidden = false; });
+});
+function start() {
+  const inside = document.getElementById('inside');
+  const openBtn = document.getElementById('open');
+  const fx = document.getElementById('fx');
+  const ctx = fx.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let bits = [], running = false;
+
+  function size() { fx.width = innerWidth * devicePixelRatio; fx.height = innerHeight * devicePixelRatio; }
+  addEventListener('resize', size); size();
+
+  function burst() {
+    if (reduce) return;
+    const colors = ['#f2a93b', '#e46f7f', '#fbf7ef', '#8fd3c1', '#b9a4f5'];
+    for (let i = 0; i < 160; i++) {
+      bits.push({
+        x: fx.width / 2, y: fx.height * 0.45,
+        vx: (Math.random() - 0.5) * 18 * devicePixelRatio,
+        vy: (Math.random() * -16 - 4) * devicePixelRatio,
+        r: (Math.random() * 5 + 3) * devicePixelRatio,
+        c: colors[i % colors.length], a: Math.random() * 6, life: 0
+      });
+    }
+    if (!running) { running = true; requestAnimationFrame(tick); }
+  }
+  function tick() {
+    ctx.clearRect(0, 0, fx.width, fx.height);
+    bits.forEach(b => { b.vy += 0.45 * devicePixelRatio; b.x += b.vx; b.y += b.vy; b.a += 0.12; b.life++;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a); ctx.fillStyle = b.c; ctx.fillRect(-b.r, -b.r / 2, b.r * 2, b.r); ctx.restore(); });
+    bits = bits.filter(b => b.y < fx.height + 40 && b.life < 240);
+    if (bits.length) requestAnimationFrame(tick); else { running = false; ctx.clearRect(0, 0, fx.width, fx.height); }
+  }
+
+  openBtn.addEventListener('click', () => {
+    const show = inside.hidden;
+    inside.hidden = !show;
+    openBtn.textContent = show ? 'Close the card' : 'Open the card';
+    if (show) { burst(); inside.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); }
+  });
+  document.getElementById('cheer').addEventListener('click', burst);
+}
+</script>
+</body>
+</html>
