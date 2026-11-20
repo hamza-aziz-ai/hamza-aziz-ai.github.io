@@ -9,7 +9,7 @@ set -eu
 rm -rf _site
 mkdir _site
 cp -R index.html 404.html chat.html matrimony.html robots.txt sitemap.xml CNAME \
-      assets 404-assets projects hamza-aziz-resume matrimony _site/
+      assets 404-assets projects hamza-aziz-resume matrimony for-khyati-dab972 _site/
 rm -rf _site/404-assets/scss
 
 # Browsers and Cloudflare keep scripts and stylesheets for 4 hours, so give
