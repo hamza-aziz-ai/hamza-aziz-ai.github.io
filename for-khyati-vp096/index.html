@@ -115,55 +115,44 @@ button:hover { transform: translateY(-1px); }
 button:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
 canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
 @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+.lock { padding-top: 18vh; text-align: center; }
+.lock p { color: var(--paper); opacity: .8; margin: 0; }
+.lock form { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.lock input { font: 15px var(--body); padding: 12px 16px; border-radius: 999px; border: 1.5px solid rgba(251,247,239,.4); background: transparent; color: var(--paper); min-width: 240px; }
+.lock .err { color: var(--rose); opacity: 1; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="eyebrow">Last working day &middot; 20 November 2026</div>
-  <article class="card" aria-label="Farewell card for Khyati">
-    <section class="cover">
-      <span class="date">To Khyati Khaitan &middot; AI Product Engineer</span>
-      <h1>Lane 1 is still<br><em>listening.</em></h1>
-      <p>Your last day at VoicePlug, and the drive-thru lanes are about to get a lot quieter.</p>
-      <div class="ticket" aria-label="Order ticket">
-        <div class="ticket__head"><span>ORDER #VP096</span><span>LANE 1</span><span>20 NOV 2026</span></div>
-        <div class="ticket__row"><span>1&times; Thank you</span><span>large</span></div>
-        <div class="ticket__row"><span>1&times; Good luck</span><span>extra</span></div>
-        <div class="ticket__row"><span>1&times; Stay in touch</span><span>no substitutions</span></div>
-        <div class="ticket__row"><span>1&times; PS5 Digital (slim)</span><span>still pending &#128527;</span></div>
-        <div class="ticket__row"><span>SHIFT</span><span>DEC 2025 &ndash; NOV 2026</span></div>
-        <div class="ticket__total"><span>STATUS</span><span>ACCEPTED BY POS &#10003;</span></div>
-      </div>
-    </section>
-    <section class="inside" id="inside" hidden>
-      <p>Dear Khyati,</p>
-      <p>On 20 October you told me, &ldquo;Mera toh last November 20th hai. Phir tumko hi sambhalna hai sab.&rdquo; Well, it is November 20th. I'll try, but GINA is going to miss you, and so am I.</p>
-      <p>From the day you joined in December 2025, you worked the hardest part of this job alongside me: the mishearings, the vague menu names, and the orders a POS would refuse. Together we took live ordering from 25&ndash;30% to more than 60% across real restaurants. A good part of that number is yours, and it leaves with you.</p>
-      <p>Endings at work don't always arrive the way we would choose them. Whatever the circumstances, they say nothing about what you are worth. Your record speaks for itself, from the Gold Award at Bank of America to the fixes you shipped here and the 700+ problems on LeetCode.</p>
-      <h2 class="memories__title">Things I'll remember</h2>
-      <ul class="memories">
-        <li>Your 11 pm GINA questions, like whether two cart-update workers can write the same session at once. (They can't. You knew that. You just wanted to be sure.)</li>
-        <li>Your finance chatbot going live on Streamlit, and you fixing it the same evening I called it too rigid.</li>
-        <li>&ldquo;Chalo ab PS5 dilao phir.&rdquo; You still owe me one. The offer letter you get next is the perfect excuse: <a class="ps5" href="https://amzn.in/d/08O592SL" target="_blank" rel="noopener">here is the exact one</a>.</li>
-        <li>The Sunday Swap questionnaire. Chatpata hai. Build the website, add the AI analysis at the end, and send me the link first.</li>
-      </ul>
-      <p>The interviews will turn into an offer. And on the days when nothing comes back from anywhere, remember what I told you on 5 November: <strong>chinta mat karo, main hoon na.</strong> Referrals, mock interviews, a second pair of eyes on a CV, just ask.</p>
-      <ul class="wishes" aria-label="Wishes">
-        <li>Thank you</li><li>Stay in touch</li><li>Big things ahead</li><li>I'll miss working with you</li>
-      </ul>
-      <p class="love">I love you.</p>
-      <div class="sign">Noiiiceee things ahead. Your teammate, Hamza</div>
-    </section>
-  </article>
-  <div class="actions">
-    <button id="open" type="button">Open the card</button>
-    <button id="cheer" class="ghost" type="button">Send good wishes</button>
-  </div>
+<div class="wrap lock" id="lock">
+  <div class="eyebrow">Private card</div>
+  <p>This card opens only with its private link.</p>
+  <form id="keyform"><input id="keyin" aria-label="Access key" placeholder="Paste the access key" autocomplete="off"> <button type="submit">Unlock</button></form>
+  <p id="keyerr" class="err" hidden>That key doesn't open this card.</p>
 </div>
+<div id="card"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 
 <script>
-(function () {
+const BLOB = "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";
+function b64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+async function unlock(k) {
+  const raw = b64(k.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - k.length % 4) % 4));
+  const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  const data = b64(BLOB);
+  const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: data.slice(0, 12) }, key, data.slice(12));
+  document.getElementById('lock').remove();
+  document.getElementById('card').innerHTML = new TextDecoder().decode(plain);
+  start();
+}
+function tryKey(k) { return unlock(k.trim()).then(() => true, () => false); }
+const fromHash = new URLSearchParams(location.hash.slice(1)).get('k');
+if (fromHash) tryKey(fromHash).then(ok => { if (!ok) document.getElementById('keyerr').hidden = false; });
+document.getElementById('keyform').addEventListener('submit', e => {
+  e.preventDefault();
+  const k = document.getElementById('keyin').value;
+  tryKey(k).then(ok => { if (ok) history.replaceState(null, '', '#k=' + k.trim()); else document.getElementById('keyerr').hidden = false; });
+});
+function start() {
   const inside = document.getElementById('inside');
   const openBtn = document.getElementById('open');
   const fx = document.getElementById('fx');
@@ -203,7 +192,7 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
     if (show) { burst(); inside.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' }); }
   });
   document.getElementById('cheer').addEventListener('click', burst);
-})();
+}
 </script>
 </body>
 </html>
