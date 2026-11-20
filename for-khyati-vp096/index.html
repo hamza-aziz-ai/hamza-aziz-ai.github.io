@@ -23,7 +23,7 @@
   --hand: "Caveat", "Segoe Script", cursive;
   color-scheme: dark;
 }
-html, body { height: 100%; }
+html { min-height: 100%; }
 body {
   background: radial-gradient(120% 90% at 50% 0%, var(--ground-2), var(--ground) 70%);
   color: var(--paper);
@@ -92,7 +92,7 @@ body {
 .ps5 { color: var(--rose); font-weight: 600; }
 .love { font-family: var(--hand); font-size: 40px; color: var(--rose); margin: 8px 0 0; line-height: 1.1; }
 .sign { font-family: var(--hand); font-size: 34px; color: var(--rose); margin-top: 6px; }
-.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-bottom: 72px; }
 button {
   font: 600 15px var(--body);
   border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer;
