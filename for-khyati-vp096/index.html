@@ -86,6 +86,9 @@ body {
 .inside p { margin: 0; font-size: 17px; line-height: 1.7; }
 .wishes { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 4px 0 0; }
 .wishes li { font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 999px; background: #f3e9d6; color: var(--ink); }
+.memories__title { font-family: var(--display); font-weight: 400; font-size: 24px; margin: 8px 0 0; color: var(--ink); }
+.memories { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.memories li { font-size: 16px; line-height: 1.6; padding: 12px 14px 12px 16px; background: #f6efe2; border-left: 3px solid var(--marigold); border-radius: 0 8px 8px 0; }
 .sign { font-family: var(--hand); font-size: 34px; color: var(--rose); margin-top: 6px; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 button {
@@ -114,19 +117,29 @@ canvas { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
         <div class="ticket__row"><span>1&times; Thank you</span><span>large</span></div>
         <div class="ticket__row"><span>1&times; Good luck</span><span>extra</span></div>
         <div class="ticket__row"><span>1&times; Stay in touch</span><span>no substitutions</span></div>
+        <div class="ticket__row"><span>1&times; PS5 Digital (slim)</span><span>still pending &#128527;</span></div>
         <div class="ticket__row"><span>SHIFT</span><span>DEC 2025 &ndash; NOV 2026</span></div>
         <div class="ticket__total"><span>STATUS</span><span>ACCEPTED BY POS &#10003;</span></div>
       </div>
     </section>
     <section class="inside" id="inside" hidden>
       <p>Dear Khyati,</p>
+      <p>On 20 October you told me, &ldquo;Mera toh last November 20th hai. Phir tumko hi sambhalna hai sab.&rdquo; Well, it is November 20th. I'll try, but GINA is going to miss you, and so am I.</p>
       <p>From the day you joined in December 2025, you worked the hardest part of this job alongside me: the mishearings, the vague menu names, and the orders a POS would refuse. Together we took live ordering from 25&ndash;30% to more than 60% across real restaurants. A good part of that number is yours, and it leaves with you.</p>
       <p>Endings at work don't always arrive the way we would choose them. Whatever the circumstances, they say nothing about what you are worth. Your record speaks for itself, from the Gold Award at Bank of America to the fixes you shipped here and the 570+ problems on LeetCode.</p>
-      <p>The next team you join is lucky. Keep in touch, and if I can ever help with a referral, a reference or a mock interview, just ask.</p>
+      <h2 class="memories__title">Things I'll remember</h2>
+      <ul class="memories">
+        <li>Your 11 pm GINA questions, like whether two cart-update workers can write the same session at once. (They can't. You knew that. You just wanted to be sure.)</li>
+        <li>Searching your name and seeing your own site come up first. <em>Sabse pehle apna hi name.</em> SEO successful &#128524;</li>
+        <li>&ldquo;Daily problem ka link bhjo na.&rdquo; Every single time.</li>
+        <li>Your finance chatbot going live on Streamlit, and you fixing it the same evening I called it too rigid.</li>
+        <li>The Sunday Swap questionnaire. Chatpata hai. Build the website, add the AI analysis at the end, and send me the link first.</li>
+      </ul>
+      <p>The interviews will turn into an offer. And on the days when nothing comes back from anywhere, remember what I told you on 5 November: <strong>chinta mat karo, main hoon na.</strong> Referrals, mock interviews, a second pair of eyes on a CV, just ask.</p>
       <ul class="wishes" aria-label="Wishes">
         <li>Thank you</li><li>Stay in touch</li><li>Big things ahead</li><li>I'll miss working with you</li>
       </ul>
-      <div class="sign">Your teammate, Hamza</div>
+      <div class="sign">Noiiiceee things ahead. Your teammate, Hamza</div>
     </section>
   </article>
   <div class="actions">
